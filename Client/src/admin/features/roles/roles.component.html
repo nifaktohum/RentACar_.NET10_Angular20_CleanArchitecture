@@ -1,0 +1,130 @@
+<!-- Rollerin listesi -->
+<div class="roles-card">
+  <div class="card-header">
+    <div class="header-title">
+      <h3>Dinamik Rol Tanımlamaları</h3>
+      <p>Sistemdeki rolleri, açıklamalarını ve aktif kullanıcı sayılarını buradan yönetebilirsiniz.</p>
+    </div>
+    <div class="p-button-list">
+      <p-button (onClick)="openRoleDialog()" class="p-button-add" icon="ri-add-large-line" pTooltip="Şube Ekle"
+        tooltipPosition="top" pRipple [raised]="true"></p-button>
+      <p-button class="p-button-menu" severity="info" icon="ri-menu-line" [raised]="true" pRipple></p-button>
+      <p-button class="p-button-reset" severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile"
+        tooltipPosition="top" (onClick)=" refreshData()" [loading]="isLoading()" [raised]="true"></p-button>
+      <div class="header-actions">
+      </div>
+    </div>
+  </div>
+
+  <div class="role-management-wrapper">
+    <p-table #dt [value]="roles()" [rows]="5" [paginator]="true" [globalFilterFields]="['name', 'description']"
+      responsiveLayout="scroll">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 30%">Rol Bilgisi</th>
+          <th style="width: 40%">Açıklama</th>
+          <th style="width: 15%; text-align: center;">Kullanıcı Sayısı</th>
+          <th style="width: 15%; text-align: center;">İşlemler</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-role>
+        <tr>
+          <!-- // Rol Bilgisi -->
+          <td>
+            <div class="role-info">
+              <span class="role-name">{{ role.name }}</span>
+              <span class="role-id">{{ role.id.toLowerCase() }}</span>
+            </div>
+          </td>
+          <!-- // Açıklama -->
+          <td>
+            <span class="role-desc">{{ role.description }}</span>
+          </td>
+          <!-- // Kullanıcı Sayısı -->
+          <td style="text-align: center;">
+            <span class="user-badge">{{ role.userCount }} Kullanıcı</span>
+          </td>
+          <!-- // İşlemler -->
+          <td style="text-align: center;">
+            <div class="action-buttons">
+              <button pButton icon="ri-shield-keyhole-line ri-1x" class="p-button-rounded p-button-text btn-permission"
+                (click)="openPermissionDialog(role)" pTooltip="Yetkileri Yönet" title="Yetkiler" tooltipPosition="top">
+              </button>
+              <button pButton icon="ri-edit-line ri-1x" class="p-button-rounded p-button-text btn-edit" title="Düzenle"
+                (click)="openEditRoleDialog(role)">
+              </button>
+              <button pButton icon="ri-delete-bin-line ri-1x" class="p-button-rounded p-button-text btn-delete"
+                title="Sil" (click)="deleteRole(role.id, role.name)">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="table-empty">Aradığın kriterde bir rol bulunamadı.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+
+
+<!-- Dialog Rol ekleme -->
+<p-dialog header="Yeni Rol Tanımlama" [(visible)]="isRoleDialogVisible" [modal]="true"
+  [style]="{ width: '450px', margin: '20px' }" [draggable]="false" [resizable]="false"
+  styleClass="p-fluid modern-dialog">
+
+  <div class="modern-form-container">
+    <p-floatlabel variant="on">
+      <input id="role" pInputText [(ngModel)]="newRole.name" autocomplete="off" placeholder="" />
+      <label for="role">Rol Ekle</label>
+    </p-floatlabel>
+
+    <p-floatlabel variant="on">
+      <textarea id="description" pInputTextarea [(ngModel)]="newRole.description" autocomplete="off" placeholder=" "
+        rows="3">
+        </textarea>
+      <label for="description">Açıklama Ekle</label>
+    </p-floatlabel>
+
+    <div>
+      <button pButton label="İptal" icon="ri-close-line" class="p-button-text p-button-secondary"
+        (click)="closeRoleDialog()">
+      </button>
+      <button pButton label="Kaydet" icon="ri-save-line" class="p-button-raised p-button-primary"
+        [loading]="isLoading()" (click)="saveRole()">
+      </button>
+    </div>
+  </div>
+
+
+</p-dialog>
+
+<!-- Permission list -->
+<p-dialog [header]="dialogHeader()" [(visible)]="isPermissionDialogVisible" [modal]="true"
+  [style]="{ width: '500px', margin: '20px' }" [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+  <div class="permission-list-container">
+
+    @for (perm of computedPermissions(); track perm.id) {
+    <div class="permission-item">
+      <div class="permission-info">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="module-badge">{{ perm.name.split('.')[0] }}</span>
+          <strong class="action-name">{{ perm.name.split('.')[1] }}</strong>
+        </div>
+        <small class="text-muted">{{ perm.description }}</small>
+      </div>
+
+<p-toggleSwitch [ngModel]="perm.isActive" ngDefaultControl (click)="onToggleClick(perm, $event)">
+</p-toggleSwitch>
+    </div>
+    } @empty {
+    <p class="table-empty-message">Bu role ait izin bulunamadı.</p>
+    }
+  </div>
+</p-dialog>

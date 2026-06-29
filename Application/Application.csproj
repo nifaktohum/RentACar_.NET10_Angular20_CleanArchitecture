@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />    <!-- tüm validator sınıflarını tek bir satırla IoC Container'a kaydeder -->
+    <PackageReference Include="Mapster" Version="10.0.7" />  <!-- nesneleri birbirine dönüştürme -->  
+    <PackageReference Include="MediatR" Version="14.1.0" />  
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />  
+    <PackageReference Include="TS.Result" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Domain.csproj" />
+  </ItemGroup>
+
+</Project>
+
+<!-- MediatR ==>
+  
+      Ne yapıyorum peki?
+              "Gelen her isteği alır, 'Bu işin uzmanı kim?' diye bakarım ve ona yönlendiririm. 
+              Tıpkı bir restoranda garsonun siprişi mutfağa değil de, 'servis şefi'ne vermesi gibi. 
+              Şef bilir hangi aşçının bu yemeği yapacağını."
+
+      "Tek bir istek at, tek bir cevap al. Klasik işler bunlar."                      ===> Request/Response
+      "Bir şey duyur, isteyen dinlesin. Kimin dinlediğini bilmek zorunda değilsin."   ===> Notification
+      "Büyük işleri parça parça gönderebilirsin, sıkma canını."	                      ===> StreamRequest
+
+      "Asıl gücüm şu: Bir istek bana geldiğinde, onu asıl işleyiciye (handler) göndermeden önce araya bir şeyler sokabilirim. 
+      Mesela:
+              'Bu isteği logla bakalım...'
+              'Geçerli bir istek mi? Doğrula önce...'
+              'Bu sorguyu daha önce yapmış mıydık? Cevap zaten varsa boşuna işlem yapma...'
+            Buna Pipeline Behavior diyorum. Benim süper gücüm bu."
+
+    - "Sen bana ne yapmak istediğini söyle (IRequest), ben onu yapacak kişiyi bulurum (Handler). 
+      Kimin yaptığını bilmek zorunda değilsin. Sen işine bak, iletişim benden sorulur."
+ -->

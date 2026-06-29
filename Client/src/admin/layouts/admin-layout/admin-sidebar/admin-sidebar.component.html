@@ -1,0 +1,92 @@
+<!-- admin-sidebar.component.html -->
+<nav class="sidebar">
+
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <div class="sidebar-brand">
+      <i class="ri-car-fill brand-icon"></i>
+      @if (!isCollapsed()) {
+      <span class="brand-text">RentCar</span>
+      <span class="admin-badge">Admin</span>
+      }
+    </div>
+    @if (!isCollapsed()) {
+    <div class="arrow-icon" (click)="visible()">
+      <i class="ri-arrow-left-circle-line"></i>
+    </div>
+    }
+  </div>
+
+  <!-- Sidebar Content -->
+  <div class="sidebar-content">
+    <ul class="sidebar-menu">
+      @for ( _nav of navigatios(); track _nav.title) {
+
+      <!-- Dashboard (Düz Link) -->
+      @if (!_nav.haveSubMenu) {
+
+      <li class="menu-item">
+        <a class="menu-link" [routerLink]="_nav.url" routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: true}">
+          <i [ngClass]="_nav.icon"></i>
+          @if (!isCollapsed()) {
+          <span class="menu-text">{{_nav.title}}</span>
+          }
+        </a>
+      </li>
+      } @else {
+
+      <!-- Araçlar (Alt Menülü Örnek - Açık Durum için 'open' class'ı eklenir) -->
+      <li class="menu-item" [class.open]="openSubmenus()[_nav.title.toLowerCase()]">
+        <a class="menu-link" (click)="toggleSubmenu(_nav.title.toLowerCase(), $event)">
+          <i [ngClass]="_nav.icon"></i>
+          @if (!isCollapsed()) {
+          <span class="menu-text">{{_nav.title}}</span>
+          <i class="ri-arrow-right-s-line menu-arrow"></i>
+          }
+        </a>
+
+        <!-- @if kaldırıldı, submenu her zaman DOM'da -->
+        <ul class="submenu" [class.submenu--visible]="!isCollapsed() && openSubmenus()[_nav.title.toLowerCase()]">
+          @for (_subNav of _nav.subMenus; track _subNav.title) {
+          <li>
+            <a [routerLink]="_subNav.url" routerLinkActive="sub-active" [routerLinkActiveOptions]="{exact: true}">
+              {{_subNav.title}}
+            </a>
+          </li>
+          }
+        </ul>
+      </li>
+      }
+
+      }
+      <li class="menu-divider"></li>
+
+      <!-- Ayarlar -->
+      <li class="menu-item">
+        <a class="menu-link">
+          <i class="ri-settings-3-line"></i>
+          @if (!isCollapsed()) {
+          <span class="menu-text">Ayarlar</span>
+          }
+          <i class="ri-arrow-right-s-line menu-arrow"></i>
+        </a>
+      </li>
+
+    </ul>
+
+  </div>
+
+  <!-- Sidebar Footer -->
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">
+        <img src="images/profile.png" alt="Admin">
+      </div>
+      <div class="user-details">
+        <span class="user-name">{{current()?.Email}}</span>
+        <span class="user-role">{{current()?.BranchId }}</span>
+      </div>
+    </div>
+  </div>
+</nav>

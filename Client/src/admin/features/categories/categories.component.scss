@@ -1,0 +1,195 @@
+// src/app/modules/admin/categories/category-list/category-list.component.scss
+
+::ng-deep .category-card {
+  background: var(--surface-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .header-title {
+      h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+      p {
+        margin: 0.25rem 0 0 0;
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+      }
+    }
+
+    .p-button-list {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+  }
+
+  .p-datatable-table-container {
+    .p-datatable-thead > tr > th {
+      background: var(--admin-primary); // Koyu lacivert asalet!
+      color: var(--admin-white);
+      padding: 2px 5px !important;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: none;
+    }
+
+    .p-select-label {
+      padding-block: 3px !important;
+      font-size: 12px !important;
+      color: green;
+    }
+
+    .deleted-row {
+      opacity: 0.5;
+      background: var(--surface-ground);
+    }
+
+    .category-info {
+      display: flex;
+      align-items: center;
+      transition: padding 0.3s ease; // Yumuşak geçiş için
+
+      // Level 0 (Ana Kategori)
+      &.level-0 {
+        padding-left: 0;
+        .category-name {
+          font-weight: 600;
+          color: #334155;
+        }
+      }
+
+      // Level 1 (Alt Kategori)
+      &.level-1 {
+        padding-left: 30px;
+        .category-name {
+          font-weight: 400;
+          color: #64748b;
+
+          // İsteğe bağlı: "↳" işaretini pseudo-element ile de ekleyebilirsin
+          &::before {
+            content: '↳';
+            margin-right: 8px;
+            opacity: 0.7;
+          }
+        }
+      }
+    }
+
+    .category-slug {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      background: var(--surface-ground);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .category-desc {
+      font-size: 0.85rem;
+      color: var(--text-color-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .category-order {
+      display: inline-block;
+      text-align: center;
+      min-width: 30px;
+      padding: 0.15rem 0.5rem;
+      background: var(--surface-ground);
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .category-tag {
+      text-align: center;
+      font-size: 25px;
+      gap: 0.5rem;
+      i {
+        border-radius: 50%;
+        margin: 10px;
+        // box-shadow:
+        //   rgba(0, 0, 0, 0.09) 0px 8px 4px,
+        //   rgba(0, 0, 0, 0.09) 0px 16px 8px,
+        //   rgba(0, 0, 0, 0.09) 0px 32px 16px;
+
+        border-bottom: 1px solid #10b981 !important;
+        top: 22px;
+      }
+      .checkbox-active {
+        color: #22c55e !important;
+      }
+      .checkbox-pasif {
+        color: #ef4444 !important;
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      font-size: 22px;
+      gap: 0.5rem;
+
+      .p-button-rounded {
+        font-size: 20px;
+        &.btn-permissions {
+          color: #10b981 !important;
+          border-bottom: 1px solid #10b981 !important;
+          &:hover {
+            background: rgba(16, 185, 129, 0.15) !important;
+          }
+        }
+        &.btn-edit {
+          color: #60a5fa !important;
+          border-bottom: 1px solid #60a5fa !important;
+          &:hover {
+            background: rgba(96, 165, 250, 0.15) !important;
+          }
+        }
+        &.btn-delete {
+          color: #f87171 !important;
+          border-bottom: 1px solid #f87171 !important;
+          &:hover {
+            background: rgba(248, 113, 113, 0.15) !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// Table Empty State
+.table-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-color-secondary);
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .admin-card {
+    .card-header {
+      flex-direction: column;
+      align-items: stretch;
+
+      .p-button-list {
+        justify-content: flex-start;
+      }
+    }
+  }
+}

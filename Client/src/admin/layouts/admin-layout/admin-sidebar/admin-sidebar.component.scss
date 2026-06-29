@@ -1,0 +1,284 @@
+// ==========================================================================
+// ADMIN SIDEBAR COMPONENT SCSS
+// ==========================================================================
+
+.sidebar {
+  background-color: var(--admin-primary);
+  color: var(--admin-white);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--admin-primary-dark);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-x: hidden;
+  font-family: var(--font-family-main); // Global modern font ailesi garanti altına alındı
+
+  // ------------------------------------------------------------------------
+  // SIDEBAR DARALTILDIĞINDA TETİKLENECEK CSS (.sidebar.collapsed)
+  // ------------------------------------------------------------------------
+  &.collapsed {
+    .sidebar-header {
+      justify-content: center;
+      padding: 0;
+
+      // Daraldığında marka metni ve badge gizlenmeli ki taşmasın
+      .brand-text,
+      .admin-badge {
+        display: none !important;
+      }
+    }
+
+    .sidebar-content {
+      .menu-item {
+        .menu-link {
+          justify-content: center;
+          padding: 0.75rem;
+
+          // Daraldığında menü yazısı ve sağ ok gizlenmeli
+          .menu-text,
+          .menu-arrow {
+            display: none !important;
+          }
+        }
+
+        // Daraldığında alt menü açık kalsa bile gizlenmeli
+        .submenu {
+          display: none !important;
+        }
+      }
+    }
+
+    .sidebar-footer {
+      padding: 1rem 0;
+      display: flex;
+      justify-content: center;
+
+      // Daraldığında kullanıcı detayları gizlenmeli, sadece avatar kalmalı
+      .user-details {
+        display: none !important;
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------------
+  // HEADER BÖLÜMÜ (Logo alanı)
+  // ------------------------------------------------------------------------
+  .sidebar-header {
+    height: var(--navbar-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+
+      .brand-icon {
+        font-size: 1.35rem; // Kocaman görünmemesi için hafif küçültüldü
+        color: var(--admin-accent); // Admin bütünlüğü için tek tona çekildi
+        line-height: 1;
+      }
+
+      .brand-text {
+        font-weight: 700;
+        font-size: 1.05rem; // 1.2rem'den çekildi (Yazı tipi küçültme isteğine uygun)
+        letter-spacing: 0.25px;
+        color: var(--admin-white);
+      }
+
+      .admin-badge {
+        font-size: 0.6rem; // Küçültüldü
+        background-color: rgba(56, 189, 248, 0.1); // Admin accent opak versiyonu
+        color: var(--admin-accent);
+        padding: 0.15rem 0.35rem;
+        border-radius: 4px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+    }
+    .arrow-icon {
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  }
+
+  // ------------------------------------------------------------------------
+  // MENÜ LİSTESİ İÇERİK ALANI
+  // ------------------------------------------------------------------------
+  .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem 0;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      .menu-divider {
+        height: 1px;
+        background-color: rgba(255, 255, 255, 0.04);
+        margin: 0.75rem 1.25rem;
+      }
+
+      .menu-item {
+        padding: 0.15rem 0.75rem;
+        position: relative;
+
+        .menu-link {
+          display: flex;
+          align-items: center;
+          gap: 0.875rem;
+          padding: 0.625rem 0.875rem; // Padding'ler azaltılarak daha kibar bir menü elde edildi
+          color: var(--admin-text-muted);
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: 500;
+          font-size: 0.875rem; // Kocaman görünmemesi için 0.95rem'den standart admin boyutuna çekildi
+          transition: all 0.2s ease;
+
+          i:not(.menu-arrow) {
+            font-size: 1.15rem; // İkonlar hafif dengelendi
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .menu-arrow {
+            margin-left: auto;
+            font-size: 1rem;
+            line-height: 1;
+            transition: transform 0.2s ease;
+          }
+
+          &:hover {
+            color: var(--admin-white);
+            background-color: rgba(255, 255, 255, 0.03);
+          }
+
+          // Aktif Ana Menü Tasarımı
+          &.active {
+            color: var(--admin-white);
+            background: linear-gradient(135deg, var(--admin-accent), var(--admin-accent-dark));
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.15);
+
+            i {
+              color: var(--admin-white);
+            }
+          }
+        }
+
+        // Açık olan menü öğesi (.menu-item.open)
+        &.open {
+          .menu-link {
+            color: var(--admin-white);
+            .menu-arrow {
+              transform: rotate(90deg);
+            }
+          }
+        }
+
+        // Alt Menü Listesi (Submenu)
+        .submenu {
+          max-height: 0;
+          opacity: 0;
+          overflow: hidden;
+          padding: 0 0 0 2.25rem;
+          transition:
+            max-height 0.3s ease,
+            opacity 0.3s ease,
+            padding 0.3s ease;
+
+          li {
+            padding: 0.15rem 0;
+
+            a {
+              display: block;
+              padding: 0.35rem 0.75rem;
+              color: var(--admin-text-muted);
+              text-decoration: none;
+              font-size: 0.8rem; // Küçültüldü
+              border-radius: 4px;
+              transition: all 0.15s ease;
+
+              &:hover {
+                color: var(--admin-accent);
+                padding-left: 0.9rem;
+              }
+
+              &.sub-active {
+                color: var(--admin-accent);
+                font-weight: 600;
+                background-color: rgba(56, 189, 248, 0.05);
+              }
+            }
+          }
+
+          // Açık hali
+          &--visible {
+            max-height: 300px;
+            opacity: 1;
+            padding: 0.35rem 0 0.5rem 2.25rem;
+          }
+        }
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------------
+  // FOOTER ALANI (Profil Kartı)
+  // ------------------------------------------------------------------------
+  .sidebar-footer {
+    padding: 0.875rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    background-color: rgba(0, 0, 0, 0.15);
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+
+      .user-avatar {
+        img {
+          width: 36px; // 40px'den düşürülerek daha estetik yapıldı
+          height: 36px;
+          border-radius: 8px;
+          object-fit: cover;
+          border: 1.5px solid rgba(255, 255, 255, 0.08);
+        }
+      }
+
+      .user-details {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .user-name {
+          font-weight: 600;
+          font-size: 0.8rem; // Küçültüldü
+          color: var(--admin-white);
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .user-role {
+          font-size: 0.7rem; // Küçültüldü
+          color: var(--admin-text-muted);
+        }
+      }
+    }
+  }
+}

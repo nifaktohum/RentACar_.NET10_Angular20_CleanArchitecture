@@ -1,0 +1,95 @@
+<header class="navbar-custom">
+  <div class="navbar-content">
+
+    <div class="navbar-left">
+      <nav class="custom-breadcrumb">
+        <app-braadcrumb></app-braadcrumb>
+      </nav>
+    </div>
+
+    <div class="navbar-right">
+
+      <div class="custom-dropdown" [class.active]="activeDropdown() === 'notifications'">
+        <button class="notification-btn" (click)="toggleDropdown('notifications', $event)">
+          <i class="ri-notification-3-line"></i>
+          <span class="notification-badge">3</span>
+        </button>
+
+        <div class="dropdown-panel notification-menu">
+          <div class="notification-header">
+            <h6>Bildirimler</h6>
+            <span class="badge-new">3 Yeni</span>
+          </div>
+          <div class="dropdown-divider"></div>
+
+          <div class="notification-item">
+            <div class="notification-icon bg-success">
+              <i class="ri-checkbox-circle-line"></i>
+            </div>
+            <div class="notification-content">
+              <h6>Yeni Rezervasyon</h6>
+              <p>BMW 320i için yeni rezervasyon alındı</p>
+              <small>5 dakika önce</small>
+            </div>
+          </div>
+
+          <div class="notification-item">
+            <div class="notification-icon bg-warning">
+              <i class="ri-error-warning-line"></i>
+            </div>
+            <div class="notification-content">
+              <h6>Bakım Hatırlatması</h6>
+              <p>Mercedes C180'in bakım zamanı geldi</p>
+              <small>2 saat önce</small>
+            </div>
+          </div>
+
+          <div class="dropdown-divider"></div>
+          <div class="notification-footer">
+            <a>Tüm Bildirimleri Gör</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="custom-dropdown" [class.active]="activeDropdown() === 'profile'">
+        <button class="profile-btn" (click)="toggleDropdown('profile', $event)">
+          <img src="images/profile.png" alt="Profile" class="profile-avatar">
+          <span class="layout-profile-name">{{ current()?.FullName }}</span>
+          <i class="ri-arrow-down-s-line"></i>
+        </button>
+
+        <div class="dropdown-panel profile-menu">
+          <div class="profile-header">
+            <div class="profile-info">
+              <img src="images/profile.png" alt="Profile">
+              <div>
+                <h6>{{ current()?.FullName}}</h6>
+                <p>{{ current()?.Email }}</p>
+                <span class="role-badge">{{ current()?.Role }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+
+          <a class="dropdown-link-item">
+            <i class="ri-user-line"></i> Profilim
+          </a>
+          <a class="dropdown-link-item">
+            <i class="ri-settings-3-line"></i> Hesap Ayarları
+          </a>
+          <a class="dropdown-link-item">
+            <i class="ri-notification-2-line"></i> Bildirim Ayarları
+          </a>
+          <a class="dropdown-link-item text-warning" (click)="logoutAllDevices()">
+            <i class="ri-device-line"></i> Tüm Cihazlardan Çıkış
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-link-item text-danger" (click)="logout()">
+            <i class="ri-logout-box-r-line"></i> Çıkış Yap
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</header>

@@ -1,0 +1,60 @@
+<!-- ============================================================== -->
+<!-- KATEGORİ EKLE / DÜZENLE DIALOG -->
+==============================================================
+<p-dialog [(visible)]="visible" [header]="dialogTitle" (visibleChange)="close()" [modal]="true" [style]="{ width: '550px', maxWidth: '95vw' }" >
+<!--
+<p-dialog [header]="dialogTitle()" [(visible)]="isDialogVisible" [modal]="true" [style]="{ width: '500px' }"
+  [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+  <div class="modern-form-container">
+
+    <p-floatlabel variant="on">
+      <input id="name" pInputText [(ngModel)]="categoryForm.name" autocomplete="off" placeholder="" />
+      <label for="name">Kategori Adı *</label>
+    </p-floatlabel>
+
+
+    <p-floatlabel variant="on">
+      <input id="slug" pInputText [(ngModel)]="categoryForm.slug" autocomplete="off" placeholder=""
+        (input)="categoryForm.slug = categoryForm.slug.toLowerCase().replace(/\s/g, '-')" />
+      <label for="slug">Slug *</label>
+    </p-floatlabel>
+
+
+    <p-floatlabel variant="on">
+      <input id="description" pInputText [(ngModel)]="categoryForm.description" autocomplete="off" placeholder="" />
+      <label for="description">Açıklama</label>
+    </p-floatlabel>
+
+
+    <p-floatlabel variant="on">
+      <input id="displayOrder" pInputText type="number" [(ngModel)]="categoryForm.displayOrder" autocomplete="off"
+        placeholder="" />
+      <label for="displayOrder">Görüntüleme Sırası</label>
+    </p-floatlabel>
+
+
+    <p-floatlabel variant="on">
+      <p-select [options]="parentCategories()" optionLabel="name" optionValue="id"
+        [(ngModel)]="categoryForm.parentCategoryId" placeholder="Üst Kategori Seçiniz" [showClear]="true">
+        <ng-template pTemplate="selectedItem" let-item>
+          {{ item ? item.name : 'Üst Kategori Seçiniz' }}
+        </ng-template>
+      </p-select>
+      <label>Üst Kategori</label>
+    </p-floatlabel>
+
+
+    <div class="form-toggle">
+      <label>{{ categoryForm.isActive ? '✅ Aktif' : '❌ Pasif' }}</label>
+      <p-toggleSwitch [(ngModel)]="categoryForm.isActive"></p-toggleSwitch>
+    </div>
+
+
+    <div class="form-actions">
+      <button pButton label="İptal" icon="ri-close-line" class="p-button-text p-button-secondary"
+        (click)="closeDialog()"></button>
+      <button pButton label="Kaydet" icon="ri-save-line" class="p-button-raised p-button-primary"
+        [loading]="isLoading()" (click)="saveCategory()"></button>
+    </div>
+  </div>-->
+</p-dialog>

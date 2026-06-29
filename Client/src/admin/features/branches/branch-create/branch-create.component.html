@@ -1,0 +1,86 @@
+<app-blank-nav [pageTitle]="pageTitle()" [pageIcon]="pageIcon()" pageDescription="Sistem içi kiralama operasyonlarında kullanılacak şube detayları."></app-blank-nav>
+
+<div class="branch-form-container">
+
+  <form (ngSubmit)="onSubmit()" #f="ngForm" class="branch-form">
+
+    <div class="form-section">
+      <h3><i class="ri-git-repository-private-line"></i> Genel Bilgiler</h3>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="branchName">Şube Adı *</label>
+          <input type="text" name="name" [(ngModel)]="branchForm().name" required
+            placeholder="Örn: İstanbul Kadıköy Merkez Şubesi" class="form-control" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3><i class="ri-map-pin-line"></i> Adres & İletişim Bilgileri</h3>
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="city">Şehir *</label>
+          <input type="text" name="city" [(ngModel)]="branchForm().address.city" required
+            placeholder="Örn: İstanbul" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label for="district">İlçe *</label>
+          <input type="text" name="district" [(ngModel)]="branchForm().address.district" required
+            placeholder="Örn: Kadıköy" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label for="phone1">Telefon 1 *</label>
+          <input type="tel" name="phone1" [(ngModel)]="branchForm().address.phone1" required
+            placeholder="Örn: +902165554433" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label for="phone2">Telefon 2 (Opsiyonel)</label>
+          <input type="tel" name="phone2" [(ngModel)]="branchForm().address.phone2"
+            placeholder="Örn: +902165554434" class="form-control" />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="email">E-Posta Adresi *</label>
+          <input type="email" name="email" [(ngModel)]="branchForm().address.email" required
+            placeholder="Örn: kadikoy@rentcar.com" class="form-control" />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="fullAddress">Tam Adres *</label>
+          <textarea name="fullAddress" [(ngModel)]="branchForm().address.fullAddress" required rows="3"
+            placeholder="Mahalle, cadde, sokak... " class="form-control"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section status-section">
+      <div class="status-toggle">
+        <label class="switch">
+          <input type="checkbox" name="isActive" [(ngModel)]="branchForm().isActive" />
+          <span class="slider round"></span>
+        </label>
+        <span class="status-text">
+          <strong>Şube Durumu:</strong>
+          <span [class]="branchForm().isActive ? 'text-success' : 'text-danger'">
+            {{ branchForm().isActive ? 'Aktif (Kiralama yapılabilir)' : 'Pasif' }}
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        <i class="ri-close-line"></i> İptal
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="f.invalid">
+        <i [class]="isEditMode() ? 'ri-save-line' : 'ri-check-line'"></i>
+        {{ isEditMode() ? 'Değişiklikleri Kaydet' : 'Şubeyi Oluştur' }}
+      </button>
+    </div>
+
+  </form>
+</div>

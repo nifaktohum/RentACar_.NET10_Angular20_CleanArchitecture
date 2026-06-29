@@ -1,0 +1,40 @@
+.global-loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999; /* Sayfadaki her şeyin (modal, tablo vb.) en üstünde gözüksün */
+  height: 4px;   /* İlerleme çubuğunun yüksekliği kadar alan ayırıyoruz */
+}
+
+/* app.component.scss */
+.debug-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #00ff00;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 99999;
+  pointer-events: none;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;    /* Kutunun içindeki elemanları yatayda ortalar */
+  justify-content: center; /* Kutunun içindeki elemanları dikeyde ortalar */
+  
+  pre {
+    margin: 0;
+    line-height: 1.6;
+    text-align: center;   /* Metni merkeze hizalar */
+    
+    /* 🎯 İNATÇI BOŞLUKLARI EZEN SİHİRLİ DOKUNUŞ: */
+    white-space: pre-line; /* Kod editöründeki gereksiz tab boşluklarını görmezden gelir, sadece satır atlamalarını tutar ve metni ortalar */
+    width: 100%;          /* pre etiketinin kutuyu tam kaplamasını sağlıyoruz ki ortalama düzgün çalışsın */
+  }
+}
+

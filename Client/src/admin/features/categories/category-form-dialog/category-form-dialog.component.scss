@@ -1,0 +1,95 @@
+// Dialog Form Styles
+// .modern-form-container {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 1rem;
+//   padding: 0.5rem 0;
+
+//   .form-toggle {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     padding: 0.5rem 0;
+//     border-top: 1px solid var(--surface-border);
+//     margin-top: 0.5rem;
+//   }
+
+//   .form-actions {
+//     display: flex;
+//     justify-content: flex-end;
+//     gap: 0.75rem;
+//     margin-top: 0.5rem;
+//     padding-top: 0.75rem;
+//     border-top: 1px solid var(--surface-border);
+//   }
+// }
+
+// components/category-form-dialog/category-form-dialog.component.scss
+
+.modern-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0.25rem 0;
+
+  .field-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+    .field-label {
+      font-weight: 500;
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+
+      .required {
+        color: var(--red-500);
+        margin-left: 2px;
+      }
+    }
+
+    .field-hint {
+      font-size: 0.75rem;
+      color: var(--text-color-secondary);
+      margin-top: 0.2rem;
+    }
+
+    .w-full {
+      width: 100%;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--surface-border);
+  }
+}
+
+// Dialog özel stilleri
+::ng-deep {
+  .modern-dialog {
+    .p-dialog-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--surface-border);
+
+      .p-dialog-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+    }
+
+    .p-dialog-content {
+      padding: 1.5rem;
+    }
+  }
+}

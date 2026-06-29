@@ -1,0 +1,194 @@
+ ::ng-deep .branches-container {
+  background-color: #f8fafc; // Hafif modern grimsi arka plan (Slate 50)
+  min-height: 100vh;
+
+  p-card {
+    .p-card-body {
+      padding: 0 10px 0 0 !important;
+    }
+    .p-button-list {
+      display: flex;
+      justify-content: end;
+      h2 {
+        margin-right: auto;
+        border-bottom: 2px solid var(--text-muted);
+        padding-inline: 50px;
+      }
+      p-button .p-button {
+        display: flex;
+        margin-left: 3px;
+        padding: 3px;
+        margin-top: 10px;
+      }
+    }
+  }
+
+  // PrimeNG Tablo Özelleştirmeleri
+  p-table {
+    width: 100%;
+    .p-datatable-thead {
+      tr {
+        th {
+          &.col-name {
+            width: 20%;
+            padding-right: 70px;
+          }
+          &.col-city {
+            width: 15%;
+          }
+          &.col-address {
+            width: 25%;
+            padding-right: 100px;
+          }
+          &.col-phone {
+            width: 15%;
+            padding-right: 20px;
+          }
+          &.col-email {
+            width: 15%;
+          }
+          &.col-status {
+            width: 5% !important;
+          }
+        }
+      }
+    }
+
+    // Satır içi özel hücre tasarımları
+    td {
+      &.branch-name {
+        font-weight: 600;
+        color: #1e293b; // Koyu şık yazı (Slate 800)
+      }
+
+      &.branch-address {
+        font-size: 0.875rem;
+        color: #64748b; // Daha hafif gri adres yazısı (Slate 500)
+      }
+
+      &.empty-table-message {
+        text-align: center;
+        padding: 2rem;
+        color: #94a3b8;
+      }
+    }
+  }
+
+  .role-management-wrapper {
+    .p-datatable-thead > tr > th {
+      white-space: nowrap;
+      text-align: start;
+      vertical-align: middle;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      background: var(--admin-primary);
+      color: var(--admin-white);
+      border-bottom: 2px solid var(--surface-border);
+    }
+
+    .p-datatable-tbody > tr {
+      background: var(--admin-white);
+      color: var(--admin-text);
+      transition: background-color 0.2s;
+
+      &:nth-child(even) {
+        background: var(--admin-light); // Zebra çizgiler kanks
+      }
+
+      &:hover {
+        background: rgba(
+          56,
+          189,
+          248,
+          0.05
+        ) !important; // Satıra gelince hafif accent rengi parlasın
+      }
+
+      td {
+        border-bottom: 1px solid var(--admin-border);
+        vertical-align: middle;
+      }
+    }
+
+    .p-paginator {
+      background: var(--admin-light);
+      border-top: 1px solid var(--admin-border);
+      padding: 0.75rem;
+
+      .p-paginator-page,
+      .p-paginator-next,
+      .p-paginator-last,
+      .p-paginator-first,
+      .p-paginator-prev {
+        color: var(--admin-text-muted);
+        border-radius: 6px;
+        min-width: 2.25rem;
+        height: 2.25rem;
+
+        &:not(.p-highlight):hover {
+          background: var(--admin-border);
+          color: var(--admin-text);
+        }
+
+        &.p-highlight {
+          background: var(--admin-accent); // Aktif sayfada patlayan mavi!
+          color: var(--admin-primary-dark);
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
+  // Dark tema için stiller (opsiyonel)
+  .p-datatable {
+    .tag {
+      position: relative;
+      white-space: nowrap;
+      text-align: start;
+      font-size: 30px;
+      i {
+        position: absolute;
+        align-items: center;
+        box-shadow:
+          rgba(0, 0, 0, 0.09) 0px 8px 4px,
+          rgba(0, 0, 0, 0.09) 0px 16px 8px,
+          rgba(0, 0, 0, 0.09) 0px 32px 16px;
+        top: 22px;
+      }
+      .checkbox {
+        color: #22c55e;
+      }
+      .indeterminate {
+        color: #ef4444;
+      }
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      button {
+        border-radius: 50%;
+      }
+
+      .actions-edit {
+        color: #60a5fa !important;
+        border-bottom: 1px solid #60a5fa;
+
+        &:hover {
+          box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+          background-color: rgba(96, 165, 250, 0.15) !important;
+        }
+      }
+
+      .actions-delete {
+        color: #f87171 !important;
+        border-bottom: 1px solid #f87171 !important;
+
+        &:hover {
+          background-color: rgba(248, 113, 113, 0.15) !important;
+          box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,329 @@
+<div class="login-part">
+  <div class="login-login-wrapper">
+    <div class="login-login-container">
+
+      <div class="login-login-form">
+        <div class="login-header">
+          <div class="login-brand">
+            <i class="ri-car-fill"></i>
+            <h1>RentCar</h1>
+            <span class="login-label">login Panel</span>
+          </div>
+          <div class="login-header-des">
+            <h2>Hoş Geldiniz</h2>
+            <p>login paneline erişim için giriş yapın</p>
+          </div>
+        </div>
+
+        <!-- sol Login form ===> -->
+        <form #form="ngForm" (ngSubmit)="login(form)" autocomplete="off" class="login-form">
+          <div class="form-group">
+            <label for="loginEmail" class="form-label">E-posta Adresi</label>
+            <div class="input-custom-group">
+              <span class="input-icon">
+                <i class="ri-user-line"></i>
+              </span>
+              <input name="email" ngModel type="email" id="email" [(ngModel)]="loginEmail"
+                placeholder="E-posta adresinizi girin" [emailValidationDirective]="emailError" required
+                autocomplete="off" readonly (focus)="$event.target.removeAttribute('readonly')">
+            </div>
+            <p #emailError class="error-container"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword" class="form-label">Şifre</label>
+            <div class="input-custom-group">
+              <span class="input-icon">
+                <i class="ri-lock-line"></i>
+              </span>
+              <input type="password" name="password" ngModel id="loginPassword" placeholder="Şifrenizi girin" required
+                [togglePasswordDirective]="eyeIcon" #passwordToggle="toggleDir">
+
+              <button type="button" class="password-toggle" (click)="passwordToggle.toggle()">
+                <i #eyeIcon class="ri-eye-off-line"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="login-options">
+            <div class="form-checkbox">
+              <input type="checkbox" id="rememberMe" name="rememberMe" [(ngModel)]="isRememberMeChecked">
+              <label for="rememberMe">Beni hatırla</label>
+            </div>
+
+            <div class="forgot-password-options">
+              <a class="forgot-link" (click)="openEmailResetModal()">
+                <i class="ri-mail-line"></i> Email ile Sıfırla
+              </a>
+              <span class="separator">|</span>
+              <a class="forgot-link" (click)="openSmsResetModal()">
+                <i class="ri-question-answer-line"></i> Sms ile Sıfırla
+              </a>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="loading()">
+            @if (loading()) {
+            <mat-spinner diameter="20" class="custom-spinner"></mat-spinner>
+            } @else {
+            <i class="ri-shield-user-line"></i>
+            <span>Login Girişi</span>
+            }
+          </button>
+
+          <div class="two-factor-section">
+            <div class="two-factor-header">
+              <i class="ri-shield-check-line icon-success"></i>
+              <h6>İki Faktörlü Doğrulama</h6>
+              <p>Telefonunuza gönderilen 5 haneli kodu girin</p>
+            </div>
+            <div class="verification-code">
+              <input type="text" maxlength="1">
+              <input type="text" maxlength="1">
+              <input type="text" maxlength="1">
+              <input type="text" maxlength="1">
+              <input type="text" maxlength="1">
+              <input type="text" maxlength="1">
+            </div>
+            <div class="verification-actions">
+              <button type="button" class="btn btn-secondary">
+                <i class="ri-arrow-left-line"></i> Geri
+              </button>
+              <button type="button" class="btn btn-primary">
+                <i class="ri-checkbox-circle-line"></i> Doğrula
+              </button>
+            </div>
+            <div class="resend-section">
+              <p>Kod gelmedi mi?</p>
+              <button type="button" class="btn-link">
+                Yeniden gönder <span class="countdown">(30s)</span>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="login-footer">
+          <div class="footer-links">
+            <a>Yardım</a>
+            <a>Gizlilik</a>
+            <a>İletişim</a>
+          </div>
+          <p class="copyright">© 2026 RentCar. Tüm hakları saklıdır.</p>
+        </div>
+      </div>
+
+
+      <!-- sag yan acıklama paneli -->
+      <div class="login-login-info">
+        <div class="info-content">
+          <div class="info-header">
+            <div class="security-badge">
+              <i class="ri-shield-user-line"></i>
+            </div>
+            <h3>Güvenli login Erişimi</h3>
+            <p>Gelişmiş güvenlik protokolleri ile korunan kurumsal yönetim paneli</p>
+          </div>
+
+          <div class="security-features">
+            <div class="feature-item">
+              <i class="ri-checkbox-circle-fill"></i>
+              <div class="feature-content">
+                <h6>256-bit SSL Şifreleme</h6>
+                <p>Tüm veriler en yüksek güvenlik standartlarıyla korunur</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="ri-key-2-fill"></i>
+              <div class="feature-content">
+                <h6>İki Faktörlü Doğrulama</h6>
+                <p>Ek güvenlik katmanı ile hesap koruması</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="ri-radar-line"></i>
+              <div class="feature-content">
+                <h6>Oturum İzleme</h6>
+                <p>Tüm giriş aktiviteleri kaydedilir ve anlık izlenir</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="ri-refresh-line"></i>
+              <div class="feature-content">
+                <h6>Otomatik Güncellemeler</h6>
+                <p>Sistem güvenliği kesintisiz olarak güncel tutulur</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="support-info">
+            <h6>Teknik Destek</h6>
+            <p>Giriş sorunları için IT departmanı ile iletişime geçin</p>
+            <div class="support-contacts">
+              <a class="support-contact">
+                <i class="ri-phone-line"></i> +90 452 123 45 67
+              </a>
+              <a href="mailto:it-support@rentcar.com" class="support-contact">
+                <i class="ri-mail-line"></i> it-support@rentcar.com
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-footer">
+          <div class="version-info">
+            <span>login Panel v2.1.0</span>
+            <span>Son Güncelleme: 01.07.2025</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  @if (activeResetMethod() !== null) {
+  <app-auth-password-reset [activeMethod]="activeResetMethod()" (onClose)="closeResetModal()">
+  </app-auth-password-reset>
+  }
+
+
+  <!-- 
+  <div class="custom-modal" id="forgotPasswordModal" [class.open]="activeResetMethod() !== null">
+    <div class="modal-backdrop" (click)="closeResetModal()"></div>
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i [ngClass]="activeResetMethod() === 'email' ? 'ri-mail-line' : 'ri-phone-line'"></i>
+            Şifre Sıfırlama ({{ activeResetMethod() === 'email' ? 'E-posta' : 'SMS' }})
+          </h5>
+          <button type="button" class="btn-close" (click)="closeResetModal()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+
+          @if (currentResetStep() === 1) {
+          <div class="reset-form">
+            <div class="reset-header">
+              <i [ngClass]="activeResetMethod() === 'email' ? 'ri-mail-send-line' : 'ri-smartphone-line'"></i>
+              <h6>{{ activeResetMethod() === 'email' ? 'E-posta Adresinizi Girin' : 'Telefon Numaranızı Girin' }}</h6>
+              <p>{{ activeResetMethod() === 'email' ? 'Şifre sıfırlama bağlantısını e-posta adresinize göndereceğiz' :
+                'Şifre sıfırlama kodunu telefonunuza SMS olarak göndereceğiz kanka.' }}</p>
+            </div>
+
+            <form class="login-form" #firstStepForm="ngForm" (ngSubmit)="sendResetCode()">
+              <div class="form-group">
+                <label class="form-label">{{ activeResetMethod() === 'email' ? 'E-posta Adresi' : 'Telefon Numarası' }}</label>
+                <div class="input-custom-group">
+                  <span class="input-icon">
+                    <i [ngClass]="activeResetMethod() === 'email' ? 'ri-mail-line' : 'ri-phone-line'"></i>
+                  </span>
+
+                  @if (activeResetMethod() === 'email') {
+                  <input type="email" name="resetEmail" [(ngModel)]="resetModel.email" placeholder="login@rentcar.com"
+                    required>
+                  } @else {
+                  <input type="text" name="resetPhone" 
+                      [ngModel]="resetModel.phoneNumber | phoneFormatPipe" 
+                      (ngModelChange)="resetModel.phoneNumber = $event"
+                      placeholder="Sms için TEL NO. giriniz."
+                    required>
+                  }
+                </div>
+              </div>
+              <div class="security-note">
+                <i class="ri-information-line"></i>
+                <small>Güvenlik nedeniyle sadece sistemde kayıtlı olan bilgilerinize doğrulama kodu gönderilir.</small>
+              </div>
+            </form>
+          </div>
+          }
+
+          @if (currentResetStep() === 2) {
+          <div class="reset-form">
+            <div class="reset-header">
+              <i class="ri-shield-keyhole-line text-primary" style="font-size: 2.5rem;"></i>
+              <h6>Doğrulama Kodunu Girin</h6>
+              <p>
+                <strong>{{ activeResetMethod() === 'email' ? resetModel.email : resetModel.phoneNumber }}</strong>
+                adresine gönderilen 6 haneli kodu ve yeni şifrenizi girin kanka.
+              </p>
+            </div>
+
+            <form class="login-form" #resetForm="ngForm" (ngSubmit)="completePasswordReset()">
+
+              <div class="form-group mb-3">
+                <label class="form-label">Doğrulama Kodu</label>
+                <div class="input-custom-group">
+                  <span class="input-icon">
+                    <i class="ri-lock-password-line"></i>
+                  </span>
+                  <input type="text" name="resetCode" 
+                      [ngModel]="resetModel.code | codeFormatPipe"
+                      (ngModelChange)="resetModel.code = $event"
+                      placeholder="123-456" maxlength="7"
+                    class="form-control" required>
+                </div>
+              </div>
+
+              <div class="form-group mb-3">
+                <label class="form-label">Yeni Şifre</label>
+                <div class="input-custom-group">
+                  <span class="input-icon">
+                    <i class="ri-key-2-line"></i>
+                  </span>
+                  <input [type]="isPasswordVisible ? 'text' : 'password'" name="newPassword"
+                    [(ngModel)]="resetModel.newPassword" placeholder="Yeni şifre" class="form-control" required>
+                  <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+                    <i [ngClass]="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group mb-3">
+                <label class="form-label">Yeni Şifre Tekrarı</label>
+                <div class="input-custom-group">
+                  <span class="input-icon">
+                    <i class="ri-key-2-line"></i>
+                  </span>
+                  <input [type]="isPasswordVisible ? 'text' : 'password'" name="confirmPassword"
+                    [(ngModel)]="resetModel.confirmPassword" placeholder="Şifre tekrarı" class="form-control" required>
+                  <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+                    <i [ngClass]="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"></i>
+                  </button>
+                </div>
+
+                @if (resetModel.newPassword && resetModel.confirmPassword && resetModel.newPassword !==
+                resetModel.confirmPassword) {
+                <div class="text-danger mt-1 d-flex align-items-center" style="font-size: 0.85rem; color: red;">
+                  <i class="ri-error-warning-line me-1"></i> Şifreler birbiriyle eşleşmiyor.
+                </div>
+                }
+              </div>
+
+            </form>
+          </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeResetModal()">İptal</button>
+
+          @if (currentResetStep() === 1) {
+          <button type="button" class="btn btn-primary" (click)="sendResetCode()"
+            [disabled]="activeResetMethod() === 'email' ? !resetModel.email : !resetModel.phoneNumber">
+            <i class="ri-send-plane-line"></i> Gönder
+          </button>
+          } @else if(currentResetStep() === 2) {
+          <button type="button" class="btn btn-primary" (click)="completePasswordReset()"
+            [disabled]="isResetButtonDisabled">
+            <i class="ri-check-line"></i> Şifreyi Güncelle
+          </button>
+          }
+        </div>
+
+      </div>
+    </div>
+  </div>
+  -->
+</div>

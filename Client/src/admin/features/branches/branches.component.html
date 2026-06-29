@@ -1,0 +1,77 @@
+<div class="branches-container">
+  <p-card>
+    <div class="p-button-list">
+      <h2>Şubeler</h2>
+      <p-button routerLink="/admin/branches/branch-create" class="p-button-add" icon="ri-add-large-line"
+        pTooltip="Şube Ekle" tooltipPosition="top" pRipple [raised]="true"></p-button>
+      <p-button class="p-button-menu" severity="info" icon="ri-menu-line" [raised]="true" pRipple></p-button>
+      <p-button class="p-button-reset" severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile"
+        tooltipPosition="top" (onClick)=" refreshData()" [loading]="isLoading()" [raised]="true"></p-button>
+    </div>
+
+
+
+    <div class="role-management-wrapper">
+      <p-table [value]="branches()" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [paginator]="true" [rows]="10"
+        [totalRecords]="totalCount()" [loading]="isLoading()" [rowsPerPageOptions]="[5, 10, 20]"
+        [tableStyle]="{'width': 'auto'}" showCurrentPageReport="true">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-name">Şube Adı</th>
+            <th class="col-city">Şehir / İlçe</th>
+            <th class="col-address">Açık Adres</th>
+            <th class="col-phone">Telefon-1</th>
+            <th class="col-phone">Telefon-2</th>
+            <th class="col-email">E-Posta</th>
+            <th class="col-created-by">Oluşturan</th>
+            <th class="col-created-at">Kayıt Tarihi</th>
+            <th class="col-updated-by">Son Güncl.</th>
+            <th class="col-updated-at">Güncl. Tarihi</th>
+            <th class="col-actions">İşlemler</th>
+            <th class="col-status">Durum</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-branch>
+          <tr>
+            <td class="branch-name">{{ branch.name }}</td>
+            <td>{{ branch.address.city }} / {{ branch.address.district }}</td>
+            <td class="branch-address">{{ branch.address.fullAddress }}</td>
+            <td>{{ branch.address.phone1 | phoneFormatPipe }}</td>
+            <td>{{ branch.address.phone2 | phoneFormatPipe}}</td>
+            <td>{{ branch.address.email }}</td>
+            <td> {{ branch.createdByName }} </td>
+            <td> {{ branch.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+            <td> {{ branch.updatedByName || '--------' }} </td>
+            <td> {{ (branch.updatedAt | date: 'dd.MM.yyyy HH:mm') || '--------' }} </td>
+            <td class="actions">
+              <!-- Düzenleme Butonu -->
+              <button pButton [routerLink]="['/admin/branches/branch-edit/', branch.id]" type="button"
+                ngClass="actions-edit" icon="ri-edit-line ri-1x" class=" p-button-text p-button-primary"
+                pTooltip="Düzenle" tooltipPosition="top">
+              </button>
+              <!-- Silme Butonu -->
+              <button ngClass="actions-delete" tooltipPosition="top" pButton type="button" icon="ri-delete-bin-line"
+                class="p-button-text p-button-danger" pTooltip="Sil" tooltipPosition="top"
+                (click)="deleteBranch(branch.id, branch.name)">
+              </button>
+
+            </td>
+            <td class="tag">
+              <i [class]="branch.isActive ? 'checkbox ri-checkbox-circle-line' : 'indeterminate ri-indeterminate-circle-line'"
+                class="mr-1"></i>
+            </td>
+          </tr>
+        </ng-template>
+
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="10" class="empty-table-message">Kayıtlı şube bulunamadı.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+</div>

@@ -1,0 +1,261 @@
+// ==========================================================================
+// ARAÇ DETAY & SAYFA İSKELETİ SCSS TASARIMI (GLOBAL DEĞİŞKENLİ)
+// ==========================================================================
+
+.content-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; // Elemanlar (header, içerik, footer) arası ideal boşluk
+  width: 100%;
+
+  // ------------------------------------------------------------------------
+  // 1. PAGE HEADER (SAYFA BAŞLIĞI VE AKSİYONLAR)
+  // ------------------------------------------------------------------------
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--admin-border);
+
+    .page-title {
+      h1 {
+        font-size: var(--font-size-xl);
+        font-weight: 700;
+        color: var(--admin-text);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        letter-spacing: -0.5px;
+
+        i {
+          color: var(--primary-color);
+          font-size: 1.6rem;
+        }
+      }
+
+      .page-subtitle {
+        font-size: var(--font-size-sm);
+        color: var(--admin-text-muted);
+        margin: 0.25rem 0 0 0;
+      }
+    }
+
+    // Sağ taraftaki aksiyon butonları grubu
+    .page-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      // Durum rozetleri (Aktif / Pasif)
+      .status-badge {
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.35rem 0.75rem;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+
+          &.status-active {
+            background-color: rgba(34, 197, 94, 0.1); // Success renginin opak hali
+            color: var(--admin-success);
+          }
+
+          &.status-inactive {
+            background-color: rgba(244, 63, 94, 0.1); // Danger renginin opak hali
+            color: var(--admin-danger);
+          }
+        }
+      }
+
+      // Ortak Aksiyon Buton Tasarımları
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        font-size: var(--font-size-base);
+        font-weight: 500;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+
+        // Geri Butonu
+        &.btn-outline-secondary {
+          background-color: var(--admin-accent);
+          color: var(--admin-text-muted);
+
+          &:hover {
+            background-color: var(--admin-accent-dark);
+            color: var(--admin-text);
+            border-color: #cbd5e1;
+          }
+        }
+
+        // Düzenle Butonu
+        &.btn-primary {
+          background-color: var(--admin-accent);
+          color: var(--admin-white);
+          border: none;
+
+          &:hover {
+            background-color: var(--admin-accent-dark); // Biraz daha koyu tonu
+            transform: translateY(-1px);
+            box-shadow:
+              rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+              rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+          }
+        }
+
+        i {
+          font-size: 1.1rem;
+          padding-right: 5px;
+        }
+      }
+
+      .action-group {
+        display: inline-flex;
+
+        .report-download-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.625rem 1.25rem;
+          margin-left: 5px;
+          // YENİ: Base font size
+          font-size: 0.9rem;
+          font-weight: 600;
+          border-radius: 8px;
+          border: 1px solid var(--admin-border);
+          background-color: var(--admin-white);
+          color: var(--admin-text);
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background-color: var(--admin-light);
+            border-color: var(--admin-text-muted);
+          }
+        }
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------------
+  // 2. RECORD INFO FOOTER (AUDIT / DENETİM KARTLARI)
+  // ------------------------------------------------------------------------
+  .record-info-footer {
+    margin-top: auto; // Sayfanın en altına yapışması için esneklik
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--admin-border);
+
+    .info-grid {
+      display: flex;
+      flex-direction: row-reverse; // Yeni olan (Son Güncelleme) solda, ilk olan sağda dursun
+      justify-content: flex-start;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .info-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      min-width: 250px;
+      padding: 0.75rem 1rem;
+      background-color: var(--admin-white);
+      border: 1px solid var(--admin-border);
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+
+      .info-card-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background-color: var(--admin-light);
+        flex-shrink: 0;
+
+        i {
+          font-size: 1.1rem;
+
+          &.text-warning {
+            color: var(--admin-warning) !important;
+          }
+          &.text-success {
+            color: var(--admin-success) !important;
+          }
+        }
+      }
+
+      .info-card-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+
+        .info-card-label {
+          font-size: 11px;
+          font-weight: 600;
+          text-transform: uppercase;
+          color: var(--admin-text-muted);
+          letter-spacing: 0.5px;
+          margin: 0;
+        }
+
+        .info-card-details {
+          display: flex;
+          flex-direction: column;
+          line-height: 1.4;
+
+          .info-card-user {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: var(--admin-text);
+          }
+
+          .info-card-date {
+            font-size: var(--font-size-sm);
+            color: var(--admin-text-muted);
+          }
+        }
+      }
+    }
+  }
+}
+
+// ------------------------------------------------------------------------
+// 3. RESPONSIVE TASARIM DÜZENLEMELERİ (MOBİL UYUMLULUK)
+// ------------------------------------------------------------------------
+@media (max-width: 768px) {
+  .content-area {
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .page-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+    }
+
+    .record-info-footer {
+      .info-grid {
+        flex-direction: column;
+
+        .info-card {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

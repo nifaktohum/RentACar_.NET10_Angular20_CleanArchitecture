@@ -1,0 +1,334 @@
+<div class="user-card">
+  <div class="card-header">
+    <div class="header-title">
+      <h3>Kullanıcı Yönetimi</h3>
+      <p>Sistemdeki tüm kullanıcıları listeleyebilir, düzenleyebilir ve yetkilerini yönetebilirsin.</p>
+    </div>
+    <div class="p-button-list">
+      <p-button (click)="openUserDialog()" icon="ri-user-add-line" pTooltip="Yeni Kullanıcı Ekle" pRipple
+        [raised]="true"></p-button>
+      <p-button severity="contrast" icon="ri-refresh-line" pTooltip="Yenile" (click)="loadUsers()"
+        [loading]="isLoading()" [raised]="true"></p-button>
+    </div>
+  </div>
+
+  <div class="user-management-wrapper">
+    <p-table #dt [value]="users()" [rows]="10" [paginator]="true"
+      [globalFilterFields]="['firstName', 'lastName', 'email']" responsiveLayout="scroll">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3%">#</th>
+          <th style="width: 25%">Kullanıcı</th>
+          <th style="width: 25%">İletişim</th>
+          <th style="width: 25%">Şube / Roller</th>
+          <th style="width: 10%; text-align: center;">Durum</th>
+          <th style="width: 15%; text-align: center;">İşlemler</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user let-i="rowIndex">
+        <tr>
+          <td>{{ i + 1 }}</td>
+          <!-- Ad Soyad -->
+          <td>
+            <div class="user-info">
+              <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+              <span class="user-email">{{ user.email }}</span>
+            </div>
+          </td>
+
+          <!-- Telefon -->
+          <td>
+            <span class="user-phone">{{ user.phoneNumber | phoneFormatPipe}}</span>
+          </td>
+
+          <!-- Şube / Roller -->
+          <td>
+            <div>
+              <span>{{ user.branchName }}</span>
+              <div>
+                @for(role of user.roleNames; track role.id) {
+                <span class="">{{ role }}</span>
+                }
+              </div>
+            </div>
+          </td>
+
+          <!-- Durum -->
+          <td class="tag">
+            <i [class]="user.isActive ? 'checkbox-active ri-checkbox-circle-line' : 'checkbox-pasif ri-indeterminate-circle-line'"
+              class="mr-1"></i>
+          </td>
+
+          <!-- İşlemler -->
+          <td style="text-align: center;">
+            <div class="action-buttons">
+              <button pButton icon="ri-shield-user-line" class="p-button-rounded p-button-text btn-permissions"
+                (click)="openUserDetail(user)" pTooltip="Yetkiler"></button>
+              <button pButton icon="ri-edit-line" class="p-button-rounded p-button-text btn-edit"
+                (click)="openEditUserDialog(user)"></button>
+              <button pButton icon="ri-delete-bin-line" class="p-button-rounded p-button-text btn-delete"
+                (click)="deleteUser(user.id, user.fullName)"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="table-empty">Sistemde kayıtlı kullanıcı bulunamadı.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- ============================================================== -->
+<!-- KULLANICI EKLE / DÜZENLE DIALOG -->
+<!-- ============================================================== -->
+<p-dialog [header]="dialogTitle()" [(visible)]="isUserDialogVisible" [modal]="true" [style]="{ width: '450px' }"
+  [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+
+  <div class="modern-form-container">
+    <!-- Ad Soyad -->
+    <div class="form-row">
+      <p-floatlabel variant="on" class="form-firstname">
+        <input id="firstName" pInputText [(ngModel)]="userForm.firstName" autocomplete="off" placeholder="" />
+        <label for="firstName">Ad</label>
+      </p-floatlabel>
+      <p-floatlabel variant="on">
+        <input id="lastName" pInputText [(ngModel)]="userForm.lastName" autocomplete="off" placeholder="" />
+        <label for="lastName">Soyad</label>
+      </p-floatlabel>
+    </div>
+
+    <!-- Email -->
+    <p-floatlabel variant="on">
+      <input id="email" ngModel pInputText [(ngModel)]="userForm.email" autocomplete="off" placeholder="" readonly
+        (focus)="$event.target.removeAttribute('readonly')" />
+      <label for="email">Email</label>
+    </p-floatlabel>
+
+    <!-- Telefon -->
+    <p-floatlabel variant="on">
+      <input id="phoneNumber" pInputText [ngModel]="userForm.phoneNumber | phoneFormatPipe"
+        (ngModelChange)="userForm.phoneNumber = $event" autocomplete="off" placeholder="" />
+      <label for="phoneNumber">Telefon</label>
+    </p-floatlabel>
+
+    <!-- Şifre (Sadece yeni kullanıcı) -->
+    @if (!userForm.id) {
+    <p-floatlabel variant="on">
+      <input id="password" pInputText [(ngModel)]="userForm.password" type="password" autocomplete="off"
+        placeholder="" />
+      <label for="password">Şifre</label>
+    </p-floatlabel>
+    }
+
+    <!-- Şube Seçimi -->
+    <p-floatlabel variant="on">
+      @if (authService.isAdmin()) {
+      <p-select [options]="branches()" optionLabel="name" optionValue="id" [(ngModel)]="userForm.branchId"
+        placeholder="Şube Seçiniz" placeholder="">
+      </p-select>
+      <label for="branchId">Şube Seçiniz..</label>
+      }
+    </p-floatlabel>
+
+    <!-- Rol Seçimi -->
+    <p-floatlabel variant="on">
+      <p-select [options]="roles()" optionLabel="name" optionValue="id" [(ngModel)]="userForm.roleId"
+        placeholder="Rol Seçiniz" placeholder="">
+      </p-select>
+      <label for="roleId">Rol Seçiniz..</label>
+    </p-floatlabel>
+
+    <!-- Aktiflik -->
+    <div class="form-toggle">
+      <label>{{ userForm.isActive ? '✅ Aktif' : '❌ Pasif' }}</label>
+      <p-toggleSwitch [(ngModel)]="userForm.isActive"></p-toggleSwitch>
+
+    </div>
+
+    <!-- Butonlar -->
+    <div class="form-actions">
+      <button pButton label="İptal" icon="ri-close-line" class="p-button-text p-button-secondary"
+        (click)="closeUserDialog()"></button>
+      <button pButton label="Kaydet" icon="ri-save-line" class="p-button-raised p-button-primary"
+        [loading]="isLoading()" (click)="saveUser()"></button>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- ============================================================== -->
+<!-- KULLANICI DETAY DIALOG (SADECE BİLGİ GÖSTERİMİ) -->
+<!-- ============================================================== -->
+<!-- Detay Dialog -->
+<p-dialog [header]="'Kullanıcı Detayı'" [(visible)]="isDetailDialogVisible" [modal]="true" [style]="{ width: '520px' }"
+  [draggable]="false" [resizable]="false" styleClass="modern-dialog">
+
+  @if (selectedUser(); as user) {
+  <div class="user-detail-container">
+
+    <!-- ====================== -->
+    <!-- PROFİL BAŞLIĞI -->
+    <!-- ====================== -->
+    <div class="detail-header">
+      <div class="avatar" [class.inactive]="!user.isActive">
+        <span>{{ user.fullName.charAt(0) }}</span>
+      </div>
+      <div class="header-info">
+        <h3>{{ user.fullName }}</h3>
+        <div class="header-badges">
+          <span class="status-badge" [class.active]="user.isActive">
+            <i [class]="user.isActive ? 'ri-checkbox-circle-fill' : 'ri-indeterminate-circle-fill'"></i>
+            {{ user.isActive ? 'Aktif' : 'Pasif' }}
+          </span>
+          @if (user.isDeleted) {
+            <span class="status-badge" class="deleted">
+              <i class="ri-delete-bin-fill"></i> Silinmiş
+            </span>
+          }
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================== -->
+    <!-- TEMEL BİLGİLER -->
+    <!-- ====================== -->
+    <div class="detail-section">
+      <div class="section-title">Temel Bilgiler</div>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="ri-mail-line"></i>
+            <span>Email</span>
+          </div>
+          <div class="detail-value">{{ user.email }}</div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="ri-phone-line"></i>
+            <span>Telefon</span>
+          </div>
+          <div class="detail-value">{{ user.phoneNumber | phoneFormatPipe }}</div>
+        </div>
+
+        <div class="detail-item full-width">
+          <div class="detail-label">
+            <i class="ri-store-3-line"></i>
+            <span>Şube</span>
+          </div>
+          <div class="detail-value">{{ user.branchName }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================== -->
+    <!-- ROLLER -->
+    <!-- ====================== -->
+    <div class="detail-section">
+      <div class="section-title">
+        <i class="ri-shield-user-line"></i>
+        Roller
+      </div>
+      <div class="role-container">
+        @for (role of user.roles; track role.roleId) {
+        <div class="role-item">
+          <span class="role-name">{{ role.roleName }}</span>
+          @if (role.description) {
+          <span class="role-desc">- {{ role.description }}</span>
+          }
+        </div>
+        } @empty {
+        <span class="empty-text">Rol atanmamış</span>
+        }
+      </div>
+    </div>
+
+    <!-- ====================== -->
+    <!-- PERMISSION'LAR -->
+    <!-- ====================== -->
+    <div class="detail-section">
+      <div class="section-title">
+        <i class="ri-lock-line"></i>
+        Yetkiler
+      </div>
+      <div class="permission-container">
+        @for (perm of user.permissions; track perm.permissionId) {
+        <div class="permission-item">
+          <i class="ri-checkbox-circle-fill permission-icon"></i>
+          <span class="permission-name">{{ perm.permissionName }}</span>
+        </div>
+        } @empty {
+        <span class="empty-text">Yetki atanmamış</span>
+        }
+      </div>
+    </div>
+
+    <!-- ====================== -->
+    <!-- ZAMAN BİLGİLERİ -->
+    <!-- ====================== -->
+    <!-- ====================== -->
+    <!-- ZAMAN BİLGİLERİ -->
+    <!-- ====================== -->
+    <div class="detail-section">
+      <div class="section-title">
+        <i class="ri-time-line"></i>
+        Zaman Bilgileri
+      </div>
+      <div class="time-grid">
+        <!-- Oluşturulma -->
+        <div class="time-item">
+          <span class="time-label">
+            <i class="ri-calendar-2-line"></i> Oluşturulma
+          </span>
+          <span class="time-value">{{ user.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+        </div>
+
+        <!-- Oluşturan -->
+        <div class="time-item">
+          <span class="time-label">
+            <i class="ri-user-line"></i> Oluşturan
+          </span>
+          <span class="time-value">{{ user.createdByName || 'Bilinmeyen' }}</span>
+        </div>
+
+        <!-- Güncellenme (varsa) -->
+        @if (user.updatedAt) {
+        <div class="time-item">
+          <span class="time-label">
+            <i class="ri-refresh-line"></i> Güncellenme
+          </span>
+          <span class="time-value">{{ user.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+        </div>
+        }
+
+        <!-- Güncelleyen (varsa) -->
+        @if (user.updatedBy) {
+        <div class="time-item">
+          <span class="time-label">
+            <i class="ri-user-line"></i> Güncelleyen
+          </span>
+          <span class="time-value">{{ user.updatedByName || 'Bilinmeyen' }}</span>
+        </div>
+        }
+      </div>
+    </div>
+
+  </div>
+  }
+
+  <!-- FOOTER -->
+<ng-template pTemplate="footer">
+  <div class="dialog-footer">
+    <button pButton label="Kapat" icon="ri-close-line" class="p-button-text p-button-secondary btn-close"
+      (click)="isDetailDialogVisible = false">
+    </button>
+  </div>
+</ng-template>
+</p-dialog>

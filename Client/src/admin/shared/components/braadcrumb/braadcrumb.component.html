@@ -1,0 +1,39 @@
+<ol class="breadcrumb">
+  @for (_bread of breadCrumbService.breadCrumbData(); track _bread.url) {
+
+    <li class="breadcrumb-item" [ngClass]="_bread.isActive ? 'active' : '' ">
+      <a [routerLink]="_bread.url">
+        <i [ngClass]="_bread.icon"></i>
+        <span>{{_bread.title}}</span>
+      </a>
+    </li>
+  }
+  
+
+
+<!-- <ol class="breadcrumb">
+  @for (crumb of breadCrumbService.breadCrumbData(); track crumb.title; let index = $index) {
+
+  @if (index > 0) {
+  <span class="breadcrumb-separator">›</span>
+  }
+
+  @if (!crumb.isActive) {
+  <li class="breadcrumb-item">
+    <a [routerLink]="crumb.url">
+      @if (crumb.icon) {
+      <i [ngClass]="crumb.icon"></i>
+      }
+      <span>{{ crumb.title }}</span>
+    </a>
+  </li>
+  } @else {
+  <li class="breadcrumb-item" aria-current="page">
+    @if (crumb.icon) {
+    <i [ngClass]="crumb.icon"></i>
+    }
+    <span>{{ crumb.title }}</span>
+  </li>
+  }
+  }
+</ol> -->

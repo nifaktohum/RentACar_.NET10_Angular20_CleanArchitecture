@@ -1,0 +1,85 @@
+<title>RentACar | {{pageTitle()}}</title>
+<!-- Araç Detay Content -->
+<div class="content-area">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title">
+      <h1>
+        <i [ngClass]="pageIcon()"></i>
+        {{ pageTitle() }}
+      </h1>
+      <p class="page-subtitle">{{ pageDescription() }}</p>
+    </div>
+    <div class="page-actions">
+      @if (statusActive()) {
+      <div class="status-badge">
+        @if (isActive()) {
+        <span class="badge status-active">Aktif</span>
+        } @else {
+        <span class="badge status-inactive">Pasif</span>
+        }
+      </div>
+      }
+      @if (backBtnActive()) {
+      <a (click)="back()" class="btn btn-outline-secondary">
+        <i class="ri-arrow-left-line me-1"></i>Geri
+      </a>
+      }
+      <div class="action-group">
+        <button [routerLink]="editBtnUrl()" type="button" class="btn btn-primary">
+          <i class="ri-edit-line me-1"></i>Düzenle
+        </button>
+        @if (reportBtnDown()) {
+          <button type="button" class="report-download-btn">
+            <i class="ri-download-line"></i>
+            Rapor İndir
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <ng-content></ng-content>
+
+
+  <!-- Kayıt Bilgileri Footer -->
+@if(auditActive() && auditEntity()) {
+<div class="record-info-footer">
+  <div class="info-grid">
+
+    <div class="info-card">
+      <div class="info-card-icon">
+        <i class="ri-add-circle-line text-success"></i>
+      </div>
+      <div class="info-card-content">
+        <label class="info-card-label">Oluşturulma</label>
+        <div class="info-card-details">
+          <span class="info-card-user">{{ auditEntity()?.createdFullname }}</span>
+          <span class="info-card-date">
+            {{ auditEntity()?.createdAt | date: 'dd MMM yyyy HH:mm:ss' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    @if(auditEntity()?.updatedAt) {
+    <div class="info-card">
+      <div class="info-card-icon">
+        <i class="ri-pencil-line text-warning"></i>
+      </div>
+      <div class="info-card-content">
+        <label class="info-card-label">Son Güncelleme</label>
+        <div class="info-card-details">
+          <span class="info-card-user">{{ auditEntity()?.updateFullname }}</span>
+          <span class="info-card-date">
+            {{ auditEntity()?.updatedAt | date: 'dd MMM yyyy HH:mm:ss' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    }
+
+  </div>
+</div>
+}
+</div>

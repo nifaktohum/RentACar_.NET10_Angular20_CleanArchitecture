@@ -1,0 +1,39 @@
+.admin-layout {
+  position: relative;
+  display: grid;
+  // İlk sütun sidebar genişliği, ikinci sütun kalan tüm alan (1fr)
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  transition: grid-template-columns 0.3s ease; // Menü kapanırken akıcı geçiş sağlar
+
+  // Eğer sol menü daraltılmışsa grid yapısını otomatik güncelle
+  &.sidebar-collapsed {
+    grid-template-columns: 63px 1fr;
+  }
+
+  .main-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-x: hidden;
+
+    .page-content {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto; // Sadece içerik alanı kendi içinde scroll olsun
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+.buton-reply {
+  position: absolute;
+  font-size: 30px;
+  padding: 5px;
+  border-radius: 0 10px 10px 0;
+  top: 5px;
+  z-index: 9999;
+  left: 60px;
+  cursor: pointer;
+}

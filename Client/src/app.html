@@ -1,0 +1,30 @@
+      <div class="global-loader-container">
+        @if (busyService.loading()) {
+        <mat-progress-bar mode="indeterminate" color="primary">
+        </mat-progress-bar>
+        }
+      </div>
+
+
+
+<router-outlet />
+
+
+
+      @if (!environment.production) {
+        <div class="debug-panel">
+          <pre>Loading: {{ debugInfo?.isLoading }}
+            Busy Count: {{ debugInfo?.busyCount }}</pre>
+          </div>
+        }
+  
+
+  <!-- // primeNG'den ToastModule ve ConfirmDialogModule  -->
+      <p-toast position="top-right" [baseZIndex]="9999" [life]="3000"></p-toast> <!-- bildirim pencereleri-->
+      <p-confirmDialog  
+        [style]="{width: '400px'}"
+        acceptLabel="Evet, Sil"
+        rejectLabel="İptal"
+        [closeOnEscape]="true"
+        [dismissableMask]="false">
+      </p-confirmDialog> <!-- onay pencereleri -->

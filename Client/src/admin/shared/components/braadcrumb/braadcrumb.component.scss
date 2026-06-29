@@ -1,0 +1,92 @@
+// ==========================================================================
+// YENİ NESİL MİNİMAL BREADCRUMB SCSS TASARIMI (FARKLI TARZ)
+// ==========================================================================
+
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.4rem 0.85rem;
+  margin: 0;
+  list-style: none;
+  background: rgba(255, 255, 255, 0.4); // Hafif şeffaf cam efekti
+  backdrop-filter: blur(8px); // Arka planı pürüzsüzce bulandırır
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.6); // Çok ince modern bir çerçeve
+  border-radius: 20px; // Hap (pill) şeklinde oval ve estetik köşeler
+  font-family: var(--font-family-main, 'Inter', sans-serif);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.01); // Neredeyse görünmez mikro gölge
+  
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.775rem; // Ekstra kibar ve küçük yazı boyutu
+    font-weight: 500;
+    color: var(--admin-text-muted, #64748b);
+    line-height: 1;
+
+    // Link içeren tüm elemanlar (Ana Sayfa, Dashboard vb.)
+    a {
+      color: var(--admin-text-muted, #64748b);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border-radius: 12px;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); // Pürüzsüz ivmeli geçiş
+
+      // Ev ikonu veya diğer ikonlar için özel boyutlandırma
+      i {
+        font-size: 1.2rem;
+        color: var(--admin-text-muted, #64748b);
+        opacity: 0.7;
+        transform: translateY(-0.5px); // İkonu yazı çizgisine tam eşitleme
+        transition: all 0.2s ease;
+      }
+
+      // Üzerine gelindiğinde (Hover) mikro hareket ve parlama efekti
+      &:hover {
+        color: var(--admin-accent-dark, #0284c7);
+        transform: translateY(-1px); // Çok hafif yukarı yükselme (Premium hissi)
+        background-color: rgba(56, 189, 248, 0.06); // Çok soft mavi/opak bir ışık efekti
+
+        i {
+          color: var(--admin-accent, #38bdf8);
+          opacity: 1;
+          transform: scale(1.05) translateY(-0.5px); // İkon hafifçe büyür
+        }
+      }
+    }
+
+    // Aktif bulunulan en son sayfa
+    &.active {
+      color: var(--admin-text, #1e293b);
+      font-weight: 600; // Yazı biraz daha kalın ve oturaklı
+      padding: 0.2rem 0.5rem;
+      letter-spacing: -0.1px; // Inter fontunda yan yana daha sıkı ve şık dursun
+      pointer-events: none;
+    }
+
+    // ------------------------------------------------------------------------
+    // AYRAÇ RE-DESIGN (Farklı tarz: Eğik çizgi yerine mikro ok/nokta)
+    // ------------------------------------------------------------------------
+    & + .breadcrumb-item {
+      padding-left: 0.35rem;
+
+      &::before {
+        float: none;
+        display: inline-block;
+        // Klasik "/" yerine modern, ince bir yön oku veya nokta kullanabilirsin. 
+        // Aşağıdaki Unicode karakteri çok zarif bir sağ oktur (›)
+        content: "›"; 
+        color: var(--admin-border, #cbd5e1);
+        font-size: 0.95rem; // Ok işareti için ideal ölçek
+        font-weight: 300;
+        vertical-align: middle;
+        line-height: 1;
+        opacity: 0.8;
+      }
+    }
+  }
+}

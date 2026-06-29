@@ -1,0 +1,570 @@
+
+
+// Giriş Sayfası Ana Kapsayıcı
+.login-part {
+  font-family: var(--font-family-main);
+  font-size: var(--font-size-base);
+  color: var(--admin-text);
+  background: radial-gradient(
+    circle at 0% 0%,
+    var(--admin-primary-dark) 0%,
+    var(--secondary-color) 100%
+  );
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-login-wrapper {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+}
+
+// Kart Tasarımı (Değiştirildi: Kenarlıklar inceltildi ve shadow derinleştirildi)
+.login-login-container {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  width: 100%;
+  background-color: var(--admin-white);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+  }
+}
+
+// Sol Taraf: Modern Minimalist Form Alanı
+.login-login-form {
+  padding: 50px 60px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--admin-white);
+  @media (max-width: 576px) {
+    padding: 40px 24px;
+  }
+
+  .login-header {
+    margin-bottom: 35px;
+
+    .login-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+
+      i {
+        font-size: 28px;
+        color: var(--primary-color);
+      }
+
+      h1 {
+        font-size: var(--font-size-lg);
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin: 0;
+        text-transform: uppercase;
+      }
+
+      .login-label {
+        background-color: var(--border-color);
+        color: var(--text-dark);
+        font-size: var(--font-size-sm);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-left: auto;
+      }
+    }
+
+    .login-header-des {
+      text-align: center;
+    }
+
+    h2 {
+      font-size: var(--font-size-xl);
+      color: var(--admin-primary-dark);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: var(--admin-text-muted);
+      font-size: var(--font-size-base);
+      margin: 0;
+    }
+  }
+}
+
+// Giriş Form Elemanları ve Modern Input Hatları
+.login-form {
+  margin-top: 50px;
+  .form-group {
+    margin-bottom: 24px;
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--admin-text-muted);
+      font-size: var(--font-size-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  // Yeni Tasarım: Inputlar daha flat ve border alt çizgisi/odaklanması daha keskin
+  .input-custom-group {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--admin-border);
+    border-radius: 10px;
+    background-color: var(--admin-light);
+
+    &:focus-within {
+      border-color: var(--primary-color);
+      background-color: var(--admin-white);
+      box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.1);
+    }
+
+    .input-icon {
+      padding-left: 16px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+    }
+
+    input {
+      border: none;
+      outline: none;
+      padding: 14px 16px;
+      width: 100%;
+      font-size: var(--font-size-base);
+      color: var(--admin-text);
+      background: transparent;
+
+      &::placeholder {
+        color: var(--text-muted);
+      }
+    }
+
+    .password-toggle {
+      border: none;
+      background: transparent;
+      padding: 0 16px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        color: var(--admin-text);
+      }  
+    }
+  }
+}
+
+// Seçenekler
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  font-size: var(--font-size-sm);
+
+  .form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+
+    input[type='checkbox'] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--primary-dark);
+    }
+
+    label {
+      cursor: pointer;
+      color: var(--admin-text);
+      font-weight: 500;
+    }
+  }
+
+  // // 🔥 Yeni eklediğimiz ikili şifre sıfırlama link grubu kanka
+  .forgot-password-options {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .forgot-link {
+      color: var(--primary-dark);
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px; // İkon ile yazı arasındaki tatlı boşluk kanka
+      cursor: pointer;
+      transition: color 0.2s ease-in-out;
+
+      i {
+        font-size: 1.1rem; // İkonların boyutunu yazıya göre eşitledik kanka
+      }
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+
+    .separator {
+      color: var(--admin-text);
+      opacity: 0.4; // Ayracın çok parlayıp göz yormaması için kanka
+      font-size: var(--font-size-xs);
+      user-select: none;
+    }
+  }
+}
+
+// Buton Yenilemesi (Daha dolgun ve micro-interaction içeren yapı)
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+
+  i {
+    font-size: 18px;
+  }
+
+  &.btn-primary {
+    background-color: var(--admin-primary);
+    color: var(--admin-white);
+
+    &:hover {
+      background-color: var(--admin-primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &.btn-secondary {
+    background-color: var(--admin-light);
+    border-color: var(--admin-border);
+    color: var(--admin-text);
+    &:hover {
+      background-color: var(--admin-border);
+    }
+  }
+}
+
+// İki Faktörlü Doğrulama Alanı Tasarımı
+.two-factor-section {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px dashed var(--admin-border);
+  display: none;
+
+  &.active {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .two-factor-header {
+    text-align: center;
+
+    .icon-success {
+      font-size: 36px;
+      color: var(--admin-success);
+    }
+
+    h6 {
+      font-size: var(--font-size-lg);
+      margin: 12px 0 6px 0;
+      font-weight: 700;
+    }
+
+    p {
+      font-size: var(--font-size-sm);
+      color: var(--admin-text-muted);
+      margin: 0;
+    }
+  }
+
+  .verification-code {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+
+    input {
+      width: 48px;
+      height: 48px;
+      text-align: center;
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      border: 1.5px solid var(--admin-border);
+      border-radius: 8px;
+      background-color: var(--admin-light);
+      outline: none;
+      transition: all 0.2s;
+
+      &:focus {
+        border-color: var(--primary-color);
+        background-color: var(--admin-white);
+        box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.15);
+      }
+    }
+  }
+
+  .verification-actions {
+    display: flex;
+    gap: 12px;
+    .btn {
+      width: 50%;
+    }
+  }
+
+  .resend-section {
+    text-align: center;
+    font-size: var(--font-size-sm);
+
+    p {
+      color: var(--admin-text-muted);
+      margin-bottom: 4px;
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--primary-dark);
+      font-weight: 700;
+      cursor: pointer;
+
+      &:hover {
+        color: var(--primary-color);
+      }
+      .countdown {
+        color: var(--admin-danger);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Alt Bilgiler
+.login-footer {
+  margin-top: auto;
+  padding-top: 30px;
+  text-align: center;
+  font-size: var(--font-size-sm);
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 10px;
+
+    a {
+      color: var(--admin-text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      &:hover {
+        color: var(--primary-dark);
+      }
+    }
+  }
+
+  .copyright {
+    color: var(--text-muted);
+    margin: 0;
+  }
+}
+
+// Sağ Taraf: Premium Bilgi Paneli (Koyu ve Neon Vurgulu Tasarım)
+.login-login-info {
+  background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-primary-dark) 100%);
+  color: var(--admin-white);
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+
+  .info-header {
+    .security-badge {
+      width: 60px;
+      height: 60px;
+      background-color: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 15px;
+      margin-inline: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+
+      i {
+        font-size: 42px;
+        color: var(--admin-accent);
+      }
+    }
+
+    h3 {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+    }
+
+    p {
+      color: #94a3b8;
+      font-size: var(--font-size-base);
+      line-height: 1.5;
+      margin: 0;
+    }
+  }
+
+  .security-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px 0;
+
+    .feature-item {
+      display: flex;
+      gap: 16px;
+
+      i {
+        color: var(--admin-accent);
+        font-size: 20px;
+        margin-top: 1px;
+      }
+
+      .feature-content {
+        h6 {
+          font-size: var(--font-size-base);
+          font-weight: 600;
+          color: var(--admin-white);
+          margin: 0 0 4px 0;
+        }
+        p {
+          font-size: var(--font-size-sm);
+          color: #64748b;
+          margin: 0;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+
+  .support-info {
+    background: rgba(2, 6, 23, 0.4);
+    padding: 24px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    h6 {
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      margin: 0 0 6px 0;
+      color: var(--admin-accent);
+    }
+
+    p {
+      font-size: var(--font-size-sm);
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+
+    .support-contacts {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .support-contact {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+        font-size: var(--font-size-sm);
+        transition: color 0.2s;
+
+        i {
+          color: var(--admin-accent);
+          font-size: 16px;
+        }
+        &:hover {
+          color: var(--admin-white);
+        }
+      }
+    }
+  }
+
+  .info-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 20px;
+    font-size: var(--font-size-sm);
+    color: #475569;
+
+    .version-info {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}
+
+.cdk-overlay-container {
+  z-index: 99999 !important; /* Modal backdrop'un z-index değerinden daha yüksek olmalı */
+}
+.mdc-snackbar__label {
+  z-index: 99999 !important;
+}
+
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

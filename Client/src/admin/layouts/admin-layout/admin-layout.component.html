@@ -1,0 +1,24 @@
+<!-- admin-layout.component.html -->
+<div class="admin-layout" [class.sidebar-collapsed]="isSidebarCollapsed()">
+  <!-- Sol Menü: Duruma göre geniş veya dar görüntülenecek -->
+  <app-admin-sidebar [(isCollapsed)]="isSidebarCollapsed"></app-admin-sidebar>
+
+  <!-- Sağ İçerik Alanı -->
+  <div class="main-wrapper">
+
+    @if (isSidebarCollapsed()) {
+    <div class="buton-reply" (click)="isSidebarCollapsed.set(false)">
+      <i class="ri-arrow-right-s-fill"></i>
+    </div>
+    }
+
+    <!-- Üst Menü: Menüyü açıp kapatma tetikleyicisini dinliyoruz -->
+    <app-admin-navbar (toggleSidebarEvent)="toggleSidebar()"></app-admin-navbar>
+
+    <!-- Dinamik Sayfa Gövdesi -->
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+

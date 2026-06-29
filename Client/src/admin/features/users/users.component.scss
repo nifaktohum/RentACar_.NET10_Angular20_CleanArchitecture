@@ -1,0 +1,576 @@
+// =============================================================================
+// USER COMPONENT - PREMIUM MODERN DESIGN
+// =============================================================================
+
+ ::ng-deep .user-card {
+  background: var(--admin-white);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+
+  // Header
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--admin-light);
+    border-bottom: 1px solid var(--admin-border);
+    .header-title {
+      h3 {
+        margin: 0 0 0.25rem 0;
+        color: var(--admin-text);
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0;
+        color: var(--admin-text-muted);
+        font-size: 0.875rem;
+      }
+    }
+    .p-button-list {
+      display: flex;
+      gap: 0.5rem;
+      padding-block: 5px;
+    }
+  }
+
+  // Table
+  .user-management-wrapper {
+    .p-datatable-thead > tr > th {
+      background: var(--admin-primary);
+      color: var(--admin-white);
+      padding: 1rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: none;
+    }
+    .p-datatable-tbody > tr {
+      background: var(--admin-white);
+      transition: background-color 0.2s;
+      &:nth-child(even) {
+        background: var(--admin-light);
+      }
+      &:hover {
+        background: rgba(56, 189, 248, 0.05) !important;
+      }
+      td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--admin-border);
+        vertical-align: middle;
+
+        &.tag {
+          text-align: center;
+          font-size: 25px;
+            gap: 0.5rem;
+          i {
+            border-radius: 50%;
+            margin: 10px;
+            // box-shadow:
+            //   rgba(0, 0, 0, 0.09) 0px 8px 4px,
+            //   rgba(0, 0, 0, 0.09) 0px 16px 8px,
+            //   rgba(0, 0, 0, 0.09) 0px 32px 16px;
+                
+        border-bottom: 1px solid #10b981 !important;
+            top: 22px;
+          }
+          .checkbox-active {
+            color: #22c55e !important;
+          }
+          .checkbox-pasif {
+            color: #ef4444 !important;
+          }
+        }
+      }
+    }
+  }
+
+  // User Info & Badges
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    .user-name {
+      font-weight: 600;
+      color: var(--admin-text);
+    }
+    .user-id {
+      font-size: 0.75rem;
+      color: var(--admin-text-muted);
+      font-family: monospace;
+    }
+  }
+
+  .user-badge {
+    background: rgba(168, 85, 247, 0.1);
+    color: var(--admin-info);
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .form-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+  }
+
+  // Action Buttons
+  .action-buttons {
+    display: flex;
+    justify-content: center;
+    font-size: 22px;
+    gap: 0.5rem;
+
+    .p-button-rounded {
+      font-size: 20px;
+      &.btn-permissions {
+        color: #10b981 !important;
+        border-bottom: 1px solid #10b981 !important;
+        &:hover {
+          background: rgba(16, 185, 129, 0.15) !important;
+        }
+      }
+      &.btn-edit {
+        color: #60a5fa !important;
+        border-bottom: 1px solid #60a5fa !important;
+        &:hover {
+          background: rgba(96, 165, 250, 0.15) !important;
+        }
+      }
+      &.btn-delete {
+        color: #f87171 !important;
+        border-bottom: 1px solid #f87171 !important;
+        &:hover {
+          background: rgba(248, 113, 113, 0.15) !important;
+        }
+      }
+    }
+  }
+}
+
+// =============================================================================
+// DIALOG & FORM - SHARED MODERN DESIGN
+// =============================================================================
+
+.modern-dialog {
+  padding: 20px;
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15) !important;
+  border: 1px solid #e2e8f0 !important;
+
+  .p-dialog-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    .p-dialog-title {
+      font-size: 1.25rem !important;
+      font-weight: 700 !important;
+    }
+  }
+
+  .p-dialog-header-actions {
+    position: relative;
+    display: flex;
+    margin-left: auto;
+    bottom: 20px;
+    left: 27px;
+    .p-dialog-close-button {
+      color: #60a5fa !important;
+      border-bottom: 1px solid #60a5fa !important;
+      &:hover {
+        background: rgba(96, 165, 250, 0.15) !important;
+      }
+    }
+  }
+
+  .modern-form-container {
+    padding: 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+
+    .form-row {
+      .form-firstname {
+        margin-bottom: 15px;
+      }
+    }
+
+    // Toggle Alanı
+    .form-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 10px;
+      label {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+    }
+
+    // Float Label Inputs
+    p-floatlabel {
+      display: block;
+      position: relative;
+      input[pInputText] {
+        width: 100% !important;
+        padding: 0.75rem 1rem !important;
+        border-radius: 10px !important;
+        border: 1px solid #cbd5e1 !important;
+        &:focus {
+          border-color: #3b82f6 !important;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12) !important;
+        }
+      }
+      p-select {
+        width: 100%;
+      }
+    }
+
+    // Buttons
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      border-top: 1px solid #e2e8f0;
+
+      .p-button-primary {
+        background: #3b82f6;
+        border: 1px solid #3b82f6;
+        color: #ffffff;
+
+        &:hover {
+          background: #2563eb;
+        }
+      }
+    }
+  }
+}
+
+
+// ============================================================
+// KULLANICI DETAY DIALOG
+// ============================================================
+// ============================================================
+// KULLANICI DETAY DIALOG - MODERN TASARIM
+// ============================================================
+
+.user-detail-container {
+  padding: 0.5rem 0;
+
+  // ---------- PROFİL BAŞLIĞI ----------
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 2px solid #f1f5f9;
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+
+      &.inactive {
+        background: linear-gradient(135deg, #94a3b8, #64748b);
+      }
+    }
+
+    .header-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+
+      h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .header-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+          padding: 0.2rem 0.75rem;
+          border-radius: 50px;
+          font-size: 0.7rem;
+          font-weight: 600;
+          background: #e5e7eb;
+          color: #6b7280;
+
+          i {
+            font-size: 0.8rem;
+          }
+
+          &.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+          }
+
+          &.deleted {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+          }
+        }
+      }
+    }
+  }
+
+  // ---------- BÖLÜM ----------
+  .detail-section {
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+
+      i {
+        font-size: 1rem;
+        color: #94a3b8;
+      }
+    }
+  }
+
+  // ---------- TEMEL BİLGİLER ----------
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+
+      &.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .detail-label {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.7rem;
+        color: #94a3b8;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+
+        i {
+          font-size: 0.85rem;
+        }
+      }
+
+      .detail-value {
+        font-size: 0.95rem;
+        color: #0f172a;
+        font-weight: 500;
+        word-break: break-word;
+      }
+    }
+  }
+
+  // ---------- ROLLER ----------
+  .role-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .role-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(59, 130, 246, 0.08);
+      padding: 0.35rem 0.8rem;
+      border-radius: 50px;
+      border: 1px solid rgba(59, 130, 246, 0.15);
+
+      .role-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #3b82f6;
+      }
+
+      .role-desc {
+        font-size: 0.7rem;
+        color: #64748b;
+      }
+    }
+  }
+
+  // ---------- PERMISSION'LAR ----------
+  .permission-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+
+    .permission-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: #f8fafc;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #334155;
+
+      .permission-icon {
+        font-size: 0.7rem;
+        color: #22c55e;
+      }
+
+      .permission-name {
+        font-family: 'Courier New', monospace;
+        font-size: 0.7rem;
+      }
+
+      &:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+      }
+    }
+  }
+
+  // ---------- ZAMAN BİLGİLERİ ----------
+// ---------- ZAMAN BİLGİLERİ ----------
+.time-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+
+    .time-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        padding: 0.5rem 0.75rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #f1f5f9;
+
+        .time-label {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.65rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+
+            i {
+                font-size: 0.7rem;
+            }
+        }
+
+        .time-value {
+            font-size: 0.9rem;
+            color: #0f172a;
+            font-weight: 600;
+            padding-left: 1.1rem;
+        }
+    }
+}
+
+  // ---------- BOŞ DURUM ----------
+  .empty-text {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  
+}
+
+
+// ============================================================
+// DIALOG FOOTER
+// ============================================================
+
+.p-dialog-footer{
+  display: flex;
+  justify-content: flex-end;
+  align-items: center !important;
+  padding: 0 !important;
+  margin-top: 15px;
+
+  .btn-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    background: var(--admin-primary) !important;  // 🎯 Logo Rengi!
+    color: #ffffff !important;
+    border: none !important;
+    transition: all 0.25s ease-in-out;
+
+
+    // İkon
+    .p-button-icon {
+      font-size: 1.1rem !important;
+      color: #ffffff !important;
+    }
+
+    // Hover Efekti
+    &:hover {
+      background: var(--admin-primary-dark) !important;  // 🎯 Logo Rengi Koyu Ton!
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    // Tıklama Efekti
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    // Focus Durumu
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+  }
+}
