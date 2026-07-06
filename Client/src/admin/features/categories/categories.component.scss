@@ -195,6 +195,13 @@
     .checkbox-pasif {
       color: #ef4444;
     }
+
+    .mat-badge-content {
+      background-color: var(--secondary-color) !important;
+      color: var(--white) !important;
+      margin: -8px !important;
+      border-radius: 10px !important;
+    }
   }
 
   /* ===========================
@@ -259,6 +266,3 @@
     }
   }
 }
-
-
-

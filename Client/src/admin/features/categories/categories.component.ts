@@ -18,6 +18,7 @@ import { CardModule } from 'primeng/card';
 import { CustomConfirmDialogService } from '../../shared/services/custom-confirm-dialog.service';
 import { TreeTableModule } from 'primeng/treetable';
 import { ActivatedRoute } from '@angular/router';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @Component({
   selector: 'app-categories',
@@ -32,6 +33,7 @@ import { ActivatedRoute } from '@angular/router';
     CategoryFormDialogComponent,
     IconFieldModule,
     InputIconModule,
+    MatBadgeModule
   ],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.scss',

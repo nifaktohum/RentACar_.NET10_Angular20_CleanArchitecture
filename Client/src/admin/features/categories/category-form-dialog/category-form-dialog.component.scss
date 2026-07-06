@@ -6,12 +6,11 @@
   .field-container {
     display: flex;
     flex-direction: column;
-    gap: 1.3rem;
-    margin-bottom: 10px;
+    margin-block: 20px;
 
     .field-label {
       text-align: center;
-      padding-bottom: 5px;
+      padding-bottom: 15px;
       font-weight: 500;
       font-size: 1.2rem;
       color: var(--text-color-secondary);
@@ -21,7 +20,7 @@
   .p-button-group {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     button {
       flex: 1;
       &.p-button-primary {

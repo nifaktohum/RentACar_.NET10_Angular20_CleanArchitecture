@@ -26,6 +26,12 @@ body {
 }
 
 :root {
+
+    @include mat.badge-overrides((
+    background-color: orange,
+    disabled-state-background-color: red,
+  ));
+  
   --primary-color: #00d2ff;
   --primary-dark: #00a8cc;
   --secondary-color: #101827;

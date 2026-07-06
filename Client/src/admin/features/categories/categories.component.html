@@ -80,8 +80,9 @@
             <td><span class="category-desc">{{ rowData.description || '-' }}</span></td>
             <td><span class="category-order">{{ rowData.displayOrder }}</span></td>
             <td>
-              <span class="category-tag">
-                <i [class]="rowData.isActive ? 'ri-checkbox-circle-line checkbox-active' : 'ri-indeterminate-circle-line checkbox-pasif'"></i>
+              <span class="category-tag"  >
+                <i [matBadge]="rowData.subCategories?.length"  container-offset="12px"
+                  [class]=" rowData.isActive ? 'ri-checkbox-circle-line checkbox-active' : 'ri-indeterminate-circle-line checkbox-pasif'"></i>
               </span>
             </td>
             <td>
