@@ -22,6 +22,7 @@ import { PhoneFormatPipe } from "../../../shared/pipes/phone-format.pipe";
 import { AuthService } from '../../../core/services/auth.service';
 import { DatePipe } from '@angular/common';
 import { UserDetail } from '../../core/models/detailUser.model';
+import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'app-users',
@@ -31,7 +32,8 @@ import { UserDetail } from '../../core/models/detailUser.model';
     FloatLabelModule,
     DialogModule,
     FormsModule, SelectModule, ToggleSwitchModule,
-    PhoneFormatPipe, DatePipe
+    PhoneFormatPipe, DatePipe, 
+    CardModule
 ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.scss',
@@ -154,6 +156,7 @@ export class UsersComponent implements OnInit {
     };
     this.isUserDialogVisible = true;
   }
+  
   openEditUserDialog(user: any) {
     this.dialogTitle.set(user.fullName + ' Düzenle');
     // 1. Rol ismini al (Örn: 'Customer')

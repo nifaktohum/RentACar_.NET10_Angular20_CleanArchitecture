@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Abstractions;
 
 namespace Domain.Categories;
@@ -66,6 +62,29 @@ public sealed class Category : BaseEntity
       throw new InvalidOperationException("Bir kategori kendi kendisinin alt kategorisi olamaz.");
 
     ParentCategoryId = parentCategoryId;
+  }
+
+  // ✅ OVERRIDE - Category'ye özel davranış
+  public override void SetActiveStatus(bool isActive)
+  {
+    IsActive = isActive;
+
+    if (SubCategories.Any())
+    {
+      foreach (var sub in SubCategories)
+      {
+        sub.SetActiveStatus(isActive);
+      }
+    }
+  }
+
+  // ✅ PRIVATE: Alt kategorileri pasif yap (Recursive)
+  private void SetSubCategoriesInactive()
+  {
+    foreach (var sub in SubCategories)
+    {
+      sub.SetActiveStatus(false); // Recursive!
+    }
   }
 
   // İş Kuralları

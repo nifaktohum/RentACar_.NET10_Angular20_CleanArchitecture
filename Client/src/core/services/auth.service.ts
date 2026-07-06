@@ -41,6 +41,9 @@ export class AuthService {
         tap(res => {
           if (res.isSuccessful && res.data) {
             this.saveToken(res.data.token);
+
+            const decoded = jwtDecode<TokenPayload>(res.data.token);
+            this.currentUser.set(decoded);
           }
         })
       );
@@ -56,7 +59,8 @@ export class AuthService {
     localStorage.setItem('fullName', data.fullName);
     localStorage.setItem('email', data.email);
     // Token kaydını zaten yapıyorsun
-    this.saveToken(data.token);
+    // this.saveToken(data.token);
+    
   }
 
   loadSession() {
@@ -72,8 +76,9 @@ export class AuthService {
   }
 
   saveToken(token: string) {
+    console.log("SAVE TOKEN", token);
     localStorage.setItem('token', token);
-    this.loadSession(); // Token gelince signal'leri de anında tetikle kanka!
+    console.log("After save:", localStorage.getItem("token"));
   };
 
   getToken(): string | null {
@@ -92,22 +97,35 @@ export class AuthService {
   }
 
   logout() {
-    // Kullanıcı çıkış yapmak istediğinde yerel hafızadaki token'ı temizliyoruz.
-    localStorage.removeItem('token');
+    console.trace("🚨 LOGOUT ÇAĞRILDI");
+
+    localStorage.removeItem("token");
     localStorage.clear();
+
     this.currentUser.set(null);
-  };
+  }
 
   // // AuthService sınıfının içine eklenecek olan süre kontrol metodu:
   isTokenExpired(): boolean {
     const token = this.getToken();
-    if (!token) return true;
+    console.log("TOKEN =", token);
+    if (!token) {
+      console.log("Token yok");
+      return true;
+    }
 
     try {
       const decoded = this.getDecodedToken();
-      if (!decoded || !decoded.exp) return true;
+      console.log("Decoded =", decoded);
+      if (!decoded || !decoded.exp) {
+        console.log("Decode başarısız");
+        return true;
+      }
+      console.log("exp =", decoded.exp);
+      console.log("now =", Date.now());
 
       const expiryTime = decoded.exp * 1000; // Saniyeyi JS'e uygun milisaniyeye çevirdik
+      console.log("expiry =", expiryTime);
       const currentTime = Date.now();
 
       return currentTime > expiryTime; // Süre bittiyse true fırlatır kanka
@@ -187,4 +205,5 @@ export class AuthService {
 
     console.log('✅ Oturum temizlendi, rememberedEmail korundu:', localStorage.getItem('rememberedEmail'));
   }
+
 }

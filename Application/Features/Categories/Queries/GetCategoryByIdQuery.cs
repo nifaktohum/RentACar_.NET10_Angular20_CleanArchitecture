@@ -38,6 +38,7 @@ public sealed class GetCategoryByIdQueryHandler(
                 sc.Id,
                 sc.Name,
                 sc.Slug,
+                sc.Description,
                 sc.DisplayOrder,
                 sc.ParentCategoryId,
                 sc.ParentCategory?.Name,

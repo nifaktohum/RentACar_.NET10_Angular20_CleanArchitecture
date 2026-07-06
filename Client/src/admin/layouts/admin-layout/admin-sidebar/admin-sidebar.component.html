@@ -26,7 +26,8 @@
       @if (!_nav.haveSubMenu) {
 
       <li class="menu-item">
-        <a class="menu-link" [routerLink]="_nav.url" routerLinkActive="active"
+        <!-- ✅ queryParams desteği eklendi -->
+        <a class="menu-link" [routerLink]="_nav.url" [queryParams]="_nav.queryParams" routerLinkActive="active"
           [routerLinkActiveOptions]="{exact: true}">
           <i [ngClass]="_nav.icon"></i>
           @if (!isCollapsed()) {
@@ -50,7 +51,9 @@
         <ul class="submenu" [class.submenu--visible]="!isCollapsed() && openSubmenus()[_nav.title.toLowerCase()]">
           @for (_subNav of _nav.subMenus; track _subNav.title) {
           <li>
-            <a [routerLink]="_subNav.url" routerLinkActive="sub-active" [routerLinkActiveOptions]="{exact: true}">
+            <!-- ✅ Alt menü için de queryParams desteği -->
+            <a [routerLink]="_subNav.url" [queryParams]="_subNav.queryParams" routerLinkActive="sub-active"
+              [routerLinkActiveOptions]="{exact: true}">
               {{_subNav.title}}
             </a>
           </li>

@@ -9,5 +9,6 @@ public sealed record CategoryDto(
     string? Description,
     int? DisplayOrder,
     Guid? ParentCategoryId,
-    string? ParentCategoryName
+    string? ParentCategoryName,
+    bool IsActive
 );

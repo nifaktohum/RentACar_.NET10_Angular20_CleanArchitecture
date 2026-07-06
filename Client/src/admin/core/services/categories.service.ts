@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { Result } from '../../../core/models/result.model';
-import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../models/category.model';
+import { Category, CategoryRequest } from '../models/category.model';
 import { BYPASS_INTERCEPTOR } from '../../../core/interceptors/error.interceptor';
 
 @Injectable({
@@ -33,13 +33,13 @@ export class CategoriesService {
     });
   }
 
-  create(data: CreateCategoryRequest): Observable<Result<Category>> {
+  create(data: CategoryRequest): Observable<Result<Category>> {
     return this.http.post<Result<Category>>(`${this.apiUrl}/create`, data, {
       context: new HttpContext().set(BYPASS_INTERCEPTOR, true)
     });
   }
 
-  update(data: UpdateCategoryRequest): Observable<Result<Category>> {
+  update(data: CategoryRequest): Observable<Result<Category>> {
     return this.http.put<Result<Category>>(`${this.apiUrl}/update`, data, {
       context: new HttpContext().set(BYPASS_INTERCEPTOR, true)
     });
@@ -47,7 +47,7 @@ export class CategoriesService {
 
   delete(id: string): Observable<Result<void>> {
     return this.http.delete<Result<void>>(`${this.apiUrl}/delete`, { 
-       body: id = id,
+      body: { id: id }, 
       context: new HttpContext().set(BYPASS_INTERCEPTOR, true)
       });
   }

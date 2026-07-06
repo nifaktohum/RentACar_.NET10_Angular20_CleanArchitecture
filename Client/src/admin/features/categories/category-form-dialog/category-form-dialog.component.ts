@@ -1,13 +1,26 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, input, model, output, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, model, output, signal, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
-import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../../../core/models/category.model';
+import { Category, CategoryRequest } from '../../../core/models/category.model';
+import { FloatLabel } from 'primeng/floatlabel';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { MessageService } from 'primeng/api';
+import { CategoriesService } from '../../../core/services/categories.service';
+import { finalize } from 'rxjs';
+import { NgTemplateOutlet } from '@angular/common';
+import { ToggleSwitch } from 'primeng/toggleswitch';
 
 @Component({
   selector: 'app-category-form-dialog',
   imports: [
+    NgTemplateOutlet,
     DialogModule,
-    FormsModule
+    FormsModule,
+    FloatLabel,
+    SelectModule,
+    ButtonModule,
+    ToggleSwitch
   ],
   templateUrl: './category-form-dialog.component.html',
   styleUrl: './category-form-dialog.component.scss',
@@ -15,114 +28,244 @@ import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../../..
   encapsulation: ViewEncapsulation.Emulated
 })
 export class CategoryFormDialogComponent {
-  isDialogVisible(): any {
-    throw new Error('Method not implemented.');
-  }
-  readonly title = input<string>("Kategori Ekle")
-  readonly visible = model(false);
-  readonly mode = input<"create" | "edit">("create");
-  readonly editData = input<Category | null>(null);
-  readonly parentCategories = input<Category[]>([]);
-  readonly saving = input<boolean>(false);
-  readonly save = output<CreateCategoryRequest | UpdateCategoryRequest>();
+  private messageServiceToast = inject(MessageService);
+  private categoriesService = inject(CategoriesService);
 
-  // Form model
-  formData: CreateCategoryRequest = {
+  // ==================== INPUTS ====================
+  readonly mode = input<'dialog' | 'page'>('dialog');
+  readonly title = input<string>("Kategori Ekle");
+  readonly visible = model(false);
+  readonly editmode = input<"create" | "edit">("create");
+  readonly editData = input<Category | null>(null);
+  readonly parentCategories = model<Category[]>([]);
+  readonly isLoading = model<boolean>(false);
+
+  // ==================== OUTPUTS ====================
+  readonly save = output<CategoryRequest>();
+  readonly saveSuccess = output<boolean>();
+
+  // ==================== SIGNALS ====================
+  readonly isSubCategoryMode = signal<boolean>(false);
+
+  // ==================== FORM MODEL ====================
+  categoryForm: CategoryRequest = {
+    id: '',
     name: '',
     slug: '',
     description: null,
     displayOrder: null,
-    parentCategoryId: null
+    parentCategoryId: null,
+    isActive: true
   };
 
+  // ==================== COMPUTED ====================
   get dialogTitle(): string {
-    return this.mode() === 'create' ? 'Yeni Kategori Ekle' : 'Kategori Düzenle';
+    return this.editmode() === 'create' ? 'Yeni Kategori Ekle' : 'Kategori Düzenle';
   }
 
   get isEditMode(): boolean {
-    return this.mode() === 'edit';
+    return this.editmode() === 'edit';
   }
 
-  // Lifecycle
+  // ✅ Update için veriyi hazırla (her seferinde dinamik oluştur)
+  private getUpdateData(): CategoryRequest {
+    return {
+      id: this.editData()?.id || '',
+      name: this.categoryForm.name,
+      slug: this.categoryForm.slug,
+      description: this.categoryForm.description,
+      displayOrder: this.categoryForm.displayOrder,
+      parentCategoryId: this.categoryForm.parentCategoryId,
+      isActive: this.categoryForm.isActive
+    };
+  }
+
+  // ==================== LIFECYCLE ====================
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['editData'] && this.editData() && this.mode() === 'edit') {
+    // ✅ Edit modunda formu doldur
+    if (changes['editData'] && this.editData() && this.editmode() === 'edit') {
       this.populateForm(this.editData()!);
     }
 
-    if (changes['visible'] && !this.visible) {
+    // ✅ Dialog kapatıldığında formu resetle
+    if (changes['visible'] && !this.visible()) {
       this.resetForm();
     }
 
-    if (changes['mode'] && this.mode() === 'create') {
+    // ✅ Mode değiştiğinde formu resetle
+    if (changes['mode'] && this.editmode() === 'create') {
       this.resetForm();
     }
   }
 
-  onSubmit(): void {
-    // Validasyon
-    if (!this.formData.name?.trim()) {
-      // Toast veya error mesajı göster
-      return;
-    }
+  // ==================== PUBLIC METHODS ====================
 
-    if (!this.formData.slug?.trim()) {
+  /**
+   * Kategoriyi kaydeder (Create veya Update)
+   */
+  saveCategory(): void {
+    // Validasyonlar
+    if (!this.categoryForm.name?.trim() || !this.categoryForm.slug?.trim()) {
+      this.messageServiceToast.add({
+        severity: 'warn',
+        summary: 'Uyarı',
+        detail: 'Kategori adı ve Slug zorunludur.'
+      });
       return;
     }
 
     // Slug'ı formatla
-    this.formData.slug = this.formData.slug
+    this.categoryForm.slug = this.categoryForm.slug
       .toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-]/g, '');
 
-    // Save event'ini fırlat
-    if (this.isEditMode && this.editData()) {
-      const updateData: UpdateCategoryRequest = {
-        id: this.editData()!.id,
-        ...this.formData
-      };
-      this.save.emit(updateData);
-    } else {
-      this.save.emit(this.formData);
-    }
+    this.isLoading.set(true);
+
+    // ✅ Create veya Update işlemi
+    const request$ = this.editmode() === 'create'
+      ? this.categoriesService.create(this.categoryForm)
+      : this.categoriesService.update(this.getUpdateData());  // ✅ Dinamik update data
+
+    request$.pipe(finalize(() => this.isLoading.set(false))).subscribe({
+      next: (res) => {
+        if (res.isSuccessful) {
+          const action = this.editmode() === 'create' ? 'kaydedildi' : 'güncellendi';
+          this.messageServiceToast.add({
+            severity: 'success',
+            summary: 'Başarılı 🎉',
+            detail: `"${this.categoryForm.name}" başarıyla ${action}.`
+          });
+
+          this.resetForm();
+
+          // ✅ Page modunda formu temizle, sayfada kal
+          if (this.mode() === 'page') {
+            // Form zaten resetlendi, devam et
+            this.saveSuccess.emit(true);
+            // Odağı name alanına ver
+            setTimeout(() => {
+              const nameInput = document.getElementById('name') as HTMLInputElement;
+              if (nameInput) nameInput.focus();
+            }, 100);
+          } else {
+            // Dialog modunda kapat
+            this.closeDialog();
+            this.saveSuccess.emit(true);
+          }
+          return;
+        }
+
+        this.messageServiceToast.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: res.errorMessages?.join(', ') || 'İşlem başarısız.'
+        });
+        this.saveSuccess.emit(false);
+      },
+      error: (err) => {
+        this.messageServiceToast.add({
+          severity: 'error',
+          summary: 'Sistem Hatası',
+          detail: err.error?.errorMessages?.join(', ') || 'Sunucuya ulaşılamadı, lütfen tekrar deneyin.'
+        });
+        this.saveSuccess.emit(false);
+        console.error(err);
+      }
+    });
   }
 
-  //  * Slug'ı otomatik formatlar
+  /**
+   * Slug'ı otomatik formatlar
+   */
   formatSlug(): void {
-    if (this.formData.name) {
-      this.formData.slug = this.formData.name
+    if (this.categoryForm.name) {
+      this.categoryForm.slug = this.categoryForm.name
         .toLowerCase()
         .replace(/\s+/g, '-')
         .replace(/[^a-z0-9-]/g, '');
     }
   }
 
-  //  * Form'u doldurur (edit modu için)
-  private populateForm(category: Category): void {
-    this.formData = {
-      name: category.name,
-      slug: category.slug,
-      description: category.description ?? null,
-      displayOrder: category.displayOrder ?? null,
-      parentCategoryId: category.parentCategoryId ?? null
-    };
+  /**
+   * İsim değiştiğinde slug'ı güncelle
+   */
+  onNameSlugChange(): void {
+    this.categoryForm.slug = this.categoryForm.name
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
   }
 
-  //  * Form'u resetler
-  private resetForm(): void {
-    this.formData = {
-      name: '',
-      slug: '',
-      description: null,
-      displayOrder: null,
-      parentCategoryId: null
-    };
+  /**
+   * Dialog'u kapat
+   */
+  closeDialog(): void {
+    this.visible.set(false);
+    this.resetForm();
   }
 
-
+  /**
+   * Kapat (alias)
+   */
   close(): void {
     this.visible.set(false);
     this.resetForm();
   }
 
+  /**
+   * Ana kategori moduna geç
+   */
+  setParentCategoryMode(): void {
+    this.isSubCategoryMode.set(false);
+    this.categoryForm.parentCategoryId = null;
+  }
+
+  /**
+   * Alt kategori moduna geç
+   */
+  setSubCategoryMode(): void {
+    this.isSubCategoryMode.set(true);
+  }
+
+  // ==================== PRIVATE METHODS ====================
+
+  /**
+   * Form'u doldurur (edit modu için)
+   */
+  private populateForm(category: Category): void {
+    this.categoryForm = {
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      description: category.description ?? null,
+      displayOrder: category.displayOrder ?? null,
+      parentCategoryId: category.parentCategoryId ?? null,
+      isActive: category.isActive
+    };
+
+    // ✅ Alt kategori ise isSubCategoryMode'u true yap
+    this.isSubCategoryMode.set(category.parentCategoryId !== null);
+  }
+
+  /**
+   * Form'u resetler
+   */
+  private resetForm(): void {
+    this.categoryForm = {
+      id: '',
+      name: '',
+      slug: '',
+      description: null,
+      displayOrder: null,
+      parentCategoryId: null,
+      isActive: true
+    };
+
+    // ✅ Create modunda ise SubCategory modunu sıfırla
+    if (this.editmode() === 'create') {
+      this.isSubCategoryMode.set(false);
+    }
+  }
 }

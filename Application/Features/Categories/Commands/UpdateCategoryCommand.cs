@@ -4,6 +4,7 @@ using Domain.Repositories;
 using FluentValidation;
 using GenericRepository;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using TS.Result;
 
@@ -16,7 +17,8 @@ public sealed record UpdateCategoryCommand(
                             string Slug,
                             string? Description,
                             int? DisplayOrder,
-                            Guid? ParentCategoryId
+                            Guid? ParentCategoryId,
+                            bool IsActive
                         ) : IRequest<Result<CategoryDto>>;
 
 public sealed class UpdateCategoryCommandHandler(
@@ -45,12 +47,18 @@ public sealed class UpdateCategoryCommandHandler(
 
       RuleFor(x => x.Description)
           .MaximumLength(500).WithMessage("Açıklama 500 karakterden uzun olamaz.");
+        
+      RuleFor(x => x.IsActive)
+          .NotNull().WithMessage("Aktiflik durumu belirtilmelidir.");
     }
   }
   public async Task<Result<CategoryDto>> Handle(UpdateCategoryCommand _req, CancellationToken _token)
   {
     // 1. Kategori var mı?
-    var category = await _categoryRepo.GetByExpressionWithTrackingAsync(c => c.Id == _req.Id, _token);
+    var category = await _categoryRepo
+    .GetAll().Include(c => c.SubCategories)
+    .FirstOrDefaultAsync(c => c.Id == _req.Id && !c.IsDeleted, _token);
+
     if (category is null) return Result<CategoryDto>.Failure(404, "Kategori bulunamadı.");
 
     // 2. Slug kontrolü (kendi hariç)
@@ -85,10 +93,11 @@ public sealed class UpdateCategoryCommandHandler(
         description: _req.Description,
         displayOrder: _req.DisplayOrder,
         parentCategoryId: _req.ParentCategoryId
+        
     );
     // 6. Update metadata
     category.UpdateMetadata(updatedBy);
-
+    category.SetActiveStatus(_req.IsActive);
     _categoryRepo.Update(category);
 
     await unit.SaveChangesAsync(_token);
@@ -100,7 +109,8 @@ public sealed class UpdateCategoryCommandHandler(
           Description: category.Description,
           DisplayOrder: category.DisplayOrder,
           ParentCategoryId: category.ParentCategoryId,
-          ParentCategoryName: category.ParentCategory?.Name
+          ParentCategoryName: category.ParentCategory?.Name,
+          IsActive: category.IsActive
       );
 
     return Result<CategoryDto>.Succeed(response);

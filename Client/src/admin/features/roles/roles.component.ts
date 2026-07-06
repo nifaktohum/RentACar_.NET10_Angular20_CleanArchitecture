@@ -14,7 +14,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { PermissionService } from '../../core/services/permission.service';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { PermissionModel } from '../../core/models/permission.molel';
-import { AuthService } from '../../../core/services/auth.service';
+import { CardModule } from 'primeng/card';
 
 export const ADMIN_ROLE_ID = 'A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D';
 
@@ -28,12 +28,13 @@ export const ADMIN_ROLE_ID = 'A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D';
     ConfirmDialogModule,
     DialogModule,
     FloatLabelModule,
-    ToggleSwitchModule 
+    ToggleSwitchModule,
+    CardModule
   ],
   templateUrl: './roles.component.html',
   styleUrl: './roles.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.Emulated
 })
 export class RolesComponent implements OnInit {
   

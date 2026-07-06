@@ -46,4 +46,11 @@ public sealed class CategoriesController(IMediator _mediator): BaseApiController
     var result = await _mediator.Send(category, token);
     return result.IsSuccessful ? Ok(result) : BadRequest(result);
   }
+
+  [HttpGet("gethierarchy")]
+  public async Task<IActionResult> GetHierarchy(CancellationToken token)
+  {
+    var result = await _mediator.Send(new GetCategoryHierarchyQuery(), token);
+    return Ok(result);
+  }
 }

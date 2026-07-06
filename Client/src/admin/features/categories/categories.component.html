@@ -1,100 +1,122 @@
-<!-- src/app/modules/admin/categories/category-list/category-list.component.html -->
+<!-- categories.component.html -->
 
+<!-- ✅ SAYFA MODU (Kategori Ekle Sayfası) -->
+@if (isPageMode()) {
+<div class="page-container">
+  <!-- <div class="page-header">
+    <h2>
+      <i class="ri-add-circle-line"></i>
+      Yeni Kategori Ekle
+    </h2>
+    <p>Araç kategorisi oluşturun ve hiyerarşik yapıda düzenleyin.</p>
+  </div> -->
+
+  <app-category-form-dialog [mode]="'page'" [editmode]="'create'" [parentCategories]="parentCategories()"
+    (saveSuccess)="onSaveSuccess($event)">
+  </app-category-form-dialog>
+</div>
+}
+
+<!-- ✅ LİSTE MODU (Kategori Yönetimi) -->
+@if (!isPageMode()) {
 <div class="category-card">
-  <div class="card-header">
-    <div class="header-title">
+  <p-card>
+    <!-- Header -->
+    <div class="p-button-list">
       <h3>Kategori Yönetimi</h3>
       <p>Araç kategorilerini listeleyebilir, düzenleyebilir ve yönetebilirsin.</p>
+
+      <p-button icon="ri-folder-add-line" pTooltip="Yeni Kategori Ekle" [raised]="true"
+        (click)="openNewCategoryDialog()">
+      </p-button>
+
+      <p-button icon="ri-tree-line" severity="secondary" pTooltip="Hiyerarşik Görünüm" [raised]="true"
+        (click)="navigateToHierarchy()">
+      </p-button>
+
+      <p-button severity="contrast" icon="ri-refresh-line" pTooltip="Yenile" [raised]="true" [loading]="isLoading()"
+        (click)="refreshData()">
+      </p-button>
     </div>
-    <div class="p-button-list">
-      <p-button (click)="openNewCategoryDialog()" icon="ri-folder-add-line" pTooltip="Yeni Kategori Ekle"
-        [raised]="true"></p-button>
-      <p-button (click)="navigateToHierarchy()" icon="ri-tree-line" pTooltip="Hiyerarşik Görünüm" severity="secondary"
-        [raised]="true"></p-button>
-      <p-button severity="contrast" icon="ri-refresh-line" pTooltip="Yenile" (click)="refreshData()"
-        [loading]="isLoading()" [raised]="true"></p-button>
-    </div>
-  </div>
 
-  <div class="p-category-management-wrapper">
-    <p-table #dt [value]="categories()" [rows]="10" [paginator]="true"
-      [globalFilterFields]="['name', 'slug', 'description', 'parentName']" responsiveLayout="scroll"
-      [loading]="isLoading()">
+    <!-- TreeTable -->
+    <div class="category-management-wrapper">
+      <p-treetable #tt [value]="treeCategories()" [loading]="isLoading()" [paginator]="true" [rows]="5"
+        [rowsPerPageOptions]="[5, 10, 25]" paginatorDropdownAppendTo="body" [tableStyle]="{ 'min-width': '75rem' }">
 
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 3%">#</th>
-          <th style="width: 20%">Kategori Adı</th>
-          <th style="width: 15%">Slug</th>
-          <th style="width: 25%">Açıklama</th>
-          <th style="width: 10%">Sıra</th>
-          <th style="width: 15%">
+        <!-- Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width:3%">No:</th>
+            <th style="width:30%">Kategori</th>
+            <th style="width:15%">Slug</th>
+            <th style="width:25%">Açıklama</th>
+            <th style="width:8%">Sıra</th>
+            <th style="width:10%;text-align:center">Durum</th>
+            <th style="width:12%;text-align:center">İşlemler</th>
+          </tr>
+        </ng-template>
 
-            <p-columnFilter field="parentName" matchMode="equals" [showMenu]="false">
-              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                <p-select [ngModel]="value" [options]="parentCategories()" optionLabel="name" optionValue="name"
-                  (onChange)="filter($event.value)" placeholder="Üst Kategori" [showClear]="true" [style]="{'width':'100%'}">
-                </p-select>
-              </ng-template>
-            </p-columnFilter>
-          </th>
-          <th style="width: 10%; text-align: center;">Durum</th>
-          <th style="width: 10%; text-align: center;">İşlemler</th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-category let-i="rowIndex">
-        <tr [ngClass]="{ 'deleted-row': category.isDeleted }">
-          <td>{{ i + 1 }}</td>
-          <td>
-            <div class="category-info" [style.padding-left.px]="category.level === 1 ? 30 : 0">
-              <span class="category-name" [style.font-weight]="category.level === 0 ? '600' : '400'">
-                {{ category.level === 1 ? '↳ ' + category.name : category.name }}
+        <!-- Body -->
+        <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+          <tr>
+            <td>
+              <div class="category-cell">
+                @if (rowNode.level === 0) {
+                <span class="category-index">{{ rowData.displayNumber }}</span>
+                }
+              </div>
+            </td>
+            <td>
+              <div class="category-info">
+                <p-treetable-toggler [rowNode]="rowNode"></p-treetable-toggler>
+                <span class="category-name" [class.parent-category]="rowNode.level === 0"
+                  [class.child-category]="rowNode.level > 0">
+                  {{ rowData.name }}
+                </span>
+              </div>
+            </td>
+            <td><span class="category-slug">{{ rowData.slug }}</span></td>
+            <td><span class="category-desc">{{ rowData.description || '-' }}</span></td>
+            <td><span class="category-order">{{ rowData.displayOrder }}</span></td>
+            <td>
+              <span class="category-tag">
+                <i [class]="rowData.isActive ? 'ri-checkbox-circle-line checkbox-active' : 'ri-indeterminate-circle-line checkbox-pasif'"></i>
               </span>
-            </div>
-          </td>
-          <td>
-            <span class="category-slug">{{ category.slug }}</span>
-          </td>
-          <td>
-            <span class="category-desc">{{ category.description || '-' }}</span>
-          </td>
-          <td>
-            <span class="category-order">{{ category.displayOrder || '-' }}</span>
-          </td>
-          <td>
-            <span>{{ category.parentName || '-' }}</span>
-          </td>
-          <td class="category-tag" style="text-align: center;">
-            <i [class]="category.isActive ? 'checkbox-active ri-checkbox-circle-line' : 'checkbox-pasif ri-indeterminate-circle-line'"
-              class="mr-1"></i>
-            <!-- <p-tag [severity]="getStatusSeverity(category)" [value]="getStatusLabel(category)" [rounded]="true"></p-tag> -->
-          </td>
-          <td style="text-align: center;">
-            <div class="action-buttons">
-              <button pButton icon="ri-edit-line" class="p-button-rounded p-button-text btn-edit"
-                (click)="openEditCategoryDialog(category)" pTooltip="Düzenle" [disabled]="category.isDeleted"></button>
-              <button pButton icon="ri-delete-bin-line" class="p-button-rounded p-button-text btn-delete"
-                (click)="deleteCategory(category.id, category.name)" pTooltip="Sil"
-                [disabled]="category.isDeleted"></button>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button pButton icon="ri-edit-line" class="p-button-rounded p-button-text btn-edit" pTooltip="Düzenle"
+                  (click)="openEditCategoryDialog(rowData)">
+                </button>
+                <button pButton icon="ri-delete-bin-line" class="p-button-rounded p-button-text btn-delete"
+                  pTooltip="Sil" (click)="deleteCategory(rowData.id, rowData.name)">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
 
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="8" class="table-empty">
-            {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı kategori bulunamadı.' }}
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+        <!-- Empty -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="table-empty">
+              {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı kategori bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-treetable>
+    </div>
+  </p-card>
 </div>
 
-<app-category-form-dialog [(visible)]="isDialogVisible"></app-category-form-dialog>
-
-Toast & Confirm 
-<!-- <p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog> -->
+<!-- ✅ DIALOG (Sadece liste modunda) -->
+<app-category-form-dialog
+  [(visible)]="isDialogVisible"
+  [editmode]="dialogTitle()"
+  [editData]="editData()"
+  [parentCategories]="parentCategories()"
+  (saveSuccess)="onSaveSuccess($event)">
+  </app-category-form-dialog>
+}

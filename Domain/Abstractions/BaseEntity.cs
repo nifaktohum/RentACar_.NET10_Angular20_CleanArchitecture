@@ -8,7 +8,7 @@ public abstract class BaseEntity
   public Guid CreatedBy { get; private set; }  
   public DateTimeOffset? UpdatedAt { get; private set; }
   public Guid? UpdatedBy { get; private set; }
-  public bool IsActive { get; private set; } = true;
+  public bool IsActive { get; protected set; } = true;
   public bool IsDeleted { get; private set; }
   public DateTimeOffset? DeletedAt { get; private set; }
   public Guid? DeletedBy { get; private set; }
@@ -36,7 +36,7 @@ public abstract class BaseEntity
   // KONTROL-METODU: Nesneyi tekrar kullanıma açar (Örn: Bakımdan çıkan araç tekrar kiralanabilir duruma gelir).
 
   // BaseEntity.cs içine ekle
-  public void SetActiveStatus(bool isActive) => IsActive = isActive;
+  public virtual void SetActiveStatus(bool isActive) => IsActive = isActive;
   
   public void SetCreateMetadata(Guid userId)
   {

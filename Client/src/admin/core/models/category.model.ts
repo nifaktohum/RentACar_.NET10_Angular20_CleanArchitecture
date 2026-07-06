@@ -26,19 +26,20 @@ export interface Category {
 }
 
 // Request/Response tipleri
-export interface CreateCategoryRequest {
-  name: string;
-  slug: string;
-  description?: string | null;
-  displayOrder?: number | null;
-  parentCategoryId?: string | null;
-}
+// export interface CreateCategoryRequest {
+//   name: string;
+//   slug: string;
+//   description?: string | null;
+//   displayOrder?: number | null;
+//   parentCategoryId?: string | null;
+// }
 
-export interface UpdateCategoryRequest {
-  id: string;
+export interface CategoryRequest {
+  id?: string;
   name: string;
   slug: string;
   description?: string | null;
   displayOrder?: number | null;
   parentCategoryId?: string | null;
+  isActive: boolean;
 }

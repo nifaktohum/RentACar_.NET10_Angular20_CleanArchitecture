@@ -3,7 +3,8 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Category } from '../../core/models/category.model';
 import { TagModule } from 'primeng/tag';
-import { NgClass } from '@angular/common';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { CategoriesService } from '../../core/services/categories.service';
 import { MessageService, TreeNode } from 'primeng/api';
 import { BreadCrumbModel } from '../../core/models/breadcrumb';
@@ -13,38 +14,50 @@ import { SelectModule } from 'primeng/select'
 import { FormsModule } from '@angular/forms';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { CategoryFormDialogComponent } from "./category-form-dialog/category-form-dialog.component";
-
+import { CardModule } from 'primeng/card';
+import { CustomConfirmDialogService } from '../../shared/services/custom-confirm-dialog.service';
+import { TreeTableModule } from 'primeng/treetable';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-categories',
   imports: [
     FormsModule,
-    //PrimeNG
+    TreeTableModule,
     ButtonModule,
     TableModule,
+    CardModule,
     TagModule,
-    NgClass,
     TreeSelectModule, SelectModule, MatExpansionModule,
-    CategoryFormDialogComponent
-],
+    CategoryFormDialogComponent,
+    IconFieldModule,
+    InputIconModule,
+  ],
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.Emulated
 
 })
-export class CategoriesComponent implements OnInit{
+export class CategoriesComponent implements OnInit {
   private categoryService = inject(CategoriesService);
   private breadcrumbService = inject(BreadcrumbService);
   private messageServiceToast = inject(MessageService);
+  private customConfirmDialogService = inject(CustomConfirmDialogService);
+  private route = inject(ActivatedRoute);
   
   readonly isLoading = signal<boolean>(false);
+  readonly mode = signal<'dialog' | 'page'>('dialog');
 
   // Signals
   categories = signal<Category[]>([]);
+  treeCategories = signal<TreeNode<Category>[]>([]);
   parentCategories = signal<Category[]>([]);
   isDialogVisible = model<boolean>(false);
-  dialogTitle = signal<string>('Yeni Kategori Ekle');
+  dialogTitle = signal<"create" | "edit">('create');
+  editData = signal<Category | null>(null);
+  isPageMode = signal<boolean>(false);
+
 
   categoryForm = signal<any>({
     name: '',
@@ -63,19 +76,42 @@ export class CategoriesComponent implements OnInit{
       isActive: true
     }]);
   // ==================================================>
+
   ngOnInit(): void {
+    const mode = this.route.snapshot.data['mode'];
+    this.mode.set(mode);
+
+    this.route.data.subscribe(data => {
+      // Eğer mod 'page' ise hiyerarşik veriyi çek
+      if (data['mode'] === 'page') {
+        this.categoryService.getHierarchy().subscribe({
+          next: (res) => {
+           
+            // 'res.data' senin parent listeni oluşturacak
+            this.parentCategories.set(res.data ?? []);
+          }
+        });
+      }
+    });
+ 
+    
+    this.route.data.subscribe(data => {
+      this.isPageMode.set(data['mode'] === 'page');
+    });
     this.breadcrumbService.reset(this.breadcrumbs());
     this.loadCategories();
   }
-  
+
   loadCategories() {
     this.isLoading.set(true);
 
     this.categoryService.getAll().subscribe({
       next: (res) => {
         if (res.isSuccessful && res.data) {
-          const flatData = this.flattenCategories(res.data);
-          this.categories.set(flatData);
+          this.categories.set(this.flattenCategories(res.data));
+          this.treeCategories.set(
+            this.convertToTreeNodes(res.data)
+          );
           // Parent dropdown için sadece ana kategorileri al
           this.parentCategories.set(res.data);
           this.isLoading.set(false);
@@ -87,7 +123,7 @@ export class CategoriesComponent implements OnInit{
           detail: res.errorMessages?.join(', ') || 'Kategoriler yüklenirken hata oluştu.'
         });
 
-        this.isLoading.set(false);        
+        this.isLoading.set(false);
       },
       error: (err) => {
         this.messageServiceToast.add({
@@ -103,12 +139,11 @@ export class CategoriesComponent implements OnInit{
 
 
   getParentName(category: Category): string {
-    console.log(category.parentCategory);
-    
     return category.parentCategory?.name || '-';
   }
+
   openNewCategoryDialog() {
-    this.dialogTitle.set('Yeni Kategori Ekle');
+    this.dialogTitle.set('create');
     this.categoryForm.set({
       name: '',
       slug: '',
@@ -124,14 +159,58 @@ export class CategoriesComponent implements OnInit{
   closeDialog() {
     this.isDialogVisible.set(false);
   }
+
   navigateToHierarchy() {
-  throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.');
   }
-  deleteCategory(arg0: any, arg1: any) {
-    throw new Error('Method not implemented.');
-  }  
-  openEditCategoryDialog(_t39: any) {
-    throw new Error('Method not implemented.');
+
+  deleteCategory(id: string, name: string) {
+    this.customConfirmDialogService.showDeleteConfirm( name, () => {
+      this.isLoading.set(true);
+      this.categoryService.delete(id).subscribe({
+        next: (res) => {
+          this.isLoading.set(false);
+          if (res.isSuccessful) {
+            this.messageServiceToast.add({
+              severity: 'success',
+              summary: 'Başarılı 🗑️',
+              detail: `"${name}" kategorisi başarıyla silindi.`
+            });
+            this.loadCategories();
+            this.isLoading.set(false)
+            return;
+          }
+          this.messageServiceToast.add({
+            severity: 'error',
+            summary: 'Hata',
+            detail: `${res.errorMessages}` || 'Kategori silinemedi.'
+          });
+          this.isLoading.set(false)
+        }, 
+        error: (err) => {
+          this.messageServiceToast.add({
+            severity: 'error',
+            summary: 'Hata',
+            detail: `${err.error.errorMessages}` || 'Kullanıcı silinirken hata oluştu!'
+          });
+          this.isLoading.set(false)
+          console.error(err);
+        }
+      })
+    });
+  }
+
+
+  openEditCategoryDialog(category: Category): void {
+    this.dialogTitle.set('edit');
+    this.editData.set(category);
+    this.isDialogVisible.set(true);
+  }
+
+  onSaveSuccess(isSuccess: boolean): void {
+    if (isSuccess) {
+      this.loadCategories(); 
+    }
   }
 
 
@@ -166,15 +245,22 @@ export class CategoriesComponent implements OnInit{
   }
 
 
-  // Veriyi TreeNode'a dönüştür
+  // ✅ Tree verisini oluştur
   private convertToTreeNodes(categories: Category[]): TreeNode<Category>[] {
-    return categories.map(c => ({
-      data: c,
+    var res = categories.map((c, index) => ({
+      data: {
+        ...c,
+        index: index, // ✅ 0'dan başlayan index
+        displayNumber: index + 1 // ✅ 1'den başlayan görünen numara,
+        
+      },
       children: c.subCategories?.length
-        ? this.convertToTreeNodes(c.subCategories)
-        : undefined,
+      ? this.convertToTreeNodes(c.subCategories)
+      : undefined,
       leaf: !c.subCategories?.length
     }));
+
+    return res;
   }
 
 

@@ -28,8 +28,11 @@ public sealed class CreateCategoryCommandHandler(
     // ✅ Giriş yapan kullanıcının ID'sini al
     var createdBy = _userRepo.GetCurrentUserId();
     // Slug kontrolü
-    var isSlugExist = await _categoryRepo.AnyAsync(c => c.Slug == _req.Slug.ToLowerInvariant(), _token);
-    if (isSlugExist) return Result<CategoryDto>.Failure(400, "Bu slug zaten kullanımda.");
+    var existingCategory = await _categoryRepo.GetBySlugAsync(_req.Slug, _token);
+    if (existingCategory is not null)
+    {
+      return Result<CategoryDto>.Failure(400, "Bu slug zaten kullanımda.");
+    }
 
     // Parent kategori kontrolü
     if (_req.ParentCategoryId.HasValue)
@@ -60,7 +63,8 @@ public sealed class CreateCategoryCommandHandler(
      Description: category.Description,
      DisplayOrder: category.DisplayOrder,
      ParentCategoryId: category.ParentCategoryId,
-     ParentCategoryName: category.ParentCategory?.Name
+     ParentCategoryName: category.ParentCategory?.Name,
+     IsActive: category.IsActive
     );
 
     return Result<CategoryDto>.Succeed(response);

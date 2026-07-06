@@ -35,6 +35,7 @@ public sealed class GetAllCategoriesQueryHandler(
                 sc.Id,
                 sc.Name,
                 sc.Slug,
+                sc.Description,
                 sc.DisplayOrder,
                 sc.ParentCategoryId,
                 sc.ParentCategory?.Name,  // ✅ Artık gelir

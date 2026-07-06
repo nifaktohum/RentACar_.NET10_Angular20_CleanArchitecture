@@ -20,6 +20,7 @@ public sealed record CategoryHierarchySubDto(
     Guid Id,
     string Name,
     string Slug,
+    string? Description,
     int? DisplayOrder,
     Guid? ParentCategoryId,
     string? ParentCategoryName,

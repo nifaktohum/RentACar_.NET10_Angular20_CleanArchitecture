@@ -41,7 +41,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
           // ✅ SADECE auth ile ilgili olanları temizle
           const rememberMe = localStorage.getItem('rememberedEmail');
-          localStorage.removeItem('accessToken'); // Token'ı sil
+          localStorage.removeItem('token'); // Token'ı sil
           localStorage.removeItem('fullName');
           localStorage.removeItem('email');
           // localStorage.removeItem('refreshToken'); // Varsa

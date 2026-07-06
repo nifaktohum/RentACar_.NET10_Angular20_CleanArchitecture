@@ -1,5 +1,6 @@
 using Application.Behaviors;
 using Domain.Repositories;
+using FluentValidation;
 using GenericRepository;
 using MediatR;
 using TS.Result;
@@ -10,6 +11,17 @@ namespace Application.Features.Categories.Commands;
 public sealed record DeleteCategoryCommand(
     Guid Id
 ) : IRequest<Result<Unit>>;
+
+public sealed class DeleteCategoryCommandValidator : AbstractValidator<DeleteCategoryCommand>
+{
+  public DeleteCategoryCommandValidator()
+  {
+    RuleFor(x => x.Id)
+    .NotEmpty().WithMessage("Kategori ID boş olamaz.")
+    .NotNull().WithMessage("Kategori ID null olamaz.")
+    .Must(id => id != Guid.Empty).WithMessage("Geçerli bir kategori ID'si giriniz.");
+  }
+}
 
 public sealed class DeleteCategoryCommandHandler(
                             ICategoryRepository _categoryRepo,
@@ -31,7 +43,7 @@ public sealed class DeleteCategoryCommandHandler(
     var deletedBy = _userRepo.GetCurrentUserId();
     if (deletedBy == Guid.Empty) deletedBy = Guid.Parse("00000000-0000-0000-0000-000000000001");
 
-    category.SoftDelete(deletedBy);
+    _categoryRepo.Delete(category);
 
     await _unit.SaveChangesAsync(_token);
 

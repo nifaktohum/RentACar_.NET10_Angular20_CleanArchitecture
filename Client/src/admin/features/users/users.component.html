@@ -1,87 +1,88 @@
 <div class="user-card">
-  <div class="card-header">
-    <div class="header-title">
+  <p-card>
+
+    <div class="p-button-list">
       <h3>Kullanıcı Yönetimi</h3>
       <p>Sistemdeki tüm kullanıcıları listeleyebilir, düzenleyebilir ve yetkilerini yönetebilirsin.</p>
-    </div>
-    <div class="p-button-list">
+
       <p-button (click)="openUserDialog()" icon="ri-user-add-line" pTooltip="Yeni Kullanıcı Ekle" pRipple
         [raised]="true"></p-button>
       <p-button severity="contrast" icon="ri-refresh-line" pTooltip="Yenile" (click)="loadUsers()"
         [loading]="isLoading()" [raised]="true"></p-button>
     </div>
-  </div>
 
-  <div class="user-management-wrapper">
-    <p-table #dt [value]="users()" [rows]="10" [paginator]="true"
-      [globalFilterFields]="['firstName', 'lastName', 'email']" responsiveLayout="scroll">
 
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 3%">#</th>
-          <th style="width: 25%">Kullanıcı</th>
-          <th style="width: 25%">İletişim</th>
-          <th style="width: 25%">Şube / Roller</th>
-          <th style="width: 10%; text-align: center;">Durum</th>
-          <th style="width: 15%; text-align: center;">İşlemler</th>
-        </tr>
-      </ng-template>
+    <div class="user-management-wrapper">
+      <p-table #dt [value]="users()" [rows]="10" [paginator]="true"
+        [globalFilterFields]="['firstName', 'lastName', 'email']" responsiveLayout="scroll">
 
-      <ng-template pTemplate="body" let-user let-i="rowIndex">
-        <tr>
-          <td>{{ i + 1 }}</td>
-          <!-- Ad Soyad -->
-          <td>
-            <div class="user-info">
-              <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
-              <span class="user-email">{{ user.email }}</span>
-            </div>
-          </td>
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3%">#</th>
+            <th style="width: 25%">Kullanıcı</th>
+            <th style="width: 25%">İletişim</th>
+            <th style="width: 25%">Şube / Roller</th>
+            <th style="width: 10%; text-align: center;">Durum</th>
+            <th style="width: 15%; text-align: center;">İşlemler</th>
+          </tr>
+        </ng-template>
 
-          <!-- Telefon -->
-          <td>
-            <span class="user-phone">{{ user.phoneNumber | phoneFormatPipe}}</span>
-          </td>
-
-          <!-- Şube / Roller -->
-          <td>
-            <div>
-              <span>{{ user.branchName }}</span>
-              <div>
-                @for(role of user.roleNames; track role.id) {
-                <span class="">{{ role }}</span>
-                }
+        <ng-template pTemplate="body" let-user let-i="rowIndex">
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <!-- Ad Soyad -->
+            <td>
+              <div class="user-info">
+                <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+                <span class="user-email">{{ user.email }}</span>
               </div>
-            </div>
-          </td>
+            </td>
 
-          <!-- Durum -->
-          <td class="tag">
-            <i [class]="user.isActive ? 'checkbox-active ri-checkbox-circle-line' : 'checkbox-pasif ri-indeterminate-circle-line'"
-              class="mr-1"></i>
-          </td>
+            <!-- Telefon -->
+            <td>
+              <span class="user-phone">{{ user.phoneNumber | phoneFormatPipe}}</span>
+            </td>
 
-          <!-- İşlemler -->
-          <td style="text-align: center;">
-            <div class="action-buttons">
-              <button pButton icon="ri-shield-user-line" class="p-button-rounded p-button-text btn-permissions"
-                (click)="openUserDetail(user)" pTooltip="Yetkiler"></button>
-              <button pButton icon="ri-edit-line" class="p-button-rounded p-button-text btn-edit"
-                (click)="openEditUserDialog(user)"></button>
-              <button pButton icon="ri-delete-bin-line" class="p-button-rounded p-button-text btn-delete"
-                (click)="deleteUser(user.id, user.fullName)"></button>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
+            <!-- Şube / Roller -->
+            <td>
+              <div>
+                <span>{{ user.branchName }}</span>
+                <div>
+                  @for(role of user.roleNames; track role.id) {
+                  <span class="">{{ role }}</span>
+                  }
+                </div>
+              </div>
+            </td>
 
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="5" class="table-empty">Sistemde kayıtlı kullanıcı bulunamadı.</td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+            <!-- Durum -->
+            <td class="tag">
+              <i [class]="user.isActive ? 'checkbox-active ri-checkbox-circle-line' : 'checkbox-pasif ri-indeterminate-circle-line'"
+                class="mr-1"></i>
+            </td>
+
+            <!-- İşlemler -->
+            <td style="text-align: center;">
+              <div class="action-buttons">
+                <button pButton icon="ri-shield-user-line" class="p-button-rounded p-button-text btn-permissions"
+                  (click)="openUserDetail(user)" pTooltip="Yetkiler"></button>
+                <button pButton icon="ri-edit-line" class="p-button-rounded p-button-text btn-edit"
+                  (click)="openEditUserDialog(user)"></button>
+                <button pButton icon="ri-delete-bin-line" class="p-button-rounded p-button-text btn-delete"
+                  (click)="deleteUser(user.id, user.fullName)"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="table-empty">Sistemde kayıtlı kullanıcı bulunamadı.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
 </div>
 
 <!-- ============================================================== -->
@@ -148,7 +149,6 @@
     <div class="form-toggle">
       <label>{{ userForm.isActive ? '✅ Aktif' : '❌ Pasif' }}</label>
       <p-toggleSwitch [(ngModel)]="userForm.isActive"></p-toggleSwitch>
-
     </div>
 
     <!-- Butonlar -->
@@ -186,11 +186,11 @@
             {{ user.isActive ? 'Aktif' : 'Pasif' }}
           </span>
           @if (user.isDeleted) {
-            <span class="status-badge" class="deleted">
-              <i class="ri-delete-bin-fill"></i> Silinmiş
-            </span>
+          <span class="status-badge" class="deleted">
+            <i class="ri-delete-bin-fill"></i> Silinmiş
+          </span>
           }
-          
+
         </div>
       </div>
     </div>
@@ -324,11 +324,11 @@
   }
 
   <!-- FOOTER -->
-<ng-template pTemplate="footer">
-  <div class="dialog-footer">
-    <button pButton label="Kapat" icon="ri-close-line" class="p-button-text p-button-secondary btn-close"
-      (click)="isDetailDialogVisible = false">
-    </button>
-  </div>
-</ng-template>
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button pButton label="Kapat" icon="ri-close-line" class="p-button-text p-button-secondary btn-close"
+        (click)="isDetailDialogVisible = false">
+      </button>
+    </div>
+  </ng-template>
 </p-dialog>

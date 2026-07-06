@@ -24,4 +24,6 @@ public interface ICategoryRepository : IRepository<Category>
   // Tüm kategorileri (ana ve alt kırılımlarıyla birlikte) ağaç yapısında getirir.
   // Kategori yönetim panellerinde tüm ağacı görselleştirmek için kullanılır.
   Task<List<Category>> GetCategoryHierarchyAsync(CancellationToken cancellationToken = default);
+
+  Task<Category?> GetByIdWithSubCategoriesAsync(Guid id, CancellationToken cancellationToken = default);
 }

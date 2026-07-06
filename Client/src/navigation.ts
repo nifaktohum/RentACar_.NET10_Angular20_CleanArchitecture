@@ -67,7 +67,7 @@ export const navigations: NavigationModel[] =
         },
         {
           title: 'Kategori Ekle',
-          url: '/admin/categories/add',
+          url: '/admin/categories/category-create',
           icon: 'ri-add-circle-line',
           role: 'Categories.Create',
           haveSubMenu: false

@@ -26,7 +26,7 @@ import { Result } from '../../../core/models/result.model';
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent implements OnInit{
+export class LoginComponent implements OnInit {
   private authService = inject(AuthService)
   private router = inject(Router)
   private route = inject(ActivatedRoute)
@@ -88,7 +88,7 @@ export class LoginComponent implements OnInit{
       rememberMe: this.isRememberMeChecked // // Backend bu bilgiye göre JWT süresini uzatabilir 
     };
 
-  
+
     this.authService.login(credentials).pipe(finalize(() => this.loading.set(false))).subscribe({
       next: (res: Result<LoginResponse>) => {
         if (res.isSuccessful && res.data) {
@@ -100,26 +100,26 @@ export class LoginComponent implements OnInit{
             summary: 'Giriş Başarılı :)',
             detail: `Hoş geldiniz - ${res.data.fullName}!`
           });
-
           this.router.navigateByUrl(this.returnUrl || '/');
-        } else {
-          this.messageServiceToast.add({
-            severity: 'warn',
-            summary: 'Uyarı',
-            detail: `${res.errorMessages}` || 'Sunucu hatası, lütfen tekrar deneyin.'
-          })
-          // // Sunucudan nesne geldi ama içinden token çıkmadıysa (Güvenlik önlemi)
-          // this.snackbarService.warning('Sunucudan geçersiz veri döndü, lütfen tekrar deneyin.');
+          return;
         }
+        this.messageServiceToast.add({
+          severity: 'warn',
+          summary: 'Uyarı',
+          detail: `${res.errorMessages}` || 'Sunucu hatası, lütfen tekrar deneyin.'
+        })
+        // // Sunucudan nesne geldi ama içinden token çıkmadıysa (Güvenlik önlemi)
+        // this.snackbarService.warning('Sunucudan geçersiz veri döndü, lütfen tekrar deneyin.');
+
       }, error: (err) => {
-        
+
         this.messageServiceToast.add({
           severity: 'error',
           summary: 'Hata',
           detail: `${err.error.error[0]}` || 'Sunucu hatası, lütfen tekrar deneyin.'
         })
         console.log(err.error.error[0]);
-        
+
       }
     });
   }
