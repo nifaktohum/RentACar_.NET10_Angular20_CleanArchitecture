@@ -115,6 +115,7 @@ public sealed class UserRepository : Repository<User, AppDbContext>, IUserReposi
     var userRoles = await GetUserRoleNamesAsync(userId, cancellationToken);
     return roleNames.Any(role => userRoles.Contains(role));
   }
+  
   //  bir kullanıcının belirli bir role sahip olup olmadığını kontrol eder.
   public async Task<bool> IsUserInRoleAsync(Guid userId, string roleName, CancellationToken cancellationToken)
   {
@@ -123,6 +124,7 @@ public sealed class UserRepository : Repository<User, AppDbContext>, IUserReposi
         .SelectMany(u => u.UserRoles.Select(ur => ur.Role))
         .AnyAsync(r => r.Name == roleName, cancellationToken);  // ⭐ !r.IsDeleted KALDIRILDI
   }
+  
   // "Şu an giriş yapmış olan kullanıcı, Admin rolüne sahip mi?" diye sorar.
   public async Task<bool> IsCurrentUserInRoleAsync(string roleName, CancellationToken cancellationToken)
   {
@@ -184,6 +186,7 @@ public sealed class UserRepository : Repository<User, AppDbContext>, IUserReposi
     return !await _context.Users
         .AnyAsync(u => u.Email == email && !u.IsDeleted, token);
   }
+  
   // Branch adına göre kullanıcıları getiren yeni metot
   public async Task<List<User>> GetUsersByBranchIdAsync(Guid branchId, CancellationToken token = default)
   {

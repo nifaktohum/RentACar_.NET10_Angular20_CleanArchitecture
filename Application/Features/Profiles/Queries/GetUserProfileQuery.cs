@@ -1,3 +1,4 @@
+using Application.Features.Profiles.Dto;
 using Application.Services;
 using Domain.Repositories;
 using MediatR;

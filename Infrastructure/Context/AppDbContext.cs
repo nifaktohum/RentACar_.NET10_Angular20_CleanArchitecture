@@ -2,11 +2,13 @@ using System.Security.Claims;
 using Domain.Abstractions;
 using Domain.Branchs;
 using Domain.Categories;
+using Domain.Entities.Protection;
 using Domain.Roles;
 using Domain.Users;
 using GenericRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Context;
 
@@ -14,10 +16,12 @@ namespace Infrastructure.Context;
 public class AppDbContext : DbContext, IUnitOfWork
 {
   private readonly IHttpContextAccessor _httpContextAccessor;
+  private readonly IConfiguration _config;
 
-  public AppDbContext(DbContextOptions _options, IHttpContextAccessor httpContextAccessor) : base(_options)
+  public AppDbContext(DbContextOptions _options, IHttpContextAccessor httpContextAccessor, IConfiguration config) : base(_options)
   {
     _httpContextAccessor = httpContextAccessor;
+    _config = config;
   }
 
   public DbSet<Branch> Branches { get; set; }
@@ -28,12 +32,21 @@ public class AppDbContext : DbContext, IUnitOfWork
   public DbSet<PermissionRole> PermissionRoles { get; set; }
   public DbSet<Category> Categories { get; set; }
 
+  // DbSet'ler
+  public DbSet<ProtectionPackage> ProtectionPackages { get; set; }
+  public DbSet<ProtectionBenefit> ProtectionBenefits { get; set; }
+  public DbSet<ProtectionPricing> ProtectionPricings { get; set; }
+
   protected override void OnModelCreating(ModelBuilder _modelBuilder)
   {
+    // 1. Tüm Configuration'ları otomatik bul
     _modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+    // 2. Global filter uygula (tüm entity'ler için)
     _modelBuilder.ApplyGlobalFilters();
+    // 3. Permission için özel filter
     // Sistemdeki tüm Permission sorgularına otomatik olarak bu WHERE şartını ekler
     _modelBuilder.Entity<Permission>().HasQueryFilter(p => !p.IsDeleted && p.IsActive);
+    // 4. User için özel index
     _modelBuilder.Entity<User>()
         .HasIndex(u => u.Email)
         .HasDatabaseName("IX_Users_Email")
@@ -67,7 +80,7 @@ public class AppDbContext : DbContext, IUnitOfWork
 
     Guid userId = (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var parsedGuid))
         ? parsedGuid
-        : Guid.Parse("00000000-0000-0000-0000-000000000001");
+        : Guid.Parse(_config["SeedData.CustomerUserId"]!);
 
 
     var entries = ChangeTracker.Entries<BaseEntity>();

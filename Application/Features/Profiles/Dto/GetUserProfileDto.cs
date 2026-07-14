@@ -1,4 +1,4 @@
-namespace Application.Features.Profiles.Queries;
+namespace Application.Features.Profiles.Dto;
 
 public sealed record GetUserProfileDto(
     Guid Id,

@@ -1,6 +1,6 @@
 using Domain.Branchs;
 
-namespace Application.Features.Branches.Queries;
+namespace Application.Features.Branches.Dto;
 
 public sealed record BranchDto(
     Guid Id,

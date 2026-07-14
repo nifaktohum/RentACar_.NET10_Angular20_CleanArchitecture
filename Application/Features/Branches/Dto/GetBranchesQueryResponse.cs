@@ -1,3 +1,5 @@
+using Application.Features.Branches.Dto;
+
 namespace Application.Features.Branches.Queries;
 
 public record GetBranchesQueryResponse(

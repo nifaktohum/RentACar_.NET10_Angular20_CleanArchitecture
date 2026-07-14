@@ -27,7 +27,10 @@ public sealed class CreateRoleCommandValidation : AbstractValidator<CreateRoleCo
   }
 }
 
-public sealed class CreateRoleCommandHandler(IRoleRepository _roleRepo, IUnitOfWork _unit) : IRequestHandler<CreateRoleCommand, Result<Guid>>
+public sealed class CreateRoleCommandHandler(
+                        IRoleRepository _roleRepo,
+                        IUnitOfWork _unit
+                    ) : IRequestHandler<CreateRoleCommand, Result<Guid>>
 {
   public async Task<Result<Guid>> Handle(CreateRoleCommand _req, CancellationToken _token)
   {

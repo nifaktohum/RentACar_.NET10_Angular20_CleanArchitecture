@@ -1,10 +1,8 @@
-using API;
 using API.Middlewares;
 using Application;
 using Infrastructure;
 using Infrastructure.Context;
 using Infrastructure.Extensions;
-using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
@@ -19,12 +17,13 @@ _builder.Services.AddHttpContextAccessor();
 _builder.Services.AddApplication();
 _builder.Services.AddInfrastructure(_builder.Configuration);
 _builder.Services.AddExceptionHandler<API.Exceptions.ExceptionHandler>().AddProblemDetails();
-
-_builder.Services.AddControllers().AddOData(_opt => { _opt.Select().Filter().Count().Expand().OrderBy().SetMaxTop(100); });
+_builder.Services.AddControllers();
+// _builder.Services.AddControllers().AddOData(_opt => { _opt.Select().Filter().Count().Expand().OrderBy().SetMaxTop(100); });
 _builder.Services.AddEndpointsApiExplorer();
 _builder.Services.AddSwaggerGen(c =>
 {
   // 🚗 Standart REST ve MediatR operasyonları için bir doküman tanımı
+  c.SwaggerDoc("v1-All", new OpenApiInfo { Title = "RentCar API - All Endpoints", Version = "v1"});
   c.SwaggerDoc("v1-Branches", new() { Title = "RentCar Branches", Version = "v1" });
   c.SwaggerDoc("v1-Categories", new() { Title = "RentCar Categories", Version = "v1" });
   c.SwaggerDoc("v1-Auth", new() { Title = "RentCar Auth", Version = "v1" });
@@ -32,15 +31,17 @@ _builder.Services.AddSwaggerGen(c =>
   c.SwaggerDoc("v1-Profiles", new() { Title = "RentCar Profiles", Version = "v1" });
   c.SwaggerDoc("v1-Roles", new() { Title = "RentCar Roles", Version = "v1" });
   c.SwaggerDoc("v1-Permissions", new() { Title = "RentCar Permissions", Version = "v1" });
+  c.SwaggerDoc("v1-ProtectionPackages", new() { Title = "RentCar ProtectionPackages", Version = "v1" });
 
   // Endpoint'leri GroupName'e göre doğru sekmeye dağıtan sihirli kural kanka!
   c.DocInclusionPredicate((docName, apiDesc) =>
   {
-    if (apiDesc.GroupName != null)
-    {
-      return apiDesc.GroupName == docName;
-    }
-    return docName == "v1-Branches";
+    // ALL dokümanı tüm endpointleri içerir
+    if (docName == "v1-All")
+      return true;
+
+    // Diğer dokümanlar sadece kendi GroupName'lerini içerir
+    return apiDesc.GroupName == docName;
   });
 
   // JWT Authentication Tanımlaması
@@ -99,6 +100,7 @@ if (app.Environment.IsDevelopment())
   app.UseSwagger();
   app.UseSwaggerUI(c =>
   {
+    c.SwaggerEndpoint("/swagger/v1-All/swagger.json", "RentCar API (All)");
     c.SwaggerEndpoint("/swagger/v1-Branches/swagger.json", "RentCar Branches");
     c.SwaggerEndpoint("/swagger/v1-Categories/swagger.json", "RentCar Categories");
     c.SwaggerEndpoint("/swagger/v1-Auth/swagger.json", "RentCar Auth");
@@ -106,6 +108,7 @@ if (app.Environment.IsDevelopment())
     c.SwaggerEndpoint("/swagger/v1-Profiles/swagger.json", "RentCar Profiles");
     c.SwaggerEndpoint("/swagger/v1-Roles/swagger.json", "RentCar Roles");
     c.SwaggerEndpoint("/swagger/v1-Permissions/swagger.json", "RentCar Permissions");
+    c.SwaggerEndpoint("/swagger/v1-ProtectionPackages/swagger.json", "RentCar ProtectionPackages");
   });
 }
 
@@ -129,7 +132,6 @@ app.UseAuthorization();
 
 // 11. ENDPOINT MAPPING
 app.MapControllers().RequireAuthorization();
-
 // =====================================================================================
 // 👑 VERITABANI DATA SEED İŞLEMLERİ (MANTIKSAL SIRALAMA)
 // =====================================================================================

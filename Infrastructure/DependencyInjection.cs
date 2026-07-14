@@ -1,9 +1,11 @@
 using Application.Services;
 using Domain.Repositories;
+using Domain.Repositories.Protection;
 using GenericRepository;
 using Infrastructure.Context;
 using Infrastructure.Options;
 using Infrastructure.Repositories;
+using Infrastructure.Repositories.Protection;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +29,9 @@ public static class DependencyInjection
     _services.AddScoped<IJwtProvider, JwtProvider>();
     _services.AddScoped<IEmailService, EmailService>();
     _services.AddScoped<IRoleRepository, RoleRepository>();
+    _services.AddScoped<IProtectionPackageRepository, ProtectionPackageRepository>();
+    _services.AddScoped<IProtectionBenefitRepository, ProtectionBenefitRepository>();
+    _services.AddScoped<IProtectionPricingRepository, ProtectionPricingRepository>();
 
     // Rate Limiting ve Kimlik Doğrulama Seçeneklerini (Options Pattern) bağlıyoruz 
     _services.AddRateLimiter();
