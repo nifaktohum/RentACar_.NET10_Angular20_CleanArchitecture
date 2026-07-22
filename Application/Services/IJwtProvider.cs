@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Domain.Users;
+using Domain.Entities.Users;
 
 namespace Application.Services;
 

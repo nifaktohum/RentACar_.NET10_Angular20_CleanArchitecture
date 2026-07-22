@@ -1,7 +1,5 @@
 // Kanka senin global styles.scss'teki değişkenleri doğrudan ezerek tasarımı mühürlüyoruz
 ::ng-deep .roles-card {
-  background: var(--admin-white);
-  border: 1px solid var(--admin-border);
   border-radius: 12px;
   min-height: 100vh;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -56,6 +54,87 @@
     }
 
     .role-management-wrapper {
+
+          .p-datatable-thead > tr > th {
+      white-space: nowrap;
+      text-align: start;
+      vertical-align: middle;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      background: var(--admin-primary);
+      color: var(--admin-white);
+      border-bottom: 2px solid var(--surface-border);
+
+      &.col-name {
+        width: 15%;
+      }
+      &.col-description {
+        width: 15%;
+      }
+      &.col-order {
+        width: 5%;
+        text-align: center;
+      }
+      &.col-rating {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-level {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-deductible {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-benefits {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-price {
+        width: 10%;
+        text-align: center;
+      }
+      &.col-status {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-actions {
+        width: 10%;
+        text-align: center;
+      }
+    }
+
+    .p-datatable-tbody > tr {
+      background: var(--admin-white);
+      transition: background-color 0.2s;
+
+      &:nth-child(even) {
+        background: var(--admin-light);
+      }
+
+      &:hover {
+        background: rgba(56, 189, 248, 0.05) !important;
+      }
+
+      &.inactive-row {
+        opacity: 0.6;
+        background: #f1f5f9;
+
+        .package-name {
+          text-decoration: line-through;
+        }
+      }
+
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--admin-border);
+        vertical-align: middle;
+      }
+    }
+
+
+
       .role-info {
         display: flex;
         flex-direction: column;

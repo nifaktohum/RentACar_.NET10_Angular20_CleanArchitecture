@@ -7,42 +7,38 @@ namespace Infrastructure.Configurations.Protection;
 
 /// ProtectionBenefit varlığı için veritabanı eşleme (mapping) ayarlarını yönetir.
 /// Paket içerisindeki her bir güvence maddesinin (Lastik, Cam vb.) veritabanı kurallarını tanımlar.
+// ProtectionBenefitConfiguration.cs - Netleştirilmiş hali
 public sealed class ProtectionBenefitConfiguration : BaseEntityConfiguration<ProtectionBenefit>
 {
   public override void Configure(EntityTypeBuilder<ProtectionBenefit> builder)
   {
-    // Temel entity (BaseEntity) konfigürasyonlarını (Id, CreatedBy, IsDeleted vb.) uygula
     base.Configure(builder);
 
-    // Tabloyu 'protection' şeması altında tutuyoruz
     builder.ToTable("ProtectionBenefits", "protection");
 
-    // ==================== Property Konfigürasyonları ====================
-
-    // Name alanı zorunludur ve 100 karakterle sınırlandırılmıştır
+    // Property konfigürasyonları
     builder.Property(b => b.Name).IsRequired().HasMaxLength(100);
-
-    // İsteğe bağlı açıklamalar ve ikon bilgisi
     builder.Property(b => b.Description).HasMaxLength(500);
     builder.Property(b => b.Icon).HasMaxLength(50);
-
-    // Sıralama varsayılan olarak 0'dan başlar
     builder.Property(b => b.DisplayOrder).IsRequired().HasDefaultValue(0);
 
-    // BenefitCategory enum'ını veritabanında integer olarak saklar
-    builder.Property(b => b.Category).IsRequired().HasConversion<int>();
+    builder.Property(b => b.CategoryId).IsRequired();
 
-    // ==================== Index Tanımlamaları ====================
+    builder.HasOne(x => x.Category)
+       .WithMany(x => x.Benefits)
+       .HasForeignKey(x => x.CategoryId)
+       .OnDelete(DeleteBehavior.Restrict);
 
-    // İsme göre benzersiz (unique) index, sadece silinmemiş kayıtlar dikkate alınır
-    builder.HasIndex(b => b.Name).IsUnique().HasFilter("\"IsDeleted\" = false");
+    // Index'ler
+    builder.HasIndex(x => new { x.CategoryId, x.Name })
+        .IsUnique()
+        .HasFilter("\"IsDeleted\" = false");
 
-    // Listeleme ve filtreleme performansını artırmak için indexler
-    builder.HasIndex(b => b.DisplayOrder);builder.HasIndex(b => b.Category);
+    builder.HasIndex(b => b.DisplayOrder);
+    builder.HasIndex(b => b.CategoryId);
 
-    // ==================== Global Sorgu Filtresi ====================
-
-    // Soft Delete: "IsDeleted" alanı true olanları uygulama tarafında otomatik filtrele
+    // Global Filter
     builder.HasQueryFilter(b => !b.IsDeleted);
+    builder.Navigation(x => x.Category).AutoInclude(false);
   }
 }

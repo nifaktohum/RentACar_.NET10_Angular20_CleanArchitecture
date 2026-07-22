@@ -9,7 +9,8 @@ public sealed record ProtectionBenefitDto(
     string? Description,             // Kapsamın detaylı açıklaması
     string? Icon,                    // UI'da görüntülenecek ikonun referansı
     int DisplayOrder,                // Listeleme sırası
-    string Category,                 // Kategori (Enum'ın string karşılığı - örn: "Tire", "Glass")
+    string Category,                  // Kategori adı (örnek: "Lastik")
+    Guid CategoryId,                  // Kategori ID'si
     bool IsActive,                   // Kaydın sistemdeki aktiflik durumu
     DateTimeOffset? CreatedAt,        // Kaydın oluşturulduğu zaman
     Guid? CreatedBy,                  // Kaydı oluşturan kullanıcının ID'si

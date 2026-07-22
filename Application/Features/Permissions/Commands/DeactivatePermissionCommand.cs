@@ -1,7 +1,7 @@
 using Application.Behaviors;
 using Application.Common.Helpers;
 using Domain.Repositories;
-using Domain.Roles;
+using Domain.Entities.Roles;
 using GenericRepository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

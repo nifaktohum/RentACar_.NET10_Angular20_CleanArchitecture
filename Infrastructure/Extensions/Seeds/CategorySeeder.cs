@@ -1,4 +1,4 @@
-using Domain.Categories;
+using Domain.Entities.Categories;
 using Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

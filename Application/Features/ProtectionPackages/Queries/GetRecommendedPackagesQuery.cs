@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Behaviors;
 using Application.Features.ProtectionPackages.Dto;
 using Domain.Repositories;
 using Domain.Repositories.Protection;
@@ -11,6 +12,7 @@ using TS.Result;
 
 namespace Application.Features.ProtectionPackages.Queries;
 
+[Permission("ProtectionPackage.Read")]
 public sealed record GetRecommendedPackagesQuery() : IRequest<Result<List<ProtectionPackageDto>>>;
 
 public sealed class GetRecommendedPackagesQueryHandler(
@@ -84,7 +86,8 @@ public sealed class GetRecommendedPackagesQueryHandler(
             Description: b.Description,
             Icon: b.Icon,
             DisplayOrder: b.DisplayOrder,
-            Category: b.Category.ToString(),
+            Category: b.Category?.Name ?? "Bilinmiyor",
+            CategoryId: b.CategoryId,
             IsActive: b.IsActive,
             CreatedAt: b.CreatedAt,
             CreatedBy: b.CreatedBy,

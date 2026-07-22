@@ -1,0 +1,67 @@
+<!-- modules/admin/protection-packages/components/benefit-dialog/benefit-dialog.component.html -->
+
+<p-dialog
+  [header]="dialogTitle"
+  [visible]="visible()"
+  (visibleChange)="closeDialog()"
+  [modal]="true"
+  [style]="{ width: '500px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isSaving()"
+  class="benefit-dialog">
+
+  <div class="benefit-form">
+
+    <!-- Kapsam Adı -->
+    <div class="form-field">
+      <label for="name">Kapsam Adı <span class="required">*</span></label>
+      <input id="name" pInputText [(ngModel)]="formData.name" placeholder="Örn: Lastik Cam Far Güvencesi"
+        [disabled]="isSaving()" class="w-full" />
+    </div>
+
+    <!-- Açıklama -->
+    <div class="form-field">
+      <label for="description">Açıklama</label>
+      <textarea id="description" pInputTextarea [(ngModel)]="formData.description" rows="2"
+        placeholder="Kapsam açıklaması" [disabled]="isSaving()" class="w-full">
+      </textarea>
+    </div>
+
+    <!-- Sıralama -->
+    <div class="form-field">
+      <label for="displayOrder">Sıralama</label>
+      <input id="displayOrder" pInputText type="number" [(ngModel)]="formData.displayOrder" placeholder="Örn: 1, 2, 3"
+        [disabled]="isSaving()" class="w-full" />
+    </div>
+
+    <!-- Kategori -->
+    <div class="form-field">
+      <label for="category">Kategori <span class="required">*</span></label>
+      <p-select
+        id="category"
+        [options]="benefitCategories()"
+        optionLabel="name"
+        optionValue="id"
+        [(ngModel)]="formData.categoryId"
+        placeholder="Kategori seçiniz"
+        [showClear]="true"
+        [disabled]="isSaving()"
+        [style]="{ width: '100%' }">
+      </p-select>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button pButton label="İptal" icon="ri-close-line" class="p-button-text" (click)="closeDialog()"
+        [disabled]="isSaving()">
+      </button>
+      <button pButton label="Kaydet" icon="ri-save-line" class="p-button-primary" [loading]="isSaving()"
+        (click)="saveBenefit()">
+      </button>
+    </div>
+
+  </div>
+
+</p-dialog>
+

@@ -1,0 +1,319 @@
+// modules/admin/benefit-categories/pages/benefit-categories/benefit-categories.component.scss
+
+::ng-deep .benefit-categories-container {
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  min-height: 100vh;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  p-card {
+    .p-card-body {
+      padding: 5px 10px !important;
+    }
+  }
+
+  .p-button-list {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      grid-template-areas:
+        'title btn1 btn2 btn3'
+        'desc  btn1 btn2 btn3';
+      align-items: center;
+      row-gap: 0.25rem;
+    
+      h2 {
+        margin: 0;
+        max-width: 300px;
+        border-bottom: 2px solid var(--text-muted);
+        padding-bottom: 0.5rem;
+        padding-inline: 50px;
+      }
+
+      p {
+        grid-area: desc;
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 5px;
+      }
+
+      p-button:nth-of-type(1) {
+        grid-area: btn1;
+      }
+
+      p-button:nth-of-type(2) {
+        grid-area: btn2;
+      }
+
+      p-button .p-button {
+        margin-left: 3px;
+        padding: 3px;
+      }
+  }
+
+  .table-wrapper {
+    .p-datatable-thead > tr > th {
+      white-space: nowrap;
+      text-align: start;
+      vertical-align: middle;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      background: var(--admin-primary);
+      color: var(--admin-white);
+      border-bottom: 2px solid var(--surface-border);
+
+      &.col-name {
+        width: 25%;
+      }
+
+      &.col-slug {
+        width: 15%;
+      }
+
+      &.col-order {
+        width: 8%;
+        text-align: center;
+      }
+
+      &.col-count {
+        width: 15%;
+        text-align: center;
+      }
+
+      &.col-status {
+        width: 10%;
+        text-align: center;
+      }
+
+      &.col-actions {
+        width: 12%;
+        text-align: center;
+      }
+    }
+
+    .p-datatable-tbody > tr {
+      background: var(--admin-white);
+      transition: background-color 0.2s;
+
+      &:nth-child(even) {
+        background: var(--admin-light);
+      }
+
+      &:hover {
+        background: rgba(56, 189, 248, 0.05) !important;
+      }
+
+      &.inactive-row {
+        opacity: 0.6;
+        background: #f1f5f9;
+
+        .category-name {
+          text-decoration: line-through;
+        }
+
+        .name-wrapper {
+          i {
+            opacity: 0.5;
+          }
+        }
+      }
+
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--admin-border);
+        vertical-align: middle;
+      }
+    }
+
+    .category-name {
+      .name-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        i {
+          font-size: 1.25rem;
+          color: var(--primary-color);
+          width: 1.5rem;
+          text-align: center;
+        }
+
+        span {
+          font-weight: 500;
+          color: #1e293b;
+          font-size: 0.95rem;
+        }
+      }
+    }
+
+    .category-slug {
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      color: #64748b;
+      background: #f1f5f9;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .category-order {
+      text-align: center;
+      font-weight: 500;
+      color: #475569;
+      font-size: 0.9rem;
+    }
+
+    .category-count {
+      text-align: center;
+
+      .count-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #94a3b8;
+        padding: 0.2rem 0.75rem;
+        border-radius: 20px;
+        background: #f1f5f9;
+        transition: all 0.2s;
+
+        &.has-benefits {
+          color: #15803d;
+          background: #dcfce7;
+        }
+      }
+    }
+
+    .category-status {
+      text-align: center;
+
+      .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &.status-active {
+          background: #dcfce7;
+          color: #15803d;
+
+          &:hover {
+            background: #86efac;
+            transform: scale(1.05);
+          }
+        }
+
+        &.status-inactive {
+          background: #fee2e2;
+          color: #dc2626;
+
+          &:hover {
+            background: #fca5a5;
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+
+    .category-actions {
+      display: flex;
+      justify-content: center;
+      font-size: 22px;
+      gap: 0.5rem;
+
+      .p-button-rounded {
+        font-size: 20px;
+        &.btn-edit {
+          color: #60a5fa !important;
+          border-bottom: 1px solid #60a5fa !important;
+          &:hover {
+            background: rgba(96, 165, 250, 0.15) !important;
+          }
+        }
+        &.btn-delete {
+          color: #f87171 !important;
+          border-bottom: 1px solid #f87171 !important;
+          &:hover {
+            background: rgba(248, 113, 113, 0.15) !important;
+          }
+        }
+      }
+    }
+
+    .empty-table-message {
+      text-align: center;
+      padding: 2rem;
+      color: #94a3b8;
+    }
+    .p-paginator {
+      position: relative;
+      .p-paginator-current {
+        position: absolute;
+        left: 10px;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  ::ng-deep .benefit-categories-container {
+    .p-button-list {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+
+      .header-right {
+        justify-content: flex-start;
+      }
+    }
+
+    .table-wrapper {
+      padding: 0.5rem;
+
+      .p-datatable {
+        font-size: 0.8rem;
+
+        th,
+        td {
+          padding: 0.4rem 0.5rem !important;
+        }
+      }
+
+      .category-name {
+        .name-wrapper {
+          gap: 0.4rem;
+
+          i {
+            font-size: 1rem;
+            width: 1.2rem;
+          }
+
+          span {
+            font-size: 0.85rem;
+          }
+        }
+      }
+
+      .category-slug {
+        font-size: 0.7rem;
+        padding: 0.1rem 0.3rem;
+      }
+
+      .action-buttons {
+        .action-btn {
+          width: 2rem;
+          height: 2rem;
+
+          .p-button-icon {
+            font-size: 0.8rem;
+          }
+        }
+      }
+    }
+  }
+}

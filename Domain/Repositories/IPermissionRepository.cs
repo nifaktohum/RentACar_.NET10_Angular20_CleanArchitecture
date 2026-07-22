@@ -1,5 +1,5 @@
-using Domain.Roles;
-using Domain.Users;
+using Domain.Entities.Roles;
+using Domain.Entities.Users;
 using GenericRepository;
 
 namespace Domain.Repositories;

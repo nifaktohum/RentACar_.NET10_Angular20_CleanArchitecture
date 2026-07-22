@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using Domain.Categories;
+using Domain.Entities.Categories;
 using Domain.Repositories;
 using GenericRepository;
 using Infrastructure.Context;

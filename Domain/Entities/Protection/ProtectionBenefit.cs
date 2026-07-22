@@ -1,5 +1,5 @@
 using Domain.Abstractions;
-using Domain.Protection;
+using Domain.Entities.Protection;
 
 namespace Domain.Entities.Protection;
 /// Bu sınıf, bir koruma paketinin içindeki tek bir avantajı/kapsamı temsil eder. 
@@ -17,7 +17,7 @@ public sealed class ProtectionBenefit : BaseEntity
                   string? description,
                   string? icon,
                   int displayOrder,
-                  BenefitCategory category,
+                  Guid categoryId,
                   Guid createdBy
                                   ) : base(createdBy)
   {
@@ -25,7 +25,7 @@ public sealed class ProtectionBenefit : BaseEntity
     Description = description;
     Icon = icon;
     DisplayOrder = displayOrder;
-    Category = category;
+    CategoryId = categoryId;
     ProtectionPackages = new List<ProtectionPackage>();
   }
 
@@ -36,7 +36,8 @@ public sealed class ProtectionBenefit : BaseEntity
   public string? Description { get; private set; }      // "Araç lastik, cam ve far güvencesi"
   public string? Icon { get; private set; }             // "ri-tire-line"
   public int DisplayOrder { get; private set; }         // 1, 2, 3 (sıralama)
-  public BenefitCategory Category { get; private set; } // Tire, Glass, ThirdParty, vs.
+  public Guid CategoryId { get; private set; }
+  public BenefitCategory Category { get; private set; } = null!;// Tire, Glass, ThirdParty, vs.
 
   // ==================== NAVIGATION PROPERTIES ====================
 
@@ -50,13 +51,13 @@ public sealed class ProtectionBenefit : BaseEntity
       string? description,
       string? icon,
       int displayOrder,
-      BenefitCategory category)
+      Guid categoryId)
   {
     Name = name;
     Description = description;
     Icon = icon;
     DisplayOrder = displayOrder;
-    Category = category;
+    CategoryId = categoryId;
   }
 
 }

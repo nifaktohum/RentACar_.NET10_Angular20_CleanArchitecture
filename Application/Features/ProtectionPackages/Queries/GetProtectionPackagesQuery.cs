@@ -1,3 +1,4 @@
+using Application.Behaviors;
 using Application.Features.ProtectionPackages.Dto;
 using Domain.Repositories;
 using Domain.Repositories.Protection;
@@ -7,6 +8,7 @@ using TS.Result;
 
 namespace Application.Features.ProtectionPackages.Queries;
 
+[Permission("ProtectionPackage.Read")]
 public sealed record GetProtectionPackagesQuery(
                           bool? OnlyActive = null,
                           bool? OnlyRecommended = null
@@ -89,7 +91,8 @@ public sealed class GetProtectionPackagesQueryHandler(
             Description: b.Description,
             Icon: b.Icon,
             DisplayOrder: b.DisplayOrder,
-            Category: b.Category.ToString(),
+            Category: b.Category?.Name ?? "Bilinmiyor",
+            CategoryId: b.CategoryId,
             IsActive: b.IsActive,
             CreatedAt: b.CreatedAt,
             CreatedBy: b.CreatedBy,

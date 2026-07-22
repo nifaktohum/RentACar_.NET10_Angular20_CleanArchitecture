@@ -1,3 +1,4 @@
+using Application.Behaviors;
 using Domain.Repositories;
 using Domain.Repositories.Protection;
 using GenericRepository;
@@ -7,6 +8,7 @@ using TS.Result;
 
 namespace Application.Features.ProtectionPackages._ProtectionBenefits.BenefitCommands;
 
+[Permission("ProtectionBenefit.Delete")]
 public sealed record DeleteProtectionBenefitCommand(Guid Id) : IRequest<Result<Unit>>;
 
 public sealed class DeleteProtectionBenefitCommandHandler(
@@ -22,23 +24,18 @@ public sealed class DeleteProtectionBenefitCommandHandler(
     var benefit = await _benefitRepo
         .FirstOrDefaultAsync(b => b.Id == _req.Id && !b.IsDeleted, _token);
 
-    if (benefit is null) return Result<Unit>.Failure(404, "Benefit bulunamadı.");
-
-    // 2. Bu benefit bir pakette kullanılıyor mu?
-    var isUsed = await _benefitRepo
-        .AnyAsync(b => b.Id == _req.Id && b.ProtectionPackages.Any(), _token);
-
-    if (isUsed) return Result<Unit>.Failure(400, "Bu benefit bir pakette kullanıldığı için silinemez.");
+    if (benefit is null)
+      return Result<Unit>.Failure(404, "Benefit bulunamadı.");
 
     // 2. Kullanıcı ID
     var userId = _userRepo.GetCurrentUserId();
-    if (userId == Guid.Empty) userId = Guid.Parse(_config["SeedData.AdminUserId"]!);
+    if (userId == Guid.Empty)
+      userId = Guid.Parse(_config["SeedData:AdminUserId"]!);
 
-    // 4. Soft delete
+    // 3. Soft Delete
     benefit.SoftDelete(userId);
     _benefitRepo.Update(benefit);
     await _unit.SaveChangesAsync(_token);
-
 
     return Result<Unit>.Succeed(Unit.Value);
   }

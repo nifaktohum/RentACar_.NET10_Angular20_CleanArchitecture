@@ -1,6 +1,6 @@
+using Application.Behaviors;
 using Application.Features.ProtectionPackages.Dto;
 using Domain.Entities.Protection;
-using Domain.Protection;
 using Domain.Repositories;
 using Domain.Repositories.Protection;
 using FluentValidation;
@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using TS.Result;
 
 namespace Application.Features.ProtectionPackages.Commands;
+
+[Permission("ProtectionPackage.Update")]
 
 public sealed record UpdateProtectionPackageCommand(
                               Guid Id,
@@ -110,9 +112,7 @@ public sealed class UpdateProtectionPackageCommandHandler(
 
     // 3. Benefit'leri getir
     var benefitIds = _req.BenefitIds.Distinct().ToList();
-    var benefits = await _benefitRepo
-        .Where(b => benefitIds.Contains(b.Id) && b.IsActive && !b.IsDeleted)
-        .ToListAsync(_token);
+    var benefits = await _benefitRepo.GetBenefitsByIdsAsync(_req.BenefitIds, _token);
 
     if (benefits.Count != benefitIds.Count)
     {
@@ -237,7 +237,8 @@ public sealed class UpdateProtectionPackageCommandHandler(
             Description: b.Description,
             Icon: b.Icon,
             DisplayOrder: b.DisplayOrder,
-            Category: b.Category.ToString(),
+            Category: b.Category?.Name ?? "Bilinmiyor", 
+            CategoryId: b.CategoryId,
             IsActive: b.IsActive,
             CreatedAt: b.CreatedAt,
             CreatedBy: b.CreatedBy,

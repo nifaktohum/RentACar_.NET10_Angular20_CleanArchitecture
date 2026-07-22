@@ -1,5 +1,5 @@
 using Application.Services;
-using Domain.Users;
+using Domain.Entities.Users;
 using Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

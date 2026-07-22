@@ -11,7 +11,7 @@
 
 
 
-    <div class="role-management-wrapper">
+    <div class="branch-management-wrapper">
       <p-table [value]="branches()" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [paginator]="true" [rows]="10"
         [totalRecords]="totalCount()" [loading]="isLoading()" [rowsPerPageOptions]="[5, 10, 20]"
         [tableStyle]="{'width': 'auto'}" showCurrentPageReport="true">

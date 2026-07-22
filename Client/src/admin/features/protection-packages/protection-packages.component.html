@@ -1,0 +1,125 @@
+<!-- modules/admin/protection-packages/pages/protection-packages/protection-packages.component.html -->
+
+<div class="protection-packages-container">
+  <p-card>
+    <!-- Header -->
+    <div class="p-button-list">
+      <h2>Koruma Paketleri</h2>
+      <p>Araç koruma paketlerini listeleyebilir, ekleyebilir, düzenleyebilir ve yönetebilirsin.</p>
+      <p-button (click)="openCreateDialog()" class="p-button-add" icon="ri-add-large-line"
+        pTooltip="Yeni Paket Ekle" tooltipPosition="top" pRipple [raised]="true">
+      </p-button>
+      <p-button class="p-button-menu" severity="info" icon="ri-menu-line" [raised]="true" pRipple>
+      </p-button>
+      <p-button class="p-button-reset" severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile"
+        tooltipPosition="top" (onClick)="refreshData()" [loading]="isLoading()" [raised]="true">
+      </p-button>
+    </div>
+
+    <!-- Tablo -->
+    <div class="protection-table-wrapper">
+      <p-table [value]="packages()" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [paginator]="true" [rows]="10"
+        [totalRecords]="totalCount()" [loading]="isLoading()" [rowsPerPageOptions]="[5, 10, 20]"
+        [tableStyle]="{'width': '100%'}" showCurrentPageReport="true"
+        currentPageReportTemplate="Toplam {totalRecords} paketten {first} - {last} arası gösteriliyor">
+
+        <!-- Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-name">Paket Adı</th>
+            <th class="col-description">Açıklama</th>
+            <th class="col-order">Sıra</th>
+            <th class="col-rating">⭐</th>
+            <th class="col-level">Seviye</th>
+            <th class="col-deductible">Muafiyet</th>
+            <th class="col-benefits">Kapsamlar</th>
+            <th class="col-price">Fiyat</th>
+            <th class="col-status">Durum</th>
+            <th class="col-actions">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="body" let-pkg>
+          <tr [ngClass]="{ 'inactive-row': !pkg.isActive }">
+            <td class="package-name">
+              <div class="name-wrapper">
+                <span>{{ pkg.name }}</span><br>
+                @if (pkg.isRecommended) {
+                <span class="recommended-badge">Önerilen</span>
+                }
+              </div>
+            </td>
+            <td class="package-description">{{ pkg.description || '-' }}</td>
+            <td class="package-order">{{ pkg.displayOrder }}</td>
+            <td class="package-rating">
+              @for (star of getStars(pkg.starRating); track $index) {
+              <i class="ri-star-fill star-filled"></i>
+              }
+              @for (star of getStars(5 - pkg.starRating); track $index) {
+              <i class="ri-star-line star-empty"></i>
+              }
+            </td>
+            <td class="package-level">{{ getProtectionLevelLabel(pkg.protectionLevel) }}</td>
+            <td class="package-deductible">{{ getDeductibleTypeLabel(pkg.deductibleType) }}</td>
+            <td class="package-benefits">
+              <span class="benefit-count">{{ pkg.benefits?.length || 0 }}</span>
+            </td>
+            <td class="package-price">
+              @if (pkg.pricing && pkg.pricing.length > 0) {
+              @if (pkg.pricing[0].dailyPrice) {
+              {{ pkg.pricing[0].dailyPrice | currency:'TRY':'₺' }} / gün
+              } @else if (pkg.pricing[0].deductibleAmount) {
+              {{ pkg.pricing[0].deductibleAmount | currency:'TRY':'₺' }} muafiyet
+              } @else {
+              -
+              }
+              } @else {
+              -
+              }
+            </td>
+            <td class="package-status">
+              <span class="status-badge" [class.status-active]="pkg.isActive" [class.status-inactive]="!pkg.isActive"
+                (click)="toggleStatus(pkg)">
+                {{ pkg.isActive ? 'Aktif' : 'Pasif' }}
+              </span>
+            </td>
+            <td >
+              <div class="action-buttons">
+                <button pButton (click)="openEditDialog(pkg)" type="button"
+                  class="p-button-text p-button-primary p-button-rounded btn-edit" icon="ri-edit-line" pTooltip="Düzenle"
+                  tooltipPosition="top">
+                </button>
+                <button pButton type="button" class="p-button-text p-button-danger p-button-rounded btn-delete"
+                  icon="ri-delete-bin-line" pTooltip="Sil" tooltipPosition="top"
+                  (click)="deletePackage(pkg.id, pkg.name)">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty Message -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="10" class="empty-table-message">
+              {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı koruma paketi bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </div>
+
+  </p-card>
+</div>
+
+<!-- parent.component.html -->
+
+<app-package-dialog 
+  [visible]="dialogVisible()"
+  [editData]="selectedPackage()"
+  [mode]="dialogMode()"
+  (visibleChange)="dialogVisible.set($event)"
+  (saved)="loadPackages()">
+></app-package-dialog>

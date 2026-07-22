@@ -1,4 +1,4 @@
-using Domain.Roles;
+using Domain.Entities.Roles;
 using GenericRepository;
 
 namespace Domain.Repositories;

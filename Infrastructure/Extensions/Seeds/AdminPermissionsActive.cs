@@ -1,5 +1,5 @@
 using Application.Common.Helpers;
-using Domain.Roles;
+using Domain.Entities.Roles;
 using Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

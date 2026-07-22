@@ -1,5 +1,4 @@
 using Domain.Entities.Protection;
-using Domain.Protection;
 using Domain.Repositories.Protection;
 using GenericRepository;
 using Infrastructure.Context;

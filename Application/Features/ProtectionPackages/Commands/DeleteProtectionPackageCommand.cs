@@ -1,14 +1,15 @@
+using Application.Behaviors;
 using Domain.Repositories;
 using Domain.Repositories.Protection;
 using FluentValidation;
 using GenericRepository;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using TS.Result;
 
 namespace Application.Features.ProtectionPackages.Commands;
 
+[Permission("ProtectionPackage.Delete")]
 public sealed record DeleteProtectionPackageCommand(Guid Id) : IRequest<Result<Unit>>;
 
 public sealed class DeleteProtectionPackageCommandValidator : AbstractValidator<DeleteProtectionPackageCommand>

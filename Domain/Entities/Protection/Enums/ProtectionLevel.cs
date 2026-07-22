@@ -1,4 +1,4 @@
-namespace Domain.Protection;
+namespace Domain.Entities.Protection;
 
 public enum ProtectionLevel
 {

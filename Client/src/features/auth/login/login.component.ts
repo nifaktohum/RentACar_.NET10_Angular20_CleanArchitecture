@@ -64,8 +64,6 @@ export class LoginComponent implements OnInit {
 
     // // 🔥 İŞTE SAVUNMA DUVARI: Form geçersizse backend yolculuğunu burada bitir!
     if (form.invalid) {
-      console.log('Dur yolcu! Formda validasyon hataları var, istek engellendi.');
-
       // Sayfadaki ilk hatalı (.ng-invalid sınıfına sahip) input elementini cımbızla çekiyoruz
       const firstInvalidInput = document.querySelector('.form-control.ng-invalid, input.ng-invalid') as HTMLElement;
 
@@ -119,7 +117,6 @@ export class LoginComponent implements OnInit {
           detail: `${err.error.error[0]}` || 'Sunucu hatası, lütfen tekrar deneyin.'
         })
         console.log(err.error.error[0]);
-
       }
     });
   }

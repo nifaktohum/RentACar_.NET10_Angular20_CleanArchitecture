@@ -72,11 +72,42 @@ export const navigations: NavigationModel[] =
           role: 'Categories.Create',
           haveSubMenu: false
         },
+        // {
+        //   title: 'Kategori Hiyerarşisi',
+        //   url: '/admin/categories/hierarchy',
+        //   icon: 'ri-tree-line',
+        //   role: 'Categories.Read',
+        //   haveSubMenu: false
+        // }
+      ],
+    },
+    // PROTECTION PACKAGES 
+    {
+      title: 'Koruma Paketleri',
+      key: 'protection-packages',
+      icon: 'ri-shield-star-line',
+      role: 'ProtectionPackages.Read',
+      haveSubMenu: true,
+      subMenus: [
         {
-          title: 'Kategori Hiyerarşisi',
-          url: '/admin/categories/hierarchy',
-          icon: 'ri-tree-line',
-          role: 'Categories.Read',
+          title: 'Paket Listesi',
+          url: '/admin/protection-packages',
+          icon: 'ri-list-check',
+          role: 'ProtectionPackages.Read',
+          haveSubMenu: false
+        },
+        {
+          title: 'Kapsamlar (Benefits)',
+          url: '/admin/protection-packages/benefits',
+          icon: 'ri-shield-check-line',
+          role: 'ProtectionBenefits.Read',
+          haveSubMenu: false
+        },
+        {
+          title: 'Kapsam Kategorileri',  
+          url: '/admin/protection-packages/benefit-categories',
+          icon: 'ri-price-tag-3-line',
+          role: 'BenefitCategories.Read',
           haveSubMenu: false
         }
       ],
@@ -134,7 +165,7 @@ export const navigations: NavigationModel[] =
       haveSubMenu: true,
       subMenus: [
         { title: 'Kullanıcı Listesi', url: '/admin/users', role: 'Users.Read' },
-        { title: 'Kullanıcı Ekle', url: '/admin/users/add', role: 'Users.Create' }
+        // { title: 'Kullanıcı Ekle', url: '/admin/users/add', role: 'Users.Create' }
       ],
     }
   ];

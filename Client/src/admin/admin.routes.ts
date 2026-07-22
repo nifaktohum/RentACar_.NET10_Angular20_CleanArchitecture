@@ -40,6 +40,13 @@ export const ADMIN_ROUTES: Routes = [
         loadChildren: () => import('./features/categories/categories.routes').then(m => m.CATEGORIES_ROUTES),
         canActivate: [permissionAuthGuard], // Yetki kontrolü ekledik
         data: { requiredPermission: 'Categories.Read' } // İzin kodu
+      },
+      // --- PROTECTİON PACKAGE (KORUMA PAKETLERI) ROTASI ---
+      {
+        path: 'protection-packages',
+        loadChildren: () => import('./features/protection-packages/protection-packages.routes').then(m => m.PROTECTION_PACKAGE_ROUTES),
+        canActivate: [permissionAuthGuard], // Yetki kontrolü ekledik
+        data: { requiredPermission: 'ProtectionPackage.Read' } // İzin kodu
       }
     ]
   },

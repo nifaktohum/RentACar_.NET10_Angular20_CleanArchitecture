@@ -1,5 +1,5 @@
 using Application.Features.Categories.Dto;
-using Domain.Categories;
+using Domain.Entities.Categories;
 using Domain.Repositories;
 using MediatR;
 using TS.Result;

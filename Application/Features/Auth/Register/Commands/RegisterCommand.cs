@@ -1,6 +1,6 @@
 using Application.Services;
 using Domain.Repositories;
-using Domain.Users;
+using Domain.Entities.Users;
 using FluentValidation;
 using GenericRepository;
 using MediatR;

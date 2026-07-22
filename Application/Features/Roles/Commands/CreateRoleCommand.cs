@@ -1,6 +1,6 @@
 using Application.Behaviors;
 using Domain.Repositories;
-using Domain.Roles;
+using Domain.Entities.Roles;
 using FluentValidation;
 using GenericRepository;
 using MediatR;

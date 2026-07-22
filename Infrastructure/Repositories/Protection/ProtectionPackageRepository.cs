@@ -41,9 +41,12 @@ public sealed class ProtectionPackageRepository : Repository<ProtectionPackage, 
   public async Task<ProtectionPackage?> GetPackageWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
   {
     return await _context.ProtectionPackages
-            .Include(p => p.Benefits)
-            .Include(p => p.Pricing)
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+                  .IgnoreQueryFilters()  // ✅ Global filter'ı bypass et (GetAll'daki ignoreFilters ile aynı)
+                  .Where(p => p.Id == id && !p.IsDeleted)
+                  .Include(p => p.Benefits)
+                      .ThenInclude(b => b.Category)  // ✅ Benefit'in Category'sini de getir
+                  .Include(p => p.Pricing)
+                  .FirstOrDefaultAsync(cancellationToken);
   }
   // Senin 'önerilen' olarak işaretlediğin ve aynı zamanda aktif olan paketler, bizim en çok para kazandıran ürünlerimizdir
   public async Task<List<ProtectionPackage>> GetRecommendedPackagesAsync(CancellationToken cancellationToken = default)

@@ -1,5 +1,5 @@
+using Application.Behaviors;
 using Application.Features.ProtectionPackages.Dto;
-using Domain.Protection;
 using Domain.Repositories;
 using Domain.Repositories.Protection;
 using FluentValidation;
@@ -10,13 +10,14 @@ using TS.Result;
 
 namespace Application.Features.ProtectionPackages._ProtectionBenefits.BenefitCommands;
 
+[Permission("ProtectionBenefit.Update")]
 public sealed record UpdateProtectionBenefitCommand(
                                 Guid Id,
                                 string Name,
                                 string? Description,
                                 string? Icon,
                                 int DisplayOrder,
-                                BenefitCategory Category
+                                Guid CategoryId
                       ) : IRequest<Result<ProtectionBenefitDto>>;
 
 public sealed class UpdateProtectionBenefitCommandValidator : AbstractValidator<UpdateProtectionBenefitCommand>
@@ -39,14 +40,16 @@ public sealed class UpdateProtectionBenefitCommandValidator : AbstractValidator<
     RuleFor(x => x.DisplayOrder)
         .GreaterThanOrEqualTo(0).WithMessage("Görüntüleme sırası 0 veya daha büyük olmalıdır.");
 
-    RuleFor(x => x.Category)
-        .IsInEnum().WithMessage("Geçerli bir kategori seçiniz.");
+    RuleFor(x => x.CategoryId)
+       .NotEmpty().WithMessage("Kategori ID zorunludur.")
+       .Must(id => id != Guid.Empty).WithMessage("Geçerli bir kategori ID'si giriniz.");
   }
 }
 
 public sealed class UpdateProtectionBenefitCommandHandler(
                             IProtectionBenefitRepository _benefitRepo,
                             IUserRepository _userRepo,
+                            IBenefitCategoryRepository _categoryRepo,
                             IUnitOfWork _unit,
                             IConfiguration _config
                     ) : IRequestHandler<UpdateProtectionBenefitCommand, Result<ProtectionBenefitDto>>
@@ -59,6 +62,13 @@ public sealed class UpdateProtectionBenefitCommandHandler(
         .FirstOrDefaultAsync(b => b.Id == _req.Id && !b.IsDeleted, _token);
 
     if (benefit is null) return Result<ProtectionBenefitDto>.Failure(404, "Benefit bulunamadı.");
+
+    // 2. ✅ Kategori var mı?
+    var category = await _categoryRepo
+        .FirstOrDefaultAsync(c => c.Id == _req.CategoryId && !c.IsDeleted, _token);
+
+    if (category is null)
+      return Result<ProtectionBenefitDto>.Failure(400, "Belirtilen kategori bulunamadı.");
 
     // 2. Aynı isimde başka benefit var mı?
     var existing = await _benefitRepo
@@ -77,12 +87,24 @@ public sealed class UpdateProtectionBenefitCommandHandler(
         description: _req.Description,
         icon: _req.Icon,
         displayOrder: _req.DisplayOrder,
-        category: _req.Category
+        categoryId: _req.CategoryId
     );
 
     benefit.UpdateMetadata(userId);
     _benefitRepo.Update(benefit);
     await _unit.SaveChangesAsync(_token);
+
+    #region  CreatedByName: ""
+    // 8. Kullanıcı adlarını çek
+    var userIds = new List<Guid> { benefit.CreatedBy };
+    if (benefit.UpdatedBy.HasValue) userIds.Add(benefit.UpdatedBy.Value);
+
+
+    var distinctUserIds = userIds.Distinct().ToList();
+    var userNames = await _userRepo.GetUserNamesByIdsAsync(distinctUserIds, _token);
+    string GetUserName(Guid id) => userNames.GetValueOrDefault(id, "Bilinmiyor");
+
+    #endregion
 
     // 5. Response
     var dto = new ProtectionBenefitDto(
@@ -91,14 +113,15 @@ public sealed class UpdateProtectionBenefitCommandHandler(
         Description: benefit.Description,
         Icon: benefit.Icon,
         DisplayOrder: benefit.DisplayOrder,
-        Category: benefit.Category.ToString(),
+        Category: category.Name,
+        CategoryId: benefit.CategoryId,
         IsActive: benefit.IsActive,
         CreatedAt: benefit.CreatedAt,
         CreatedBy: benefit.CreatedBy,
-        CreatedByName: "",
+        CreatedByName: GetUserName(benefit.CreatedBy),
         UpdatedAt: benefit.UpdatedAt,
         UpdatedBy: benefit.UpdatedBy,
-        UpdatedByName: null
+        UpdatedByName: benefit.UpdatedBy.HasValue ? GetUserName(benefit.CreatedBy) : null
     );
 
     return Result<ProtectionBenefitDto>.Succeed(dto);

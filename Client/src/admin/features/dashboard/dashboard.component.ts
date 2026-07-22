@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, ViewEncapsulation }
 import { BreadcrumbService } from '../../core/services/breadcrumb.service';
 import { BlankComponent } from "../../components/blank/blank.component";
 import { ButtonModule } from 'primeng/button';
+import { ProtectionPackageService } from '../../core/services/protection-packages/protection-package.service';
+import { ProtectionBenefitService } from '../../core/services/protection-packages/protection-benefit.service';
 
 
 @Component({
@@ -21,8 +23,10 @@ export class DashboardComponent implements OnInit {
   // Sidebar'ın görünürlük durumunu tutan değişken
   sidebarVisible: boolean = window.innerWidth >= 1024;
 
+  private packageService = inject(ProtectionBenefitService)
+
   ngOnInit(): void {
-    this.breadCrumbService.reset();
+    this.breadCrumbService.reset();    
   }
   
 }

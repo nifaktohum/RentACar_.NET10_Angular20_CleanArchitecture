@@ -1,5 +1,5 @@
 using Application.Behaviors;
-using Domain.Branchs;
+using Domain.Entities.Branchs;
 using Domain.Repositories;
 using FluentValidation;
 using GenericRepository;

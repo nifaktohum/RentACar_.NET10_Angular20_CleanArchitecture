@@ -1,7 +1,6 @@
 
 
 using Domain.Abstractions;
-using Domain.Protection;
 
 namespace Domain.Entities.Protection;
 

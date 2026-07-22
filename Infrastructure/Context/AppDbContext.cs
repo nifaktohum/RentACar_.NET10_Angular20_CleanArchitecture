@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using Domain.Abstractions;
-using Domain.Branchs;
-using Domain.Categories;
+using Domain.Entities.Branchs;
+using Domain.Entities.Categories;
 using Domain.Entities.Protection;
-using Domain.Roles;
-using Domain.Users;
+using Domain.Entities.Roles;
+using Domain.Entities.Users;
 using GenericRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +36,7 @@ public class AppDbContext : DbContext, IUnitOfWork
   public DbSet<ProtectionPackage> ProtectionPackages { get; set; }
   public DbSet<ProtectionBenefit> ProtectionBenefits { get; set; }
   public DbSet<ProtectionPricing> ProtectionPricings { get; set; }
+  public DbSet<BenefitCategory> BenefitCategories { get; set; }
 
   protected override void OnModelCreating(ModelBuilder _modelBuilder)
   {
@@ -80,7 +81,7 @@ public class AppDbContext : DbContext, IUnitOfWork
 
     Guid userId = (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var parsedGuid))
         ? parsedGuid
-        : Guid.Parse(_config["SeedData.CustomerUserId"]!);
+        : Guid.Parse(_config["SeedData:AdminUserId"]!);
 
 
     var entries = ChangeTracker.Entries<BaseEntity>();

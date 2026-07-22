@@ -1,7 +1,7 @@
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using Domain.Repositories;
-using Domain.Users;
+using Domain.Entities.Users;
 using GenericRepository;
 using Infrastructure.Context;
 using Microsoft.AspNetCore.Http;

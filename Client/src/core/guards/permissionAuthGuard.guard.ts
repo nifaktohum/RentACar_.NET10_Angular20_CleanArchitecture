@@ -10,18 +10,13 @@ export const permissionAuthGuard: CanActivateFn = (route, state) => {
   const snackbarService = inject(SnackbarService)
   const router = inject(Router)
 
-  console.log('----------------------------');
-  console.log('Token:', authService.getToken());
-  console.log('CurrentUser:', authService.currentUser());
-  console.log('isAuthenticated:', authService.isAuthenticated());
-  console.log('isTokenExpired:', authService.isTokenExpired());
-  console.log('----------------------------');
-  
   // // 1. KONTROL: Kullanıcı giriş yapmış mı VE token süresi hala geçerli mi?
   // // Eğer kullanıcı hiç giriş yapmadıysa VEYA token süresi dolduysa içeri almıyoruz!
-  if (!authService.isAuthenticated() || authService.isTokenExpired()) {
-    // // Eğer süresi dolmuş bir token varsa temizlik yapıp kullanıcıyı öyle yönlendiriyoruz
-    authService.logout()
+  if (!authService.isAuthenticated()) {
+    // Sadece token varsa ve süresi dolduysa logout yap
+    if (authService.getToken()) {
+      authService.logout();
+    }
     router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
     return false;
   }

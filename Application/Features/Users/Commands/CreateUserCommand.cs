@@ -1,7 +1,7 @@
 using Application.Behaviors;
 using Application.Services;
 using Domain.Repositories;
-using Domain.Users;
+using Domain.Entities.Users;
 using GenericRepository;
 using MediatR;
 using TS.Result;

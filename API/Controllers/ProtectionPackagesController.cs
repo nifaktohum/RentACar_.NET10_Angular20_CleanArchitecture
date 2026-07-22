@@ -50,6 +50,14 @@ public class ProtectionPackagesController: BaseApiController
     return result.IsSuccessful ? Ok(result) : BadRequest(result);
   }
 
+  [HttpPatch("update-isactive/{id}/{isActive}")]
+  public async Task<IActionResult> ToggleStatus(Guid id, bool isActive, CancellationToken _token)
+  {
+    var command = new ToggleProtectionPackageStatusCommand(id, isActive);
+    var result = await Mediator.Send(command, _token);
+    return result.IsSuccessful ? Ok(result) : BadRequest(result);
+  }
+
   [HttpGet("get-recommended")]
   public async Task<IActionResult> GetRecommended(CancellationToken _token)
   {

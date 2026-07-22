@@ -1,5 +1,4 @@
 using Domain.Entities.Protection;
-using Domain.Protection;
 using GenericRepository;
 
 namespace Domain.Repositories.Protection;
@@ -8,10 +7,13 @@ namespace Domain.Repositories.Protection;
 public interface IProtectionBenefitRepository : IRepository<ProtectionBenefit>
 {
   void Attach(object entity);
-  // ID'ye göre tekil getirme
-  Task<ProtectionBenefit?> GetByIdBenefitsAsync(Guid id, CancellationToken cancellationToken = default);
+  /// Kategori ID'sine göre benefit'leri getirir (Entity!)
+  Task<ProtectionBenefit?> GetByIdBenefitAsync(Guid id, CancellationToken cancellationToken = default);
+  Task<List<ProtectionBenefit>> GetBenefitsByIdsAsync(List<Guid> ids, CancellationToken cancellationToken = default);
   // Kategoriye göre listeleme
-  Task<List<ProtectionBenefit>> GetBenefitsByCategoryAsync(BenefitCategory category, CancellationToken cancellationToken = default);
+  Task<List<ProtectionBenefit>> GetBenefitsByCategoryAsync(Guid categoryId, CancellationToken cancellationToken = default);
   // Tüm aktifleri listeleme
   Task<List<ProtectionBenefit>> GetAllBenefitsAsync(CancellationToken cancellationToken = default);
+  /// Aktif benefit'leri getirir
+  Task<List<ProtectionBenefit>> GetActiveBenefitsAsync(CancellationToken cancellationToken = default);
 }

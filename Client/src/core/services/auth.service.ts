@@ -19,7 +19,17 @@ export class AuthService {
   // 🔄 Kullanıcı bilgisini reaktif bir Signal olarak saklıyoruz kanka!
   currentUser = signal<TokenPayload | null>(null);
   // 🧠 UI tarafında anlık dinlenebilecek akıllı computed selector'lar
-  isAuthenticated = computed(() => !this.isTokenExpired() && this.currentUser() !== null);
+  isAuthenticated = computed(() => {
+    const user = this.currentUser();
+    if (!user) return false;
+
+    // Token var mı kontrol et
+    const token = this.getToken();
+    if (!token) return false;
+
+    // Token süresi dolmuş mu kontrol et
+    return !this.isTokenExpired();
+  });
   userPermissions = computed(() => this.currentUser()?.Permission || []);
   isAdmin = computed(() => this.userRoles().includes('Admin'));
 
@@ -48,6 +58,7 @@ export class AuthService {
         })
       );
   }
+  
   // Bu kod, kullanıcı giriş işlemini başarıyla tamamladıktan sonra, 
   // oturum bilgilerini tarayıcının yerel hafızasına(localStorage) kalıcı olarak kaydetmekten sorumludur.
   saveUserSession(data: LoginResponse, rememberMe: boolean) {
@@ -76,9 +87,7 @@ export class AuthService {
   }
 
   saveToken(token: string) {
-    console.log("SAVE TOKEN", token);
     localStorage.setItem('token', token);
-    console.log("After save:", localStorage.getItem("token"));
   };
 
   getToken(): string | null {
@@ -97,10 +106,13 @@ export class AuthService {
   }
 
   logout() {
-    console.trace("🚨 LOGOUT ÇAĞRILDI");
+    // Sadece auth ile ilgili olanları temizle
+    localStorage.removeItem('token');
+    localStorage.removeItem('fullName');
+    localStorage.removeItem('email');
 
-    localStorage.removeItem("token");
-    localStorage.clear();
+    // 🔥 'rememberedEmail' KULLANICI İSTEĞİYLE KORUNUR
+    // localStorage.removeItem('rememberedEmail'); // ❌ BUNU YAPMA
 
     this.currentUser.set(null);
   }
@@ -108,24 +120,17 @@ export class AuthService {
   // // AuthService sınıfının içine eklenecek olan süre kontrol metodu:
   isTokenExpired(): boolean {
     const token = this.getToken();
-    console.log("TOKEN =", token);
     if (!token) {
-      console.log("Token yok");
       return true;
     }
 
     try {
       const decoded = this.getDecodedToken();
-      console.log("Decoded =", decoded);
       if (!decoded || !decoded.exp) {
-        console.log("Decode başarısız");
         return true;
       }
-      console.log("exp =", decoded.exp);
-      console.log("now =", Date.now());
 
       const expiryTime = decoded.exp * 1000; // Saniyeyi JS'e uygun milisaniyeye çevirdik
-      console.log("expiry =", expiryTime);
       const currentTime = Date.now();
 
       return currentTime > expiryTime; // Süre bittiyse true fırlatır kanka
@@ -189,8 +194,6 @@ export class AuthService {
   
   // uygulamanın "Güvenli Çıkış"(Logout) veya "Oturum Sonlandırma" mekanizmasının merkezidir.
   clearSession(): void {
-    console.log('🧹 Oturum temizleniyor (rememberedEmail korunuyor)...');
-
     // Sadece auth ile ilgili olanları temizle
     localStorage.removeItem('token');
     localStorage.removeItem('fullName');
@@ -202,8 +205,6 @@ export class AuthService {
 
     // Signal'leri temizle
     this.currentUser.set(null);
-
-    console.log('✅ Oturum temizlendi, rememberedEmail korundu:', localStorage.getItem('rememberedEmail'));
   }
 
 }

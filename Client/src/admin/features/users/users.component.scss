@@ -65,49 +65,80 @@
   // Table
   .user-management-wrapper {
     .p-datatable-thead > tr > th {
+      white-space: nowrap;
+      text-align: start;
+      vertical-align: middle;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
       background: var(--admin-primary);
       color: var(--admin-white);
-      padding: 1rem 1.25rem;
-      font-weight: 600;
-      font-size: 0.875rem;
-      border: none;
+      border-bottom: 2px solid var(--surface-border);
+
+      &.col-name {
+        width: 15%;
+      }
+      &.col-description {
+        width: 15%;
+      }
+      &.col-order {
+        width: 5%;
+        text-align: center;
+      }
+      &.col-rating {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-level {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-deductible {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-benefits {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-price {
+        width: 10%;
+        text-align: center;
+      }
+      &.col-status {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-actions {
+        width: 10%;
+        text-align: center;
+      }
     }
+
     .p-datatable-tbody > tr {
       background: var(--admin-white);
       transition: background-color 0.2s;
+
       &:nth-child(even) {
         background: var(--admin-light);
       }
+
       &:hover {
         background: rgba(56, 189, 248, 0.05) !important;
       }
+
+      &.inactive-row {
+        opacity: 0.6;
+        background: #f1f5f9;
+
+        .package-name {
+          text-decoration: line-through;
+        }
+      }
+
       td {
-        padding: 1rem 1.25rem;
+        padding: 0.75rem 1rem;
         border-bottom: 1px solid var(--admin-border);
         vertical-align: middle;
-
-        &.tag {
-          text-align: center;
-          font-size: 25px;
-          gap: 0.5rem;
-          i {
-            border-radius: 50%;
-            margin: 10px;
-            // box-shadow:
-            //   rgba(0, 0, 0, 0.09) 0px 8px 4px,
-            //   rgba(0, 0, 0, 0.09) 0px 16px 8px,
-            //   rgba(0, 0, 0, 0.09) 0px 32px 16px;
-
-            border-bottom: 1px solid #10b981 !important;
-            top: 22px;
-          }
-          .checkbox-active {
-            color: #22c55e !important;
-          }
-          .checkbox-pasif {
-            color: #ef4444 !important;
-          }
-        }
       }
     }
   }

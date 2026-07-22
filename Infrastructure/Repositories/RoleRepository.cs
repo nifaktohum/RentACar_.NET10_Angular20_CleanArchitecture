@@ -1,5 +1,5 @@
 using Domain.Repositories;
-using Domain.Roles;
+using Domain.Entities.Roles;
 using GenericRepository;
 using Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;

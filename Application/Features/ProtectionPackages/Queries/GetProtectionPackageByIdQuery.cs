@@ -1,3 +1,4 @@
+using Application.Behaviors;
 using Application.Features.ProtectionPackages.Dto;
 using Domain.Repositories;
 using Domain.Repositories.Protection;
@@ -7,6 +8,7 @@ using TS.Result;
 
 namespace Application.Features.ProtectionPackages.Queries;
 
+[Permission("ProtectionPackage.Read")]
 public sealed record GetProtectionPackageByIdQuery(Guid Id): IRequest<Result<ProtectionPackageDto>>;
 
 public sealed class GetProtectionPackageByIdQueryHandler(
@@ -17,12 +19,7 @@ public sealed class GetProtectionPackageByIdQueryHandler(
   public async Task<Result<ProtectionPackageDto>> Handle(GetProtectionPackageByIdQuery _req, CancellationToken _token)
   {
     // 1. Paketi getir (Benefits ve Pricing ile birlikte)
-    var package = await _packageRepo
-        .GetAll(ignoreFilters: true)  // Tüm verileri çek (Global filter bypass)
-        .Where(p => p.Id == _req.Id && !p.IsDeleted)  // Sadece silinmemiş olanı filtrele
-        .Include(p => p.Benefits)
-        .Include(p => p.Pricing)
-        .FirstOrDefaultAsync(_token);
+    var package = await _packageRepo.GetPackageWithDetailsAsync(_req.Id, _token);
 
     // 2. Paket bulunamadıysa
     if (package is null)
@@ -30,34 +27,33 @@ public sealed class GetProtectionPackageByIdQueryHandler(
 
     #region  CreatedByName: "";
     // // sistemdeki tüm kullanıcı ID'lerini bir havuzda topluyoruz.
-    var userId = new List<Guid>();
+    var userIds = new List<Guid>();
 
 
-      // Ana paketin oluşturucusu ve güncelleyicisi
-      userId.Add(package.CreatedBy);
+    // Ana paketin oluşturucusu ve güncelleyicisi
+    userIds.Add(package.CreatedBy);
       if (package.UpdatedBy.HasValue)
       {
-        userId.Add(package.UpdatedBy.Value);
+      userIds.Add(package.UpdatedBy.Value);
 
         // Paket içerisindeki her bir avantajın (Benefit) sorumlusu
         foreach (var b in package.Benefits)
         {
-          userId.Add(b.CreatedBy);
-          if (b.UpdatedBy.HasValue) userId.Add(b.UpdatedBy.Value);
+        userIds.Add(b.CreatedBy);
+          if (b.UpdatedBy.HasValue) userIds.Add(b.UpdatedBy.Value);
         }
         // Paket içerisindeki her bir fiyatlandırmanın (Pricing) sorumlusu
         foreach (var pr in package.Pricing)
         {
-          userId.Add(pr.CreatedBy);
-          if (pr.UpdatedBy.HasValue) userId.Add(pr.UpdatedBy.Value);
+        userIds.Add(pr.CreatedBy);
+          if (pr.UpdatedBy.HasValue) userIds.Add(pr.UpdatedBy.Value);
         }
       }    
 
     // gereksiz sorgu atmamak için Distinct() ile ID'leri tekilleştiriyoruz.
-    var distinctUserIds = userId.Distinct().ToList();
+    var distinctUserIds = userIds.Distinct().ToList();
     // tüm kullanıcıların isimlerini (FullName) bir Dictionary olarak çekiyoruz.
     var userNames = await _userRepo.GetUserNamesByIdsAsync(distinctUserIds, _token);
-
     // Eğer ID'ye ait isim bulunamazsa "Bilinmiyor" döndürerek hata almamızı engelliyoruz.
     string GetUserName(Guid userId) => userNames.GetValueOrDefault(userId, "Bilinmiyor");
 
@@ -83,7 +79,8 @@ public sealed class GetProtectionPackageByIdQueryHandler(
             Description: b.Description,
             Icon: b.Icon,
             DisplayOrder: b.DisplayOrder,
-            Category: b.Category.ToString(),
+            Category: b.Category?.Name ?? "Bilinmiyor", 
+            CategoryId: b.CategoryId,
             IsActive: b.IsActive,
             CreatedAt: b.CreatedAt,
             CreatedBy: b.CreatedBy,

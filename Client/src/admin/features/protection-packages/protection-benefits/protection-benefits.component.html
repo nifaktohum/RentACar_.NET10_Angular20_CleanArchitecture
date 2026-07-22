@@ -1,0 +1,101 @@
+<!-- modules/admin/protection-packages/pages/protection-benefits/protection-benefits.component.html -->
+
+
+<div class="protection-benefits-container">
+  <p-card>
+    <!-- Header -->
+    <div class="p-button-list">
+      <div class="header-left">
+        <h2>Kapsamlar (Benefits)</h2>
+        <p>Koruma paketlerinde kullanılan tüm kapsamları listeleyebilir ve yönetebilirsin.</p>
+      </div>
+      <div class="header-right">
+        <p-button (click)="openCreateDialog()" icon="ri-add-large-line" pTooltip="Yeni Kapsam Ekle"
+          tooltipPosition="top" [raised]="true" class="p-button-add">
+        </p-button>
+        <p-button class="p-button-reset" severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile"
+          tooltipPosition="top" (onClick)="refreshData()" [loading]="isLoading()" [raised]="true">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- Tablo -->
+    <div class="table-wrapper">
+      <p-table [value]="benefits()" [paginator]="true" [rows]="10" [totalRecords]="totalCount()" [loading]="isLoading()"
+        [rowsPerPageOptions]="[5, 10, 20]" [tableStyle]="{ 'width': '100%' }" showCurrentPageReport="true"
+        currentPageReportTemplate="Toplam {totalRecords} kapsamdan {first} - {last} arası gösteriliyor">
+
+        <!-- Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-name">Kapsam Adı</th>
+            <th class="col-description">Açıklama</th>
+            <th class="col-order">Sıra</th>
+            <th class="col-category">Kategori</th>
+            <th class="col-status">Durum</th>
+            <th class="col-actions">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="body" let-benefit>
+          <tr [ngClass]="{ 'inactive-row': !benefit.isActive }">
+            <!-- // Kapsam Adı -->
+            <td class="benefit-name">
+              <div class="name-wrapper">
+                <i [ngClass]="benefit.icon || 'ri-price-tag-3-line'"></i>
+                <span> {{ benefit.name }} </span>
+              </div>
+            </td>
+            <!-- // Açıklama -->
+            <td class="benefit-description">{{ benefit.description || '-' }}</td>
+            <!-- // Sıra -->
+            <td class="benefit-order">{{ benefit.displayOrder }}</td>
+            <!-- // Kategori -->
+            <td class="benefit-category">
+              <!-- ✅ Kategori ID'sini kullanarak isim göster -->
+              <p-tag [value]="getCategoryNameById(benefit.categoryId)"
+                [severity]="getCategorySeverityById(benefit.categoryId)" [rounded]="true">
+              </p-tag>
+            </td>
+            <!-- // Durum -->
+            <td class="benefit-status">
+              <span class="status-badge" [class.status-active]="benefit.isActive"
+                [class.status-inactive]="!benefit.isActive" (click)="toggleStatus(benefit)">
+                {{ benefit.isActive ? 'Aktif' : 'Pasif' }}
+              </span>
+            </td>
+            <!-- // İşlemler -->
+            <td>
+              <div class="action-buttons">
+                <button pButton type="button" class="p-button-text p-button-primary p-button-rounded btn-edit"
+                  icon="ri-edit-line" pTooltip="Düzenle" tooltipPosition="top" (click)="openEditDialog(benefit)">
+                </button>
+                <button pButton type="button" class="p-button-text p-button-danger p-button-rounded btn-delete"
+                  icon="ri-delete-bin-line" pTooltip="Sil" tooltipPosition="top"
+                  (click)="deleteBenefit(benefit.id, benefit.name)">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty Message -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="empty-table-message">
+              {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı kapsam bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </div>
+
+  </p-card>
+</div>
+
+<!-- Dialog -->
+<app-benefit-dialog [(visible)]="dialogVisible" [editData]="selectedBenefit()" [mode]="dialogMode()"
+  (saved)="loadBenefits()">
+</app-benefit-dialog>

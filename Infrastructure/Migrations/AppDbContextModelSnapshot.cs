@@ -127,14 +127,85 @@ namespace Infrastructure.Migrations
                     b.ToTable("Categories", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Protection.ProtectionBenefit", b =>
+            modelBuilder.Entity("Domain.Entities.Protection.BenefitCategory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Category")
-                        .HasColumnType("integer");
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DisplayOrder");
+
+                    b.HasIndex("Name")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("BenefitCategories", "protection");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Protection.ProtectionBenefit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -184,18 +255,18 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Category");
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("DisplayOrder");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("CategoryId", "Name")
                         .IsUnique()
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("ProtectionBenefits", "protection");
                 });
 
-            modelBuilder.Entity("Domain.Protection.ProtectionPackage", b =>
+            modelBuilder.Entity("Domain.Entities.Protection.ProtectionPackage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -280,7 +351,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("ProtectionPackages", "protection");
                 });
 
-            modelBuilder.Entity("Domain.Protection.ProtectionPricing", b =>
+            modelBuilder.Entity("Domain.Entities.Protection.ProtectionPricing", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -613,9 +684,20 @@ namespace Infrastructure.Migrations
                     b.Navigation("ParentCategory");
                 });
 
-            modelBuilder.Entity("Domain.Protection.ProtectionPricing", b =>
+            modelBuilder.Entity("Domain.Entities.Protection.ProtectionBenefit", b =>
                 {
-                    b.HasOne("Domain.Protection.ProtectionPackage", "ProtectionPackage")
+                    b.HasOne("Domain.Entities.Protection.BenefitCategory", "Category")
+                        .WithMany("Benefits")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Protection.ProtectionPricing", b =>
+                {
+                    b.HasOne("Domain.Entities.Protection.ProtectionPackage", "ProtectionPackage")
                         .WithMany("Pricing")
                         .HasForeignKey("ProtectionPackageId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -675,13 +757,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("ProtectionPackageBenefits", b =>
                 {
-                    b.HasOne("Domain.Protection.ProtectionBenefit", null)
+                    b.HasOne("Domain.Entities.Protection.ProtectionBenefit", null)
                         .WithMany()
                         .HasForeignKey("BenefitId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Protection.ProtectionPackage", null)
+                    b.HasOne("Domain.Entities.Protection.ProtectionPackage", null)
                         .WithMany()
                         .HasForeignKey("PackageId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -693,7 +775,12 @@ namespace Infrastructure.Migrations
                     b.Navigation("SubCategories");
                 });
 
-            modelBuilder.Entity("Domain.Protection.ProtectionPackage", b =>
+            modelBuilder.Entity("Domain.Entities.Protection.BenefitCategory", b =>
+                {
+                    b.Navigation("Benefits");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Protection.ProtectionPackage", b =>
                 {
                     b.Navigation("Pricing");
                 });

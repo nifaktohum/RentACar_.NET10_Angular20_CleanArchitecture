@@ -1,0 +1,67 @@
+<!-- modules/admin/benefit-categories/components/benefit-category-dialog/benefit-category-dialog.component.html -->
+
+<p-dialog
+  [header]="dialogTitle"
+  [visible]="visible()"
+  (visibleChange)="closeDialog()"
+  [modal]="true"
+  [style]="{ width: '500px', maxWidth: '95vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isSaving()"
+  class="category-dialog">
+
+  <div class="category-form">
+
+    <!-- Kategori Adı -->
+    <div class="form-field">
+      <label for="name">Kategori Adı <span class="required">*</span></label>
+      <input id="name" pInputText [(ngModel)]="formData.name" (ngModelChange)="generateSlug()"
+        placeholder="Örn: Lastik, Cam, Motor" [disabled]="isSaving()" class="w-full" />
+    </div>
+
+    <!-- Slug -->
+    <div class="form-field">
+      <label for="slug">Slug <span class="required">*</span></label>
+      <input id="slug" pInputText [(ngModel)]="formData.slug" placeholder="Örn: lastik, cam, motor"
+        [disabled]="isSaving()" class="w-full" />
+      <small class="field-hint">Sadece küçük harf, rakam ve tire kullanılabilir.</small>
+    </div>
+
+    <!-- Açıklama -->
+    <div class="form-field">
+      <label for="description">Açıklama</label>
+      <textarea id="description" pInputTextarea [(ngModel)]="formData.description" rows="2"
+        placeholder="Kategori açıklaması (opsiyonel)" [disabled]="isSaving()" class="w-full">
+            </textarea>
+    </div>
+
+    <!-- İkon -->
+    <div class="form-field">
+      <label for="icon">İkon</label>
+      <input id="icon" pInputText [(ngModel)]="formData.icon" placeholder="Örn: ri-tire-line" [disabled]="isSaving()"
+        class="w-full" />
+      <small class="field-hint">Remix Icon kodu (opsiyonel)</small>
+    </div>
+
+    <!-- Sıralama -->
+    <div class="form-field">
+      <label for="displayOrder">Sıralama</label>
+      <input id="displayOrder" pInputText type="number" min="0" [(ngModel)]="formData.displayOrder"
+        placeholder="0, 1, 2, ..." [disabled]="isSaving()" class="w-full" />
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button pButton label="İptal" icon="ri-close-line" class="p-button-text" (click)="closeDialog()"
+        [disabled]="isSaving()">
+      </button>
+      <button pButton label="Kaydet" icon="ri-save-line" class="p-button-primary" [loading]="isSaving()"
+        (click)="saveCategory()">
+      </button>
+    </div>
+
+  </div>
+
+</p-dialog>
+

@@ -1,4 +1,4 @@
-using Domain.Branchs;
+using Domain.Entities.Branchs;
 using Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

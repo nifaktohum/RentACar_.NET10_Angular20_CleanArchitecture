@@ -1,7 +1,7 @@
 using Application.Behaviors;
 using Application.Common.Helpers;
 using Domain.Repositories;
-using Domain.Roles; // PermissionRole entity'si için kanks
+using Domain.Entities.Roles; // PermissionRole entity'si için kanks
 using GenericRepository;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

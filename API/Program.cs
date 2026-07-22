@@ -32,6 +32,7 @@ _builder.Services.AddSwaggerGen(c =>
   c.SwaggerDoc("v1-Roles", new() { Title = "RentCar Roles", Version = "v1" });
   c.SwaggerDoc("v1-Permissions", new() { Title = "RentCar Permissions", Version = "v1" });
   c.SwaggerDoc("v1-ProtectionPackages", new() { Title = "RentCar ProtectionPackages", Version = "v1" });
+  c.SwaggerDoc("v1-BenefitCategories", new() { Title = "RentCar BenefitCategories", Version = "v1" });
 
   // Endpoint'leri GroupName'e göre doğru sekmeye dağıtan sihirli kural kanka!
   c.DocInclusionPredicate((docName, apiDesc) =>
@@ -109,6 +110,7 @@ if (app.Environment.IsDevelopment())
     c.SwaggerEndpoint("/swagger/v1-Roles/swagger.json", "RentCar Roles");
     c.SwaggerEndpoint("/swagger/v1-Permissions/swagger.json", "RentCar Permissions");
     c.SwaggerEndpoint("/swagger/v1-ProtectionPackages/swagger.json", "RentCar ProtectionPackages");
+    c.SwaggerEndpoint("/swagger/v1-BenefitCategories/swagger.json", "RentCar BenefitCategories");
   });
 }
 
@@ -135,16 +137,25 @@ app.MapControllers().RequireAuthorization();
 // =====================================================================================
 // 👑 VERITABANI DATA SEED İŞLEMLERİ (MANTIKSAL SIRALAMA)
 // =====================================================================================
+// 👑 VERITABANI DATA SEED İŞLEMLERİ
 using (var scope = app.Services.CreateScope())
 {
   var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
   var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-  // 1️⃣ Önce Migration'ları çalıştır (Tablolar + Foreign Key + Seed verileri)
-  await context.Database.MigrateAsync(); // ✅ Migration'daki rolleri ekler
-
-  // 2️⃣ Sonra Seed işlemlerini çalıştır (Eksikleri tamamlar, çakışma olmaz!)
-  await app.InitializeDatabaseSeedAsync(config);
+  try
+  {
+    await context.Database.MigrateAsync();
+    await app.InitializeDatabaseSeedAsync(config);
+  }
+  catch (Exception ex)
+  {
+    // Uygulamanın loglama servisini (ILogger) kullanarak hatayı yazdır
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "Veritabanı migration veya seed işlemi sırasında hata oluştu.");
+    // Gerekirse uygulamayı durdur veya hata ile devam et
+    throw;
+  }
 }
 // =====================================================================================
 

@@ -1,0 +1,123 @@
+::ng-deep .package-dialog {
+  .package-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; // Şube formundaki boşluk hiyerarşisi ile uyumlu
+    padding: 1rem;
+
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+
+      h4 {
+        margin: 0;
+        font-size: 1.15rem; // Branch formdaki h3 boyutu ile uyumlu
+        color: var(--admin-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-left: 4px solid var(--admin-accent);
+        padding-left: 0.75rem;
+      }
+
+      .form-row {
+        display: grid; // Daha tutarlı hizalama için grid yapısı
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+
+        .form-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+
+          &.full-width {
+            grid-column: span 2;
+          }
+
+          label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--admin-text);
+            
+            .required {
+              color: var(--admin-danger);
+            }
+          }
+          
+          // PrimeNG bileşenlerinin form-control ile aynı görünmesi için
+          .p-inputtext, .p-select, .p-multiselect, .p-textarea {
+            width: 100%;
+            background-color: var(--admin-border);
+            border-radius: 6px;
+          }
+
+          .field-hint {
+            font-size: 0.75rem;
+            color: var(--admin-text-muted);
+          }      
+
+          // Toggle alanını şube formundaki status-section stiline yaklaştırdık
+          &.toggle-field {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--admin-light);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--admin-border);
+            
+            label { 
+              margin-bottom: 0; 
+              padding: 0 !important;
+            }
+            
+            .toggle-wrapper {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              
+              .status-label {
+                font-size: 0.875rem;
+                color: var(--admin-text-muted);
+                transition: color 0.2s;
+                
+                &.active {
+                  color: var(--admin-success); // Aktif durumlar için başarı rengi
+                  font-weight: 600;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Chip tasarımı
+    .benefit-chip {
+      background: var(--admin-accent);
+      color: var(--admin-primary-dark);
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    // Buton aksiyonları
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--admin-border);
+
+      .p-button {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+      }
+    }
+  }
+}

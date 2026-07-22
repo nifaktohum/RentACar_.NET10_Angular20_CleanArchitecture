@@ -1,4 +1,4 @@
-using Domain.Protection;
+using Domain.Entities.Protection;
 
 namespace Application.Features.ProtectionPackages.Dto;
 

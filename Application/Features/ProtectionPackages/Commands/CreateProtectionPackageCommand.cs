@@ -1,17 +1,17 @@
+using Application.Behaviors;
 using Application.Features.ProtectionPackages.Dto;
 using Domain.Entities.Protection;
-using Domain.Protection;
 using Domain.Repositories;
 using Domain.Repositories.Protection;
 using FluentValidation;
 using GenericRepository;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using TS.Result;
 
 namespace Application.Features.ProtectionPackages.Commands;
 
+[Permission("ProtectionPackage.Create")]
 public sealed record CreateProtectionPackageCommand(
     string Name,
     string? Description,
@@ -88,9 +88,7 @@ public sealed class CreateProtectionPackageCommandHandler(
   {
     // 1. Benefit'leri getir
     var benefitIds = _req.BenefitIds.Distinct().ToList();
-    var benefits = await _benefitRepository
-        .Where(b => benefitIds.Contains(b.Id) && b.IsActive && !b.IsDeleted)
-        .ToListAsync(_token);
+    var benefits = await _benefitRepository.GetBenefitsByIdsAsync(_req.BenefitIds , _token);
 
     // 2. Tüm benefit'ler bulundu mu kontrol et
     if (benefits.Count != benefitIds.Count)
@@ -199,7 +197,8 @@ public sealed class CreateProtectionPackageCommandHandler(
             Description: b.Description,
             Icon: b.Icon,
             DisplayOrder: b.DisplayOrder,
-            Category: b.Category.ToString(),
+            Category: b.Category?.Name ?? "Bilinmiyor",  
+            CategoryId: b.CategoryId,
             IsActive: b.IsActive,
             CreatedAt: b.CreatedAt,
             CreatedBy: b.CreatedBy,

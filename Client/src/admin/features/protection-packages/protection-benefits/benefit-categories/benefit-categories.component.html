@@ -1,0 +1,86 @@
+<!-- modules/admin/benefit-categories/pages/benefit-categories/benefit-categories.component.html -->
+
+<div class="benefit-categories-container">
+  <p-card>
+    <!-- Header -->
+    <div class="p-button-list">
+        <h2>Kapsam Kategorileri</h2>
+        <p>Koruma paketi kapsamlarını kategorize edebilir, yönetebilirsin.</p>      
+        <p-button (click)="openCreateDialog()" icon="ri-add-large-line" pTooltip="Yeni Kategori Ekle"
+          tooltipPosition="top" [raised]="true" class="p-button-add">
+        </p-button>
+        <p-button severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile" tooltipPosition="top"
+          (onClick)="refreshData()" [loading]="isLoading()" [raised]="true" class="p-button-reset">
+        </p-button>
+    
+    </div>
+
+    <!-- Tablo -->
+    <div class="table-wrapper">
+      <p-table [value]="categories()" [paginator]="true" [rows]="10" [totalRecords]="totalCount()"
+        [loading]="isLoading()" [rowsPerPageOptions]="[5, 10, 20]" [tableStyle]="{ 'width': '100%' }"
+        showCurrentPageReport="true"
+        currentPageReportTemplate="Toplam {totalRecords} kategoriden {first} - {last} arası gösteriliyor">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-name">Kategori Adı</th>
+            <th class="col-slug">Slug</th>
+            <th class="col-order">Sıra</th>
+            <th class="col-count">Benefit</th>
+            <th class="col-status">Durum</th>
+            <th class="col-actions">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-category>
+          <tr [ngClass]="{ 'inactive-row': !category.isActive }">
+            <td class="category-name">
+              <div class="name-wrapper">
+                <i [ngClass]="category.icon || 'ri-price-tag-3-line'"></i>
+                <span>{{ category.name }}</span>
+              </div>
+            </td>
+            <td class="category-slug">{{ category.slug }}</td>
+            <td class="category-order">{{ category.displayOrder }}</td>
+            <td class="category-count">
+              <span class="count-badge" [class.has-benefits]="(category.benefitCount || 0) > 0">
+                {{ getBenefitCountLabel(category.benefitCount || 0) }}
+              </span>
+            </td>
+            <td class="category-status">
+              <span class="status-badge" [class.status-active]="category.isActive"
+                [class.status-inactive]="!category.isActive" (click)="toggleStatus(category)">
+                {{ category.isActive ? 'Aktif' : 'Pasif' }}
+              </span>
+            </td>
+            <td >
+              <div class="category-actions">
+                <button pButton class="p-button-text p-button-primary p-button-rounded btn-edit" icon="ri-edit-line"
+                  pTooltip="Düzenle" tooltipPosition="top" (click)="openEditDialog(category)">
+                </button>
+                <button pButton class="p-button-text p-button-danger p-button-rounded btn-delete" icon="ri-delete-bin-line"
+                  pTooltip="Sil" tooltipPosition="top" (click)="deleteCategory(category.id, category.name)">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="empty-table-message">
+              {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı kategori bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </div>
+  </p-card>
+</div>
+
+<!-- Dialog -->
+<app-benefit-category-dialog [(visible)]="dialogVisible" [editData]="selectedCategory()" [mode]="dialogMode()"
+  (saved)="loadCategories()">
+</app-benefit-category-dialog>

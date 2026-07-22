@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Extensions.Seeds;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Extensions;
 
@@ -40,15 +41,33 @@ public static class DatabaseMasterInitializer
       await context.CreateCustomerUserAsync(configuration, passwordHasher, merkezSube.Id);
       Console.WriteLine("--> [Seed Master] Adım 5 Customer kullanıcı tamamlandı.");
 
-      // 6️⃣ 🆕 Kategoriler (YENİ)
+      // 6️⃣ Kategoriler
       await context.SeedCategoriesAsync(configuration);
       Console.WriteLine("--> [Seed Master] Adım 6 Kategoriler tamamlandı.");
+
+      // 7️⃣ Benefit Kategorileri
+      await context.SeedBenefitCategoriesAsync(configuration);
+      Console.WriteLine("--> [Seed Master] Adım 7 Benefit Kategorileri tamamlandı.");
+
+      // 8️⃣ Benefit'ler 
+      if (!await context.ProtectionBenefits.AnyAsync())
+      {
+        await context.SeedProtectionBenefitsAsync(configuration);
+        Console.WriteLine("--> [Seed Master] Adım 8 Benefit'ler tamamlandı.");
+      }
+
+      // 9️⃣ ProtectionPackages 
+      if (!await context.ProtectionPackages.AnyAsync())
+      {
+        await context.SeedProtectionPackagesAsync(configuration);
+        Console.WriteLine("--> [Seed Master] Adım 9 Koruma Paketleri tamamlandı.");
+      }
 
       Console.WriteLine("--> [Seed Master] ✅ Tüm parçalar başarıyla işlendi!");
     }
     catch (Exception ex)
     {
-      Console.WriteLine("❌ KRİTİK HATA ŞURADA: " + ex.Message);
+      Console.WriteLine("❌ KRİTİK HATA: " + ex.Message);
       Console.WriteLine("❌ DETAY: " + ex.ToString());
       throw;
     }

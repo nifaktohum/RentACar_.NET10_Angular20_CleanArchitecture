@@ -1,0 +1,135 @@
+<!-- modules/admin/protection-packages/components/protection-package-dialog/protection-package-dialog.component.html -->
+
+<p-dialog [header]="dialogTitle" [visible]="visible()" (visibleChange)="closeDialog()" [modal]="true"
+  [style]="{ width: '650px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="!isSaving()"
+  class="package-dialog">
+
+  <div class="package-form">
+
+    <!-- Temel Bilgiler -->
+    <div class="form-section">
+      <h4>Temel Bilgiler</h4>
+
+      <div class="form-row">
+        <div class="form-field full-width">
+          <label for="name">Paket Adı <span class="required">*</span></label>
+          <input id="name" pInputText [(ngModel)]="formData.name" placeholder="Örn: Gold Güvence"
+            [disabled]="isSaving()" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field full-width">
+          <label for="description">Açıklama</label>
+          <textarea id="description" pInputTextarea [(ngModel)]="formData.description" rows="2"
+            placeholder="Paket açıklaması" [disabled]="isSaving()"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="displayOrder">Sıralama</label>
+          <input id="displayOrder" pInputText type="number" [(ngModel)]="formData.displayOrder"
+            [disabled]="isSaving()" />
+        </div>
+        <div class="form-field">
+          <label for="starRating">Yıldız Derecesi (1-5)</label>
+          <input id="starRating" pInputText type="number" [(ngModel)]="formData.starRating" min="1" max="5"
+            [disabled]="isSaving()" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="protectionLevel">Koruma Seviyesi</label>
+          <p-select id="protectionLevel" [options]="protectionLevels" optionLabel="label" optionValue="value"
+            [(ngModel)]="formData.protectionLevel" placeholder="Seçiniz" [disabled]="isSaving()">
+          </p-select>
+        </div>
+        <div class="form-field">
+          <label for="deductibleType">Muafiyet Tipi</label>
+          <p-select id="deductibleType" [options]="deductibleTypes" optionLabel="label" optionValue="value"
+            [(ngModel)]="formData.deductibleType" placeholder="Seçiniz" [disabled]="isSaving()">
+          </p-select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fiyatlandırma -->
+    <div class="form-section">
+      <h4>Fiyatlandırma</h4>
+
+      <div class="form-row">
+        @if (showDailyPrice) {
+        <div class="form-field">
+          <label for="dailyPrice">Günlük Fiyat (₺)</label>
+          <input id="dailyPrice" pInputText type="number" [(ngModel)]="formData.pricing.dailyPrice"
+            placeholder="Örn: 166" [disabled]="isSaving()" />
+        </div>
+        }
+        @if (showDeductibleAmount) {
+        <div class="form-field">
+          <label for="deductibleAmount">Muafiyet Tutarı (₺)</label>
+          <input id="deductibleAmount" pInputText type="number" [(ngModel)]="formData.pricing.deductibleAmount"
+            placeholder="Örn: 11500" [disabled]="isSaving()" />
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Kapsamlar (Benefits) -->
+    <div class="form-section">
+      <h4>Kapsamlar <span class="required">*</span></h4>
+
+      <div class="form-row">
+        <div class="form-field full-width">
+          <p-multiSelect [options]="benefits()" optionLabel="name" optionValue="id" [(ngModel)]="formData.benefitIds"
+            placeholder="Kapsam seçiniz" [disabled]="isSaving()" [style]="{ width: '100%' }" display="chip">
+            <ng-template pTemplate="selectedItems" let-selectedItems>
+              @for (item of selectedItems; track item.id) {
+              <span class="benefit-chip">{{ item.name }}</span>
+              }
+            </ng-template>
+          </p-multiSelect>
+          <small class="field-hint">En az bir kapsam seçmelisiniz.</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aktif/Pasif -->
+    <div class="form-section">
+      <div class="form-row">
+        <div class="form-field toggle-field">
+          <label>Durum</label>
+          <div class="toggle-wrapper">
+            <p-toggleSwitch [(ngModel)]="formData.isActive" [disabled]="isSaving()"></p-toggleSwitch>
+            <span class="status-label" [class.active]="formData.isActive">
+              {{ formData.isActive ? 'Aktif' : 'Pasif' }}
+            </span>
+          </div>
+        </div>
+        <div class="form-field toggle-field">
+          <label>Önerilen</label>
+          <div class="toggle-wrapper">
+            <p-toggleSwitch [(ngModel)]="formData.isRecommended" [disabled]="isSaving()"></p-toggleSwitch>
+            <span class="status-label" [class.active]="formData.isRecommended">
+              {{ formData.isRecommended ? 'Evet' : 'Hayır' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button pButton label="İptal" icon="ri-close-line" class="p-button-text" (click)="closeDialog()"
+        [disabled]="isSaving()">
+      </button>
+      <button pButton label="Kaydet" icon="ri-save-line" class="p-button-primary" [loading]="isSaving()"
+        (click)="savePackage()">
+      </button>
+    </div>
+
+  </div>
+
+</p-dialog>

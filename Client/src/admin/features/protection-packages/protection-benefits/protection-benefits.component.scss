@@ -1,0 +1,221 @@
+// modules/admin/protection-packages/pages/protection-benefits/protection-benefits.component.scss
+
+::ng-deep .protection-benefits-container {
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  min-height: 100vh;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  p-card {
+    .p-card-body {
+      padding: 5px 10px !important;
+    }
+  }
+
+  .p-button-list {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    grid-template-areas:
+      'title btn1 btn2 btn3'
+      'desc  btn1 btn2 btn3';
+    align-items: center;
+    row-gap: 0.25rem;
+
+    .header-left {
+      h2 {
+        margin: 0;
+        max-width: 300px;
+        border-bottom: 2px solid var(--text-muted);
+        padding-bottom: 0.5rem;
+        padding-inline: 50px;
+      }
+
+      p {
+        grid-area: desc;
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 5px;
+      }
+    }
+
+    p-button:nth-of-type(1) {
+      grid-area: btn1;
+    }
+
+    p-button:nth-of-type(2) {
+      grid-area: btn2;
+    }
+
+    p-button .p-button {
+      margin-left: 3px;
+      padding: 3px;
+    }
+  }
+
+  .table-wrapper {
+    .p-datatable-thead > tr > th {
+      white-space: nowrap;
+      text-align: start;
+      vertical-align: middle;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      background: var(--admin-primary);
+      color: var(--admin-white);
+      border-bottom: 2px solid var(--surface-border);
+
+      &.col-name {
+        width: 20%;
+      }
+      &.col-description {
+        width: 30%;
+      }
+      &.col-order {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-category {
+        width: 15%;
+        text-align: center;
+      }
+      &.col-status {
+        width: 12%;
+        text-align: center;
+      }
+      &.col-actions {
+        width: 10%;
+        text-align: center;
+      }
+    }
+
+    .p-datatable-tbody > tr {
+      background: var(--admin-white);
+      transition: background-color 0.2s;
+
+      &:nth-child(even) {
+        background: var(--admin-light);
+      }
+
+      &:hover {
+        background: rgba(56, 189, 248, 0.05) !important;
+      }
+
+      &.inactive-row {
+        opacity: 0.6;
+        background: #f1f5f9;
+
+        .benefit-name {
+          text-decoration: line-through;
+        }
+        .name-wrapper {
+          i {
+            opacity: 0.5;
+          }
+        }
+      }
+
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--admin-border);
+        vertical-align: middle;
+      }
+    }
+
+    .benefit-name {
+      .name-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        i {
+          font-size: 1.25rem;
+          color: var(--primary-color);
+          width: 1.5rem;
+          text-align: center;
+        }
+
+        span {
+          font-weight: 500;
+          color: #1e293b;
+          font-size: 0.95rem;
+        }
+      }
+    }
+
+    .benefit-description {
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+
+    .benefit-order {
+      text-align: center;
+    }
+
+    .benefit-category {
+      text-align: center;
+    }
+
+    .benefit-status {
+      text-align: center;
+
+      .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        cursor: default;
+
+        &.status-active {
+          background: #dcfce7;
+          color: #15803d;
+        }
+
+        &.status-inactive {
+          background: #fee2e2;
+          color: #dc2626;
+        }
+      }
+    }
+
+    // Action Buttons
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      font-size: 22px;
+      gap: 0.5rem;
+
+      .p-button-rounded {
+        font-size: 20px;
+        &.btn-edit {
+          color: #60a5fa !important;
+          border-bottom: 1px solid #60a5fa !important;
+          &:hover {
+            background: rgba(96, 165, 250, 0.15) !important;
+          }
+        }
+        &.btn-delete {
+          color: #f87171 !important;
+          border-bottom: 1px solid #f87171 !important;
+          &:hover {
+            background: rgba(248, 113, 113, 0.15) !important;
+          }
+        }
+      }
+    }
+
+    .empty-table-message {
+      text-align: center;
+      padding: 2rem;
+      color: #94a3b8;
+    }
+
+    .p-paginator {
+      position: relative;
+      .p-paginator-current {
+        position: absolute;
+        left: 10px;
+      }
+    }
+  }
+}

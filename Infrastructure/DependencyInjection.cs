@@ -32,6 +32,7 @@ public static class DependencyInjection
     _services.AddScoped<IProtectionPackageRepository, ProtectionPackageRepository>();
     _services.AddScoped<IProtectionBenefitRepository, ProtectionBenefitRepository>();
     _services.AddScoped<IProtectionPricingRepository, ProtectionPricingRepository>();
+    _services.AddScoped<IBenefitCategoryRepository, BenefitCategoryRepository>();
 
     // Rate Limiting ve Kimlik Doğrulama Seçeneklerini (Options Pattern) bağlıyoruz 
     _services.AddRateLimiter();
