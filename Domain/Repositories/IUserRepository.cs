@@ -31,8 +31,8 @@ public interface IUserRepository : IRepository<User>
 
   // Kullanıcı belirtilen role sahip mi kontrol eder
   Task<bool> IsUserInRoleAsync(Guid userId, string roleName, CancellationToken cancellationToken);
+  
   Task<bool> HasRoleAsync(Guid userId, string[] roleNames, CancellationToken cancellationToken);
-
 
   // Giriş yapan kullanıcı belirtilen role sahip mi kontrol eder
   Task<bool> IsCurrentUserInRoleAsync(string roleName, CancellationToken cancellationToken);

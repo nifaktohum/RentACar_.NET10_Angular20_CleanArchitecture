@@ -1,10 +1,12 @@
 using Application.Services;
 using Domain.Repositories;
+using Domain.Repositories.Extras;
 using Domain.Repositories.Protection;
 using GenericRepository;
 using Infrastructure.Context;
 using Infrastructure.Options;
 using Infrastructure.Repositories;
+using Infrastructure.Repositories.Extras;
 using Infrastructure.Repositories.Protection;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -33,6 +35,7 @@ public static class DependencyInjection
     _services.AddScoped<IProtectionBenefitRepository, ProtectionBenefitRepository>();
     _services.AddScoped<IProtectionPricingRepository, ProtectionPricingRepository>();
     _services.AddScoped<IBenefitCategoryRepository, BenefitCategoryRepository>();
+
 
     // Rate Limiting ve Kimlik Doğrulama Seçeneklerini (Options Pattern) bağlıyoruz 
     _services.AddRateLimiter();
@@ -86,6 +89,8 @@ public static class DependencyInjection
     _services.AddScoped<ISmsService, SmsTwilioService>();
     _services.AddScoped<IPermissionRepository, PermissionRepository>();
     _services.AddScoped<ICategoryRepository, CategoryRepository>();
+    _services.AddScoped<IExtraRepository, ExtraRepository>();
+    _services.AddScoped<IRentalExtraRepository, RentalExtraRepository>();
 
     return _services;
   }

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Domain.Abstractions;
 using Domain.Entities.Branchs;
 using Domain.Entities.Categories;
+using Domain.Entities.Extras;
 using Domain.Entities.Protection;
 using Domain.Entities.Roles;
 using Domain.Entities.Users;
@@ -31,8 +32,10 @@ public class AppDbContext : DbContext, IUnitOfWork
   public DbSet<Permission> Permissions { get; set; }
   public DbSet<PermissionRole> PermissionRoles { get; set; }
   public DbSet<Category> Categories { get; set; }
-
-  // DbSet'ler
+  // Extras
+  public DbSet<Extra> Extras { get; set; }
+  public DbSet<RentalExtra> RentalExtras { get; set; }
+  // ProtectionPackage
   public DbSet<ProtectionPackage> ProtectionPackages { get; set; }
   public DbSet<ProtectionBenefit> ProtectionBenefits { get; set; }
   public DbSet<ProtectionPricing> ProtectionPricings { get; set; }
@@ -53,6 +56,13 @@ public class AppDbContext : DbContext, IUnitOfWork
         .HasDatabaseName("IX_Users_Email")
         .IsUnique()
         .HasFilter("\"IsDeleted\" = false");
+
+    // WHERE [IsDeleted] = 0 koşulunu kendisi ekler.
+    _modelBuilder.Entity<Extra>()
+       .HasQueryFilter(e => !e.IsDeleted);
+    // WHERE [IsDeleted] = 0 koşulunu kendisi ekler.
+    _modelBuilder.Entity<RentalExtra>()
+        .HasQueryFilter(re => !re.IsDeleted);
 
     base.OnModelCreating(_modelBuilder);
   }

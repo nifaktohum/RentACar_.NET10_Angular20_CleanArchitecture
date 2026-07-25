@@ -63,6 +63,12 @@ public static class DatabaseMasterInitializer
         Console.WriteLine("--> [Seed Master] Adım 9 Koruma Paketleri tamamlandı.");
       }
 
+      // Extras'lar
+      await context.ExtrasSeedAsync(configuration);
+      Console.WriteLine("--> [Seed Master] Adım 9 Extras Paketleri tamamlandı.");
+
+
+      // =====================================> 
       Console.WriteLine("--> [Seed Master] ✅ Tüm parçalar başarıyla işlendi!");
     }
     catch (Exception ex)

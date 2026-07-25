@@ -32,8 +32,11 @@ public sealed class DeleteUserCommandHandler(
   {
     // 1. Kullanıcıyı bul
     var user = await _userRepo.FirstOrDefaultAsync(u => u.Id == _req.Id, _token);
+
     var userId = _userRepo.GetCurrentUserId();
+
     string[] roleName = ["Admin"];
+    
     var isAdmin = await _userRepo.HasRoleAsync(userId, roleName, _token);
 
     if (isAdmin) return Result<bool>.Failure("Sistem Admin silinemez.");
