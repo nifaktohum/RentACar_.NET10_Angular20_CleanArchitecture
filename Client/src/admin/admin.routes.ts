@@ -47,6 +47,13 @@ export const ADMIN_ROUTES: Routes = [
         loadChildren: () => import('./features/protection-packages/protection-packages.routes').then(m => m.PROTECTION_PACKAGE_ROUTES),
         canActivate: [permissionAuthGuard], // Yetki kontrolü ekledik
         data: { requiredPermission: 'ProtectionPackage.Read' } // İzin kodu
+      },
+      // --- EXTRA (EKSTRA PAKETLER) ROTASI ---
+      {
+        path: 'extras',
+        loadChildren: () => import('./features/extras/protection-packages.routes').then(m => m.EXTRA_ROUTES),
+        canActivate: [permissionAuthGuard], // Yetki kontrolü ekledik
+        data: { requiredPermission: 'ProtectionPackage.Read' } // İzin kodu
       }
     ]
   },

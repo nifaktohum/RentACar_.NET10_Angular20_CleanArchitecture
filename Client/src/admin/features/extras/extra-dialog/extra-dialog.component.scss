@@ -1,0 +1,173 @@
+// modules/admin/extras/components/extra-dialog/extra-dialog.component.scss
+
+::ng-deep .extra-dialog {
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1rem;
+
+    .spin {
+      font-size: 2rem;
+      animation: spin 1s linear infinite;
+      color: var(--primary-color);
+    }
+
+    span {
+      color: var(--text-color-secondary);
+      font-size: 0.9rem;
+    }
+  }
+
+  .extra-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1.2rem;
+
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+
+      h4 {
+        margin: 0;
+        font-size: 1.15rem;
+        color: var(--admin-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-left: 4px solid var(--admin-accent);
+        padding-left: 0.75rem;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+
+        .form-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+
+          &.full-width {
+            grid-column: span 2;
+          }
+
+          label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--admin-text);
+
+            .required {
+              color: var(--admin-danger);
+            }
+          }
+
+          .field-hint {
+            font-size: 0.75rem;
+            color: var(--admin-text-muted);
+          }
+
+          // Toggle alanları
+          &.toggle-field {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--admin-light);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--admin-border);
+
+            label {
+              margin-bottom: 0;
+              padding: 0 !important;
+            }
+
+            .toggle-wrapper {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+
+              .status-label {
+                font-size: 0.875rem;
+                color: var(--admin-text-muted);
+                transition: color 0.2s;
+
+                &.active {
+                  color: var(--admin-success);
+                  font-weight: 600;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--admin-border);
+
+      .p-button {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ==================== RESPONSIVE ====================
+@media (max-width: 768px) {
+  ::ng-deep .extra-dialog {
+    .extra-form {
+      .form-section {
+        .form-row {
+          grid-template-columns: 1fr;
+
+          .form-field {
+            &.full-width {
+              grid-column: span 1;
+            }
+
+            &.toggle-field {
+              flex-direction: row;
+              flex-wrap: wrap;
+            }
+          }
+        }
+      }
+
+      .form-actions {
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+
+        .p-button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

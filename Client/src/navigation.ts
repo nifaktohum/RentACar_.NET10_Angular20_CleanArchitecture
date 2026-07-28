@@ -112,6 +112,23 @@ export const navigations: NavigationModel[] =
         }
       ],
     },
+    // Extras (Ekstralar)
+    {
+      title: 'Ekstralar',
+      key: 'extras',
+      icon: 'ri-service-line',
+      role: 'Extras.Read',
+      haveSubMenu: true,
+      subMenus: [
+        {
+          title: 'Ekstra Listesi',
+          url: '/admin/extras',
+          icon: 'ri-list-check',
+          role: 'Extras.Read',
+          haveSubMenu: false
+        }
+      ],
+    },
     // Reservations
     {
       title: 'Rezervasyonlar',

@@ -1,0 +1,140 @@
+<!-- modules/admin/extras/components/extra-dialog/extra-dialog.component.html -->
+
+<p-dialog [header]="dialogTitle" [visible]="visible()" (visibleChange)="closeDialog()" [modal]="true"
+  [style]="{ width: '600px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="!isSaving()"
+  class="extra-dialog">
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <i class="ri-loader-4-line spin"></i>
+    <span>Yükleniyor...</span>
+  </div>
+  }
+
+  <div class="extra-form">
+
+    <!-- Temel Bilgiler -->
+    <div class="form-section">
+      <h4>Temel Bilgiler</h4>
+
+      <div class="form-row">
+        <div class="form-field full-width">
+          <label for="name">Hizmet Adı <span class="required">*</span></label>
+          <input id="name" pInputText [(ngModel)]="formData.name" placeholder="Örn: Kış Lastiği, Çocuk Koltuğu"
+            [disabled]="isSaving() || isLoading()" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field full-width">
+          <label for="description">Açıklama</label>
+          <textarea id="description" pInputTextarea [(ngModel)]="formData.description" rows="2"
+            placeholder="Hizmet açıklaması (opsiyonel)" [disabled]="isSaving() || isLoading()"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="icon">İkon</label>
+          <input id="icon" pInputText [(ngModel)]="formData.icon" placeholder="Örn: ri-snowflake-line"
+            [disabled]="isSaving() || isLoading()" />
+          <small class="field-hint">Remix Icon kodu (opsiyonel)</small>
+        </div>
+        <div class="form-field">
+          <label for="displayOrder">Sıralama</label>
+          <input id="displayOrder" pInputText type="number" [(ngModel)]="formData.displayOrder"
+            placeholder="0, 1, 2, ..." [disabled]="isSaving() || isLoading()" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Fiyat ve Kategori -->
+    <div class="form-section">
+      <h4>Fiyat & Kategori</h4>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="price">Fiyat (₺) <span class="required">*</span></label>
+          <input id="price" pInputText type="number" [(ngModel)]="formData.price" placeholder="0.00"
+            [disabled]="isSaving() || isLoading()" />
+        </div>
+        <div class="form-field">
+          <label for="priceType">Fiyat Tipi <span class="required">*</span></label>
+          <p-select id="priceType" [options]="priceTypeOptions" optionLabel="label" optionValue="value"
+            [(ngModel)]="formData.priceType" placeholder="Seçiniz" [disabled]="isSaving() || isLoading()"></p-select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="category">Kategori <span class="required">*</span></label>
+          <p-select id="category" [options]="categoryOptions" optionLabel="label" optionValue="value"
+            [(ngModel)]="formData.category" placeholder="Seçiniz" [disabled]="isSaving() || isLoading()"></p-select>
+        </div>
+        <div class="form-field">
+          <label for="stockLimit">Stok Limiti</label>
+          <input id="stockLimit" pInputText type="number" [(ngModel)]="formData.stockLimit"
+            placeholder="Boş bırak = Sınırsız" [disabled]="isSaving() || isLoading()" />
+          <small class="field-hint">Boş bırakırsanız sınırsız stok olur.</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Özel Alanlar -->
+    <div class="form-section">
+      <h4>Özel Alanlar</h4>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="minAge">Minimum Yaş</label>
+          <input id="minAge" pInputText type="number" [(ngModel)]="formData.minAge" placeholder="Örn: 25"
+            [disabled]="isSaving() || isLoading()" />
+          <small class="field-hint">Örn: Genç Sürücü Paketi için 25</small>
+        </div>
+        <div class="form-field">
+          <label for="ageRange">Yaş/Kilo Aralığı</label>
+          <input id="ageRange" pInputText [(ngModel)]="formData.ageRange" placeholder="Örn: 15-36 kg"
+            [disabled]="isSaving() || isLoading()" />
+          <small class="field-hint">Koltuk ekipmanları için</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Durum ve Önerilen -->
+    <div class="form-section">
+      <h4>Durum & Ayarlar</h4>
+
+      <div class="form-row">
+        <div class="form-field toggle-field">
+          <label>Durum</label>
+          <div class="toggle-wrapper">
+            <p-toggleSwitch [(ngModel)]="formData.isActive" [disabled]="isSaving() || isLoading()"></p-toggleSwitch>
+            <span class="status-label" [class.active]="formData.isActive">
+              {{ formData.isActive ? 'Aktif' : 'Pasif' }}
+            </span>
+          </div>
+        </div>
+        <div class="form-field toggle-field">
+          <label>Önerilen</label>
+          <div class="toggle-wrapper">
+            <p-toggleSwitch [(ngModel)]="formData.isRecommended"
+              [disabled]="isSaving() || isLoading()"></p-toggleSwitch>
+            <span class="status-label" [class.active]="formData.isRecommended">
+              {{ formData.isRecommended ? 'Evet' : 'Hayır' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button pButton label="İptal" icon="ri-close-line" class="p-button-text" (click)="closeDialog()"
+        [disabled]="isSaving() || isLoading()"></button>
+      <button pButton label="Kaydet" icon="ri-save-line" class="p-button-primary" [loading]="isSaving()"
+        (click)="saveExtra()" [disabled]="isLoading()"></button>
+    </div>
+
+  </div>
+
+</p-dialog>

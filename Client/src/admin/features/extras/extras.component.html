@@ -1,0 +1,141 @@
+<!-- modules/admin/extras/pages/extras/extras.component.html -->
+
+<div class="extras-container">
+  <p-card>
+    <!-- Header -->
+    <div class="p-button-list">
+      <div class="header-left">
+        <h2>Ekstra Hizmetler</h2>
+        <p>Araç kiralama sırasında eklenebilecek ekstra hizmetleri listeleyebilir, ekleyebilir, düzenleyebilir ve
+          yönetebilirsin.</p>
+      </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Ara</label>
+          <input pInputText [(ngModel)]="filterSearch" (ngModelChange)="onFilterChange()" placeholder="İsme göre ara..."
+            class="filter-input" />
+        </div>
+        <div class="filter-field">
+          <label>Kategori</label>
+          <p-select [options]="categoryOptions" optionLabel="label" optionValue="value" [(ngModel)]="filterCategory"
+            (ngModelChange)="onFilterChange()" placeholder="Tümü" [showClear]="true" class="filter-select"></p-select>
+        </div>
+        <div class="filter-field">
+          <label>Fiyat Tipi</label>
+          <p-select [options]="priceTypeOptions" optionLabel="label" optionValue="value" [(ngModel)]="filterPriceType"
+            (ngModelChange)="onFilterChange()" placeholder="Tümü" [showClear]="true" class="filter-select"></p-select>
+        </div>
+        <div class="filter-field filter-count">
+          <label>Toplam</label>
+          <span class="count-badge">{{ getFilteredExtras().length }}</span>
+        </div>
+      </div>
+      <div class="filter-right">
+        <p-button (click)="openCreateDialog()" icon="ri-add-large-line" pTooltip="Yeni Ekstra Ekle"
+          tooltipPosition="top" [raised]="true" class="p-button-add"></p-button>
+        <p-button severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile" tooltipPosition="top"
+          (onClick)="refreshData()" [loading]="isLoading()" [raised]="true" class="p-button-reset"></p-button>
+      </div>
+    </div>
+
+    <!-- Tablo -->
+    <div class="table-wrapper">
+    <p-table
+      [value]="getFilteredExtras()"
+      [paginator]="true"
+      [rows]="10"
+      [totalRecords]="totalCount()"
+      [loading]="isLoading()"
+      [rowsPerPageOptions]="[5, 10, 20, 50]"
+      [tableStyle]="{ width: '100%' }"
+      [sortField]="sortField()"
+      showCurrentPageReport="true"
+      currentPageReportTemplate="Toplam {totalRecords} ekstra hizmetten {first} - {last} arası gösteriliyor">
+        <!-- Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-name">Hizmet Adı</th>
+            <th class="col-price">Fiyat</th>
+            <th class="col-category">Kategori</th>
+            <th class="col-price-type">Fiyat Tipi</th>
+            <th class="col-order" pSortableColumn="displayOrder">
+              Sıra
+              <p-sortIcon field="displayOrder"></p-sortIcon>
+            </th>
+            <th class="col-recommended">Önerilen</th>
+            <th class="col-stock">Stok</th>
+            <th class="col-status">Durum</th>
+            <th class="col-actions">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="body" let-extra>
+          <tr [ngClass]="{ 'inactive-row': !extra.isActive }">
+            <td class="extra-name">
+              <div class="name-wrapper">
+                <i [ngClass]="extra.icon || 'ri-service-line'"></i>
+                <span>{{ extra.name }}</span>
+              </div>
+            </td>
+            <td class="extra-price">{{ extra.price | currency:'TRY':'₺':'1.0-2' }}</td>
+            <td class="extra-category">
+              <p-tag [value]="getCategoryLabel(extra.category)" [severity]="getCategorySeverity(extra.category)"
+                [rounded]="true"></p-tag>
+            </td>
+            <td class="extra-price-type">
+              <span class="price-type-badge" [class.daily]="extra.priceType === 'Daily'" [class.rental]="extra.priceType === 'Rental'">
+                {{ getPriceTypeLabel(extra.priceType) }}
+              </span>
+            </td>
+            <td class="extra-order">{{ extra.displayOrder }}</td>
+            <td class="extra-recommended">
+              @if (extra.isRecommended) {
+              <i class="ri-star-fill recommended-icon"></i>
+              } @else {
+              <span class="not-recommended">-</span>
+              }
+            </td>
+            <td class="extra-stock">{{ getStockDisplay(extra.stockLimit) }}</td>
+            <td class="extra-status">
+              <span class="status-badge" [class.status-active]="extra.isActive"
+                [class.status-inactive]="!extra.isActive" (click)="toggleStatus(extra)">
+                {{ extra.isActive ? 'Aktif' : 'Pasif' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button pButton type="button" class="p-button-text p-button-primary p-button-rounded btn-edit"
+                  icon="ri-edit-line" pTooltip="Düzenle" tooltipPosition="top" (click)="openEditDialog(extra)"></button>
+                <button pButton type="button" class="p-button-text p-button-danger p-button-rounded btn-delete"
+                  icon="ri-delete-bin-line" pTooltip="Sil" tooltipPosition="top"
+                  (click)="deleteExtra(extra.id, extra.name)"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty Message -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9" class="empty-table-message">
+              {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı ekstra hizmet bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+</div>
+
+<!-- Dialog -->
+<app-extra-dialog
+  [visible]="dialogVisible()"
+  [editId]="selectedExtraId()"
+  [mode]="dialogMode()"
+  (visibleChange)="dialogVisible.set($event)"
+  (saved)="onDialogSaved()"></app-extra-dialog>

@@ -1,0 +1,422 @@
+// modules/admin/extras/pages/extras/extras.component.scss
+
+::ng-deep .extras-container {
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  min-height: 100vh;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  p-card {
+    .p-card-body {
+      padding: 5px 10px !important;
+    }
+  }
+
+  // ==================== HEADER ====================
+  .p-button-list {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas:
+      'title btn1 btn2'
+      'desc  btn1 btn2';
+    align-items: center;
+    column-gap: 0.5rem;
+    row-gap: 0.25rem;
+
+    .header-left {
+      h2 {
+        margin: 0;
+        max-width: 300px;
+        border-bottom: 2px solid var(--text-muted);
+        padding-bottom: 0.5rem;
+        padding-inline: 50px;
+      }
+
+      p {
+        grid-area: desc;
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 5px;
+        padding-inline: 50px;
+      }
+    }
+
+    .header-right {
+      display: flex;
+      gap: 0.5rem;
+
+      p-button .p-button {
+        margin-left: 3px;
+        padding: 3px;
+      }
+    }
+  }
+
+  // ==================== FILTERS ====================
+  .filter-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 1rem 1rem 0.5rem 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+    
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      flex: 1;
+
+      .filter-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        label {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: var(--text-color-secondary);
+        }
+
+        .filter-input {
+          min-width: 200px;
+          padding: 0.5rem;
+          border-radius: 6px;
+          border: 1px solid var(--admin-border);
+          background: var(--admin-white);
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+          }
+        }
+
+        .filter-select {
+          min-width: 150px;
+
+          ::ng-deep .p-select {
+            width: 100%;
+          }
+        }
+
+        &.filter-count {
+   
+          
+          .count-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            // padding: 0 10px;
+            background: var(--admin-primary);
+            color: var(--admin-white);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-top: auto;
+            margin-bottom: 5px;
+          }
+        }
+      }
+    }
+
+    .filter-right {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+
+      p-button .p-button {
+        margin-left: 3px;
+        padding: 3px;
+      }
+    }
+  }
+
+  // ==================== TABLE ====================
+  .table-wrapper {
+    padding: 0.5rem 1rem 1rem 1rem;
+
+    .p-datatable-thead > tr > th {
+      white-space: nowrap;
+      text-align: start;
+      vertical-align: middle;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      background: var(--admin-primary);
+      color: var(--admin-white);
+      border-bottom: 2px solid var(--surface-border);
+
+      &.col-name { width: 18%; }
+      &.col-price { width: 10%; text-align: center; }
+      &.col-category { width: 12%; text-align: center; }
+      &.col-price-type { width: 10%; text-align: center; }
+      &.col-order { width: 6%; text-align: center; .p-icon {margin-left: 5px; color: #fff;}}
+      &.col-recommended { width: 8%; text-align: center; }
+      &.col-stock { width: 8%; text-align: center; }
+      &.col-status { width: 10%; text-align: center; }
+      &.col-actions { width: 12%; text-align: center; }
+    }
+
+    .p-datatable-tbody > tr {
+      background: var(--admin-white);
+      transition: background-color 0.2s;
+
+      &:nth-child(even) {
+        background: var(--admin-light);
+      }
+
+      &:hover {
+        background: rgba(56, 189, 248, 0.05) !important;
+      }
+
+      &.inactive-row {
+        opacity: 0.6;
+        background: #f1f5f9;
+
+        .extra-name .name-wrapper span {
+          text-decoration: line-through;
+        }
+
+        .name-wrapper i {
+          opacity: 0.5;
+        }
+      }
+
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--admin-border);
+        vertical-align: middle;
+      }
+    }
+
+    // Extra Name
+    .extra-name {
+      .name-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        i {
+          font-size: 1.25rem;
+          color: var(--primary-color);
+          width: 1.5rem;
+          text-align: center;
+        }
+
+        span {
+          font-weight: 500;
+          color: #1e293b;
+          font-size: 0.95rem;
+        }
+      }
+    }
+
+    // Price
+    .extra-price {
+      text-align: center;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    // Category
+    .extra-category {
+      text-align: center;
+    }
+
+    // Price Type
+    .extra-price-type {
+      text-align: center;
+
+      .price-type-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+
+        &.daily {
+          background: #dbeafe;
+          color: #1d4ed8;
+        }
+
+        &.rental {
+          background: #fef3c7;
+          color: #b45309;
+        }
+      }
+    }
+
+    // Order
+    .extra-order {
+      text-align: center;
+      font-weight: 500;
+      color: #475569;
+    }
+
+    // Recommended
+    .extra-recommended {
+      text-align: center;
+
+      .recommended-icon {
+        color: #f59e0b;
+        font-size: 1.2rem;
+      }
+
+      .not-recommended {
+        color: #d1d5db;
+      }
+    }
+
+    // Stock
+    .extra-stock {
+      text-align: center;
+      font-size: 0.875rem;
+      color: #64748b;
+    }
+
+    // Status
+    .extra-status {
+      text-align: center;
+
+      .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &.status-active {
+          background: #dcfce7;
+          color: #15803d;
+
+          &:hover {
+            background: #86efac;
+            transform: scale(1.05);
+          }
+        }
+
+        &.status-inactive {
+          background: #fee2e2;
+          color: #dc2626;
+
+          &:hover {
+            background: #fca5a5;
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+
+    // Actions
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      font-size: 22px;
+      gap: 0.5rem;
+
+      .p-button-rounded {
+        font-size: 20px;
+
+        &.btn-edit {
+          color: #60a5fa !important;
+          border-bottom: 1px solid #60a5fa !important;
+
+          &:hover {
+            background: rgba(96, 165, 250, 0.15) !important;
+          }
+        }
+
+        &.btn-delete {
+          color: #f87171 !important;
+          border-bottom: 1px solid #f87171 !important;
+
+          &:hover {
+            background: rgba(248, 113, 113, 0.15) !important;
+          }
+        }
+      }
+    }
+
+    // Empty Message
+    .empty-table-message {
+      text-align: center;
+      padding: 2rem;
+      color: #94a3b8;
+    }
+
+    // Paginator
+    .p-paginator {
+      position: relative;
+
+      .p-paginator-current {
+        position: absolute;
+        left: 10px;
+      }
+    }
+  }
+}
+
+// ==================== RESPONSIVE ====================
+@media (max-width: 768px) {
+  ::ng-deep .extras-container {
+    .p-button-list {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'title'
+        'desc'
+        'btn1'
+        'btn2';
+
+      .header-right {
+        justify-content: flex-start;
+      }
+    }
+
+    .filter-section {
+      flex-direction: column;
+      align-items: stretch;
+
+      .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+
+        .filter-field {
+          .filter-input,
+          .filter-select {
+            min-width: 100%;
+          }
+        }
+      }
+
+      .filter-right {
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+      }
+    }
+
+    .table-wrapper {
+      padding: 0.5rem;
+
+      .p-datatable {
+        font-size: 0.8rem;
+
+        th,
+        td {
+          padding: 0.4rem 0.5rem !important;
+        }
+      }
+
+      .action-buttons {
+        gap: 0.25rem;
+
+        .p-button-rounded {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
