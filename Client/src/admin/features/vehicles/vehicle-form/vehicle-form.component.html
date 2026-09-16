@@ -1,0 +1,406 @@
+<!-- modules/admin/vehicle/pages/vehicle-form/vehicle-form.component.html -->
+
+<div class="vehicle-form-container">
+  <p-card>
+    <!-- ==================== HEADER ==================== -->
+    <div class="header-section">
+      <div class="header-left">
+        <h2>
+          <i class="ri-car-line"></i>
+          {{ isEditMode() ? 'Araç Düzenle' : 'Yeni Araç Ekle' }}
+        </h2>
+        <p>
+          {{ isEditMode() ? 'Araç bilgilerini güncelleyebilirsin.' : 'Sisteme yeni bir araç ekleyebilirsin.' }}
+        </p>
+      </div>
+      <div class="header-right">
+        <p-button type="button" label="Geri Dön" icon="ri-arrow-left-line" severity="success"
+          (click)="goBack()">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- ==================== FORM ==================== -->
+    <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="vehicle-form">
+
+      <!-- ==================== TEMEL BİLGİLER ==================== -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="ri-information-line"></i>
+          Temel Bilgiler
+        </h3>
+
+        <div class="form-grid">
+          <!-- Araç Modeli -->
+          <div class="form-field full-width">
+            <label for="vehicleModelId">
+              Araç Modeli <span class="required-star">*</span>
+            </label>
+            <p-select id="vehicleModelId" [options]="vehicleModels()" optionValue="id" [optionLabel]="'name'"
+              formControlName="vehicleModelId" placeholder="Araç modeli seçiniz" [filter]="true"
+              filterBy="brand,name,vehicleTypeName" [showClear]="true"
+              [class.ng-invalid]="isFieldInvalid('vehicleModelId')" appendTo="body"
+              (onChange)="onVehicleModelChange($event.value)" styleClass="w-full">
+              <ng-template pTemplate="selectedItem" let-model>
+                @if (model) {
+                <div class="model-option">
+                  <span class="model-brand">{{ model.brand }}</span>
+                  <span class="model-name">{{ model.name }}</span>
+                  <span class="model-type">({{ model.vehicleTypeName }})</span>
+                </div>
+                }
+              </ng-template>
+              <ng-template pTemplate="item" let-model>
+                <div class="model-option">
+                  <span class="model-brand">{{ model.brand }}</span>
+                  <span class="model-name">{{ model.name }}</span>
+                  <span class="model-type">({{ model.vehicleTypeName }})</span>
+                </div>
+              </ng-template>
+            </p-select>
+            @if (isFieldInvalid('vehicleModelId')) {
+            <small class="error-text">{{ getFieldError('vehicleModelId') }}</small>
+            }
+          </div>
+
+          <!-- Seçili Model Bilgisi -->
+          @if (selectedModel()) {
+          <div class="form-field full-width">
+            <div class="selected-model-info">
+              <div class="info-item">
+                <span class="label">Marka:</span>
+                <span class="value">{{ selectedModel()!.brand }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Model:</span>
+                <span class="value">{{ selectedModel()!.name }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Tip:</span>
+                <p-tag [value]="selectedModel()!.vehicleTypeName" severity="info"></p-tag>
+              </div>
+            </div>
+          </div>
+          }
+
+          <!-- Yıl -->
+          <div class="form-field">
+            <label for="year">
+              Yıl <span class="required-star">*</span>
+            </label>
+            <input id="year" pInputText formControlName="year" placeholder="2024" maxlength="4"
+              [class.ng-invalid]="isFieldInvalid('year')" />
+            @if (isFieldInvalid('year')) {
+            <small class="error-text">{{ getFieldError('year') }}</small>
+            }
+          </div>
+
+          <!-- Plaka -->
+          <div class="form-field">
+            <label for="plate">
+              Plaka <span class="required-star">*</span>
+            </label>
+            <input id="plate" pInputText formControlName="plate" placeholder="34ABC123"
+              [class.ng-invalid]="isFieldInvalid('plate')" />
+            @if (isFieldInvalid('plate')) {
+            <small class="error-text">{{ getFieldError('plate') }}</small>
+            }
+          </div>
+
+          <!-- Renk -->
+          <div class="form-field">
+            <label for="color">
+              Renk <span class="required-star">*</span>
+            </label>
+            <p-select id="color" [options]="colors()" formControlName="color" placeholder="Renk seçiniz" [filter]="true"
+              [showClear]="true" [class.ng-invalid]="isFieldInvalid('color')" appendTo="body" styleClass="w-full">
+            </p-select>
+            @if (isFieldInvalid('color')) {
+            <small class="error-text">{{ getFieldError('color') }}</small>
+            }
+          </div>
+
+          <!-- Yakıt Tipi -->
+          <div class="form-field">
+            <label for="fuelType">
+              Yakıt Tipi <span class="required-star">*</span>
+            </label>
+            <p-select id="fuelType" [options]="fuelTypes()" formControlName="fuelType" placeholder="Yakıt tipi seçiniz"
+              [showClear]="true" [class.ng-invalid]="isFieldInvalid('fuelType')" appendTo="body" styleClass="w-full">
+            </p-select>
+            @if (isFieldInvalid('fuelType')) {
+            <small class="error-text">{{ getFieldError('fuelType') }}</small>
+            }
+          </div>
+
+          <!-- Vites Tipi -->
+          <div class="form-field">
+            <label for="transmission">
+              Vites Tipi <span class="required-star">*</span>
+            </label>
+            <p-select id="transmission" [options]="transmissionTypes()" formControlName="transmission"
+              placeholder="Vites tipi seçiniz" [filter]="true" [showClear]="true"
+              [class.ng-invalid]="isFieldInvalid('transmission')" appendTo="body" styleClass="w-full">
+            </p-select>
+            @if (isFieldInvalid('transmission')) {
+            <small class="error-text">{{ getFieldError('transmission') }}</small>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TEKNİK DETAYLAR ==================== -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="ri-settings-3-line"></i>
+          Teknik Detaylar
+        </h3>
+
+        <div class="form-grid">
+          <!-- Koltuk Sayısı -->
+          <div class="form-field">
+            <label for="seatCount">
+              Koltuk Sayısı <span class="required-star">*</span>
+            </label>
+            <p-inputNumber id="seatCount" formControlName="seatCount" [min]="1" [max]="20" [showButtons]="true"
+              buttonLayout="horizontal" incrementButtonIcon="ri-add-line" decrementButtonIcon="ri-subtract-line"
+              [class.ng-invalid]="isFieldInvalid('seatCount')" styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('seatCount')) {
+            <small class="error-text">{{ getFieldError('seatCount') }}</small>
+            }
+          </div>
+
+          <!-- Kapı Sayısı -->
+          <div class="form-field">
+            <label for="doorCount">
+              Kapı Sayısı <span class="required-star">*</span>
+            </label>
+            <p-inputNumber id="doorCount" formControlName="doorCount" [min]="2" [max]="6" [showButtons]="true"
+              buttonLayout="horizontal" incrementButtonIcon="ri-add-line" decrementButtonIcon="ri-subtract-line"
+              [class.ng-invalid]="isFieldInvalid('doorCount')" styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('doorCount')) {
+            <small class="error-text">{{ getFieldError('doorCount') }}</small>
+            }
+          </div>
+
+          <!-- Minimum Yaş -->
+          <div class="form-field">
+            <label for="minAge">Minimum Yaş</label>
+            <p-inputNumber id="minAge" formControlName="minAge" [min]="18" [max]="99" [showButtons]="true"
+              buttonLayout="horizontal" incrementButtonIcon="ri-add-line" decrementButtonIcon="ri-subtract-line"
+              [class.ng-invalid]="isFieldInvalid('minAge')" styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('minAge')) {
+            <small class="error-text">{{ getFieldError('minAge') }}</small>
+            }
+          </div>
+
+          <!-- Günlük Fiyat -->
+          <div class="form-field">
+            <label for="dailyPrice">
+              Günlük Fiyat (₺) <span class="required-star">*</span>
+            </label>
+            <p-inputNumber id="dailyPrice" formControlName="dailyPrice" [min]="0" mode="currency" currency="TRY"
+              locale="tr-TR" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="ri-add-line"
+              decrementButtonIcon="ri-subtract-line" [class.ng-invalid]="isFieldInvalid('dailyPrice')"
+              styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('dailyPrice')) {
+            <small class="error-text">{{ getFieldError('dailyPrice') }}</small>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== AÇIKLAMA ==================== -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="ri-file-text-line"></i>
+          Açıklama
+        </h3>
+
+        <div class="form-field full-width">
+          <textarea id="description" pTextarea formControlName="description"
+            placeholder="Araç hakkında detaylı bilgi..." [rows]="4" [autoResize]="true" styleClass="w-full">
+                    </textarea>
+        </div>
+      </div>
+
+      <!-- ==================== RESİMLER ==================== -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="ri-image-line"></i>
+          Araç Resimleri
+          <span class="image-count-badge">{{ totalImageCount() }}/11</span>
+        </h3>
+
+        <!-- ⭐ MEVCUT RESİMLER (Edit Mode) -->
+        @if (isEditMode() && existingImages().length > 0) {
+        <div class="existing-images-section">
+          <div class="section-header">
+            <h4>
+              <i class="ri-image-line"></i>
+              Mevcut Resimler
+            </h4>
+            <span class="image-count-badge">{{ existingImages().length }} resim</span>
+          </div>
+          <p class="hint-text">
+            <i class="ri-information-line"></i>
+            Vitrin resmi yapmak istediğiniz resme tıklayın
+          </p>
+
+          <div class="images-grid">
+            @for (image of existingImages(); track image.id) {
+            <div class="image-item" [class.main-image]="image.isMain" [class.clickable]="!image.isMain"
+              (click)="onImageClick(image)">
+
+              <div class="image-wrapper">
+                <img [src]="getImageUrl(image.imageUrl)!" [alt]="'Araç resmi'" />
+
+                @if (image.isMain) {
+                <div class="image-badge main-badge">
+                  <i class="ri-star-fill"></i>
+                  Vitrin
+                </div>
+                } @else {
+                <div class="image-overlay">
+                  <i class="ri-star-line"></i>
+                  <span>Vitrin Yap</span>
+                </div>
+                }
+              </div>
+
+              <!-- Silme butonu -->
+              @if (!image.isMain) {
+              <div class="image-actions">
+                <button pButton type="button" class="p-button-text p-button-danger" icon="ri-delete-bin-line"
+                  pTooltip="Sil" tooltipPosition="top" (click)="removeExistingImage(image, $event)">
+                </button>
+              </div>
+              } @else {
+              <div class="image-actions">
+                <button pButton disabled type="button" class="p-button-text p-button-info" icon="ri-lock-line"
+                  pTooltip="Vitrin resmi silinemez" tooltipPosition="top">
+                </button>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- ⭐ VİTRİN RESMİ SEÇ (Create Mode veya Edit Mode'da yeni vitrin) -->
+        @if (!isEditMode() || !mainImagePreview()) {
+        <div class="main-image-section">
+          <div class="main-image-header">
+            <h4>
+              <i class="ri-star-fill text-warning"></i>
+              Vitrin Resmi
+            </h4>
+            <span class="required-badge">Zorunlu</span>
+          </div>
+
+          @if (mainImagePreview()) {
+          <div class="main-image-preview">
+            <img [src]="mainImagePreview()!" alt="Vitrin resmi" />
+            <button type="button" class="remove-main-image" (click)="removeMainImage()" pTooltip="Vitrin resmini kaldır"
+              tooltipPosition="top">
+              <i class="ri-close-line"></i>
+            </button>
+            <div class="main-image-badge">
+              <i class="ri-star-fill"></i>
+              Vitrin Resmi
+            </div>
+          </div>
+          } @else {
+          <div class="main-image-upload">
+            <p-fileUpload #mainImageUpload name="mainImage" [url]="''" [multiple]="false" accept="image/*"
+              [maxFileSize]="5000000" [auto]="false" chooseLabel="Vitrin Resmi Seç" cancelLabel="İptal"
+              [showUploadButton]="false" [showCancelButton]="false" (onSelect)="onMainImageSelected($event)">
+              <ng-template pTemplate="content">
+                <div class="upload-content">
+                  <i class="ri-image-upload-line upload-icon"></i>
+                  <div class="upload-text">
+                    <span class="upload-title">Vitrin resmini seç</span>
+                    <span class="upload-subtitle">PNG, JPG, WEBP • Max 5MB</span>
+                  </div>
+                </div>
+              </ng-template>
+            </p-fileUpload>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- ⭐ SEÇİLEN EK RESİMLER ÖNİZLEME -->
+        @if (additionalFiles().length > 0) {
+        <div class="additional-images-section">
+          <div class="section-header">
+            <h4>
+              <i class="ri-image-add-line"></i>
+              Seçilen Ek Resimler
+            </h4>
+            <span class="image-count-badge">{{ additionalFiles().length }} resim</span>
+          </div>
+          <div class="images-grid">
+            @for (file of additionalFiles(); track $index) {
+            <div class="image-item">
+              <div class="image-wrapper">
+                <img [src]="getFileUrl(file)" [alt]="file.name" />
+                <button type="button" class="remove-image-btn" (click)="removeAdditionalFile($index)" pTooltip="Kaldır"
+                  tooltipPosition="top">
+                  <i class="ri-close-line"></i>
+                </button>
+              </div>
+              <div class="image-name">{{ file.name }}</div>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- ⭐ EK RESİM YÜKLEME ALANI -->
+        @if (canAddMoreImages()) {
+        <div class="upload-area">
+          <div class="upload-area-header">
+            <i class="ri-image-add-line"></i>
+            <span>Ek Resimler (Opsiyonel)</span>
+            <span class="upload-limit-info">Max 10 resim</span>
+          </div>
+          <p-fileUpload #additionalImageUpload name="additionalFiles" [url]="''" [multiple]="true" accept="image/*"
+            [maxFileSize]="5000000" [auto]="false" chooseLabel="Resim Seç" cancelLabel="İptal"
+            [showUploadButton]="false" [showCancelButton]="false" (onSelect)="onAdditionalImagesSelected($event)">
+            <ng-template pTemplate="content">
+              <div class="upload-content-area">
+                <i class="ri-image-upload-line upload-icon-area"></i>
+                <div class="upload-text-area">
+                  <span class="upload-title">Ek resimleri sürükle bırak veya seç</span>
+                  <span class="upload-subtitle">PNG, JPG, WEBP • Max 5MB</span>
+                </div>
+              </div>
+            </ng-template>
+          </p-fileUpload>
+        </div>
+        } @else {
+        <div class="upload-limit-message">
+          <i class="ri-error-warning-line"></i>
+          Maksimum resim sayısına ulaşıldı! (11/11)
+        </div>
+        }
+      </div>
+
+      <!-- ==================== FORM ACTIONS ==================== -->
+      <div class="form-actions">
+        <button pButton type="button" label="İptal" icon="ri-close-line" severity="secondary" (click)="goBack()"
+          [disabled]="isSubmitting()">
+        </button>
+        <button pButton type="submit" [label]="isEditMode() ? 'Güncelle' : 'Kaydet'" icon="ri-save-line"
+          [loading]="isSubmitting()" [disabled]="vehicleForm.invalid || isSubmitting()">
+        </button>
+      </div>
+    </form>
+  </p-card>
+</div>

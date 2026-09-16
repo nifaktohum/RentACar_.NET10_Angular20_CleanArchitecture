@@ -196,7 +196,6 @@ export class ExtraDialogComponent {
     }
   }
 
-
   createExtra(): void {
     const request: CreateExtraRequest = this.formData;
 

@@ -1,0 +1,67 @@
+<p-dialog [header]="dialogTitle" [visible]="visible()" (visibleChange)="closeDialog()" [modal]="true"
+  [style]="{ width: '550px', maxWidth: '95vw' }" [draggable]="false" [resizable]="false" [closable]="!isSaving()"
+  class="vehicle-model-dialog">
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <i class="ri-loader-4-line spin"></i>
+    <span>Yükleniyor...</span>
+  </div>
+  }
+
+  <div class="vehicle-model-form">
+    <!-- Temel Bilgiler -->
+    <div class="form-section">
+      <h4>Temel Bilgiler</h4>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="brand">Marka <span class="required">*</span></label>
+          <input id="brand" pInputText [(ngModel)]="formData.brand" placeholder="Örn: BMW, Audi, Toyota"
+            [disabled]="isSaving() || isLoading()" />
+        </div>
+        <div class="form-field">
+          <label for="name">Model Adı <span class="required">*</span></label>
+          <input id="name" pInputText [(ngModel)]="formData.name" placeholder="Örn: A3, X5, Corolla"
+            [disabled]="isSaving() || isLoading()" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field full-width">
+          <label for="description">Açıklama</label>
+          <textarea id="description" pInputTextarea [(ngModel)]="formData.description" rows="2"
+            placeholder="Model açıklaması (opsiyonel)" [disabled]="isSaving() || isLoading()"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stok ve Tip -->
+    <div class="form-section">
+      <h4>Stok & Tip</h4>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="vehicleTypeId">Araç Tipi <span class="required">*</span></label>
+          <p-select id="vehicleTypeId" [options]="vehicleTypes()" optionLabel="name" optionValue="id"
+            [(ngModel)]="formData.vehicleTypeId" placeholder="Seçiniz" appendTo="body"
+            [disabled]="isSaving() || isLoading()"></p-select>
+        </div>
+        <div class="form-field">
+          <label for="stock">Stok Adedi <span class="required">*</span></label>
+          <p-inputNumber id="stock" [(ngModel)]="formData.stock" [min]="0" [showButtons]="true"
+            buttonLayout="horizontal" incrementButtonIcon="ri-add-line" decrementButtonIcon="ri-subtract-line"
+            placeholder="0" [disabled]="isSaving() || isLoading()"></p-inputNumber>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button pButton label="İptal" icon="ri-close-line" class="p-button-text" (click)="closeDialog()"
+        [disabled]="isSaving() || isLoading()"></button>
+      <button pButton label="Kaydet" icon="ri-save-line" class="p-button-primary" [loading]="isSaving()"
+        (click)="saveVehicleModel()" [disabled]="isLoading()"></button>
+    </div>
+  </div>
+</p-dialog>

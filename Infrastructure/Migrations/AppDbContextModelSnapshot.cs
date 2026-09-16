@@ -759,6 +759,394 @@ namespace Infrastructure.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Vehicles.Vehicle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(0);
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("Brand")
+                        .HasColumnOrder(1);
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("Color")
+                        .HasColumnOrder(5);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("DailyPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("DailyPrice")
+                        .HasColumnOrder(11);
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("Description")
+                        .HasColumnOrder(13);
+
+                    b.Property<int>("DoorCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("DoorCount")
+                        .HasColumnOrder(9);
+
+                    b.Property<string>("FuelType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("FuelType")
+                        .HasColumnOrder(6);
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsAvailable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("IsAvailable")
+                        .HasColumnOrder(12);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("MinAge")
+                        .HasColumnType("integer")
+                        .HasColumnName("MinAge")
+                        .HasColumnOrder(10);
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("Model")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("Plate")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("Plate")
+                        .HasColumnOrder(4);
+
+                    b.Property<int>("SeatCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("SeatCount")
+                        .HasColumnOrder(8);
+
+                    b.Property<string>("Transmission")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("Transmission")
+                        .HasColumnOrder(7);
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("VehicleModelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Year")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)")
+                        .HasColumnName("Year")
+                        .HasColumnOrder(3);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Brand")
+                        .HasDatabaseName("IX_Vehicles_Brand");
+
+                    b.HasIndex("IsAvailable")
+                        .HasDatabaseName("IX_Vehicles_IsAvailable");
+
+                    b.HasIndex("Model")
+                        .HasDatabaseName("IX_Vehicles_Model");
+
+                    b.HasIndex("Plate")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Vehicles_Plate")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("VehicleModelId")
+                        .HasDatabaseName("IX_Vehicles_VehicleModelId");
+
+                    b.HasIndex("Year")
+                        .HasDatabaseName("IX_Vehicles_Year");
+
+                    b.HasIndex("Brand", "Model", "Year")
+                        .HasDatabaseName("IX_Vehicles_Brand_Model_Year");
+
+                    b.ToTable("Vehicles", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Vehicles.VehicleImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(0);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("Description")
+                        .HasColumnOrder(4);
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("DisplayOrder")
+                        .HasColumnOrder(2);
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("ImageUrl")
+                        .HasColumnOrder(1);
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsMain")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsMain")
+                        .HasColumnOrder(3);
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId")
+                        .HasDatabaseName("IX_VehicleImages_VehicleId");
+
+                    b.HasIndex("VehicleId", "DisplayOrder")
+                        .HasDatabaseName("IX_VehicleImages_VehicleId_DisplayOrder");
+
+                    b.HasIndex("VehicleId", "IsMain")
+                        .HasDatabaseName("IX_VehicleImages_VehicleId_IsMain")
+                        .HasFilter("\"IsMain\" = true");
+
+                    b.ToTable("VehicleImages", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Vehicles.VehicleModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("AvailableStock")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("AvailableStock")
+                        .HasColumnOrder(5);
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("Brand")
+                        .HasColumnOrder(1);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("Description")
+                        .HasColumnOrder(3);
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("Name")
+                        .HasColumnOrder(2);
+
+                    b.Property<int>("Stock")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("Stock")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("VehicleTypeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AvailableStock")
+                        .HasDatabaseName("IX_VehicleModels_AvailableStock");
+
+                    b.HasIndex("Brand")
+                        .HasDatabaseName("IX_VehicleModels_Brand");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_VehicleModels_Name");
+
+                    b.HasIndex("Stock")
+                        .HasDatabaseName("IX_VehicleModels_Stock");
+
+                    b.HasIndex("VehicleTypeId")
+                        .HasDatabaseName("IX_VehicleModels_VehicleTypeId");
+
+                    b.HasIndex("Brand", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_VehicleModels_Brand_Name")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("VehicleModels", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Vehicles.VehicleType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(0);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("Description")
+                        .HasColumnOrder(2);
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("DisplayOrder")
+                        .HasColumnOrder(4);
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("Icon")
+                        .HasColumnOrder(3);
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("Name")
+                        .HasColumnOrder(1);
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DisplayOrder")
+                        .HasDatabaseName("IX_VehicleTypes_DisplayOrder");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_VehicleTypes_Name")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("VehicleTypes", (string)null);
+                });
+
             modelBuilder.Entity("ProtectionPackageBenefits", b =>
                 {
                     b.Property<Guid>("BenefitId")
@@ -920,6 +1308,39 @@ namespace Infrastructure.Migrations
                     b.Navigation("Branch");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Vehicles.Vehicle", b =>
+                {
+                    b.HasOne("Domain.Entities.Vehicles.VehicleModel", "VehicleModel")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("VehicleModelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("VehicleModel");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Vehicles.VehicleImage", b =>
+                {
+                    b.HasOne("Domain.Entities.Vehicles.Vehicle", "Vehicle")
+                        .WithMany("Images")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Vehicles.VehicleModel", b =>
+                {
+                    b.HasOne("Domain.Entities.Vehicles.VehicleType", "VehicleType")
+                        .WithMany("VehicleModels")
+                        .HasForeignKey("VehicleTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("VehicleType");
+                });
+
             modelBuilder.Entity("ProtectionPackageBenefits", b =>
                 {
                     b.HasOne("Domain.Entities.Protection.ProtectionBenefit", null)
@@ -970,6 +1391,21 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Users.User", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Vehicles.Vehicle", b =>
+                {
+                    b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Vehicles.VehicleModel", b =>
+                {
+                    b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Vehicles.VehicleType", b =>
+                {
+                    b.Navigation("VehicleModels");
                 });
 #pragma warning restore 612, 618
         }

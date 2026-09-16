@@ -6,6 +6,7 @@ using Domain.Entities.Extras;
 using Domain.Entities.Protection;
 using Domain.Entities.Roles;
 using Domain.Entities.Users;
+using Domain.Entities.Vehicles;
 using GenericRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,10 @@ public class AppDbContext : DbContext, IUnitOfWork
   public DbSet<ProtectionBenefit> ProtectionBenefits { get; set; }
   public DbSet<ProtectionPricing> ProtectionPricings { get; set; }
   public DbSet<BenefitCategory> BenefitCategories { get; set; }
+  public DbSet<Vehicle> Vehicles { get; set; }
+  public DbSet<VehicleModel> VehicleModels { get; set; }
+  public DbSet<VehicleType> VehicleTypes { get; set; }
+  public DbSet<VehicleImage> VehicleImages { get; set; }
 
   protected override void OnModelCreating(ModelBuilder _modelBuilder)
   {
@@ -51,18 +56,16 @@ public class AppDbContext : DbContext, IUnitOfWork
     // Sistemdeki tüm Permission sorgularına otomatik olarak bu WHERE şartını ekler
     _modelBuilder.Entity<Permission>().HasQueryFilter(p => !p.IsDeleted && p.IsActive);
     // 4. User için özel index
-    _modelBuilder.Entity<User>()
-        .HasIndex(u => u.Email)
-        .HasDatabaseName("IX_Users_Email")
-        .IsUnique()
-        .HasFilter("\"IsDeleted\" = false");
+    _modelBuilder.Entity<User>().HasIndex(u => u.Email)
+                                .HasDatabaseName("IX_Users_Email")
+                                .IsUnique()
+                                .HasFilter("\"IsDeleted\" = false");
 
     // WHERE [IsDeleted] = 0 koşulunu kendisi ekler.
-    _modelBuilder.Entity<Extra>()
-       .HasQueryFilter(e => !e.IsDeleted);
+    _modelBuilder.Entity<Extra>().HasQueryFilter(e => !e.IsDeleted);
+
     // WHERE [IsDeleted] = 0 koşulunu kendisi ekler.
-    _modelBuilder.Entity<RentalExtra>()
-        .HasQueryFilter(re => !re.IsDeleted);
+    _modelBuilder.Entity<RentalExtra>().HasQueryFilter(re => !re.IsDeleted);
 
     base.OnModelCreating(_modelBuilder);
   }
@@ -99,6 +102,10 @@ public class AppDbContext : DbContext, IUnitOfWork
     // 3. Her bir entity için işlem yap
     foreach (var entry in entries)
     {
+      Console.WriteLine(
+       $"{entry.Entity.GetType().Name} - {entry.State}"
+   );
+   
       switch (entry.State)
       {
         case EntityState.Added:

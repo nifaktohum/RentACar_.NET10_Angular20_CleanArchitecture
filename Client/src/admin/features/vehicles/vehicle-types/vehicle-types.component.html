@@ -1,0 +1,126 @@
+<!-- modules/admin/vehicle-types/pages/vehicle-types/vehicle-types.component.html -->
+
+<div class="vehicle-types-container">
+  <p-card>
+    <!-- Header -->
+    <div class="p-button-list">
+      <div class="header-left">
+        <h2>Araç Tipleri</h2>
+        <p>Araç kiralama sisteminde kullanılacak araç tiplerini listeleyebilir, ekleyebilir, düzenleyebilir ve
+          yönetebilirsin.</p>
+      </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Ara</label>
+          <input pInputText [(ngModel)]="filterSearch" (ngModelChange)="onFilterChange()" placeholder="İsme göre ara..."
+            class="filter-input" />
+        </div>
+        <div class="filter-field">
+          <label>Durum</label>
+          <p-select [options]="statusOptions" optionLabel="label" optionValue="value" [(ngModel)]="filterStatus"
+            (ngModelChange)="onFilterChange()" placeholder="Tümü" [showClear]="true" class="filter-select"></p-select>
+        </div>
+        <div class="filter-field filter-count">
+          <label>Toplam</label>
+          <p-button severity="contrast" [raised]="true" class="count-badge">{{ totalCount() }}</p-button>
+        </div>
+      </div>
+      <div class="filter-right">
+        <p-button (click)="openCreateDialog()" icon="ri-add-large-line" pTooltip="Yeni Araç Tipi Ekle"
+          tooltipPosition="top" [raised]="true" class="p-button-add"></p-button>
+        <p-button severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile" tooltipPosition="top"
+          (onClick)="refreshData()" [loading]="isLoading()" [raised]="true" class="p-button-reset"></p-button>
+      </div>
+    </div>
+
+    <!-- Tablo -->
+    <div class="table-wrapper">
+    <p-table
+      [value]="getVehicleTypes()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [loading]="isLoading()"
+      [rowsPerPageOptions]="[5, 10, 20, 50]"
+      [tableStyle]="{ width: '100%' }"
+      [sortField]="sortField()"
+      [sortOrder]="sortOrder()"
+      (onPage)="onPageChange($event)"
+      (onSort)="onSort($event)"
+      [dataKey]="'id'"
+      showCurrentPageReport="true"
+      currentPageReportTemplate="Toplam {totalRecords} araç tipinden {first} - {last} arası gösteriliyor">
+        <!-- Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-name">Tip Adı</th>
+            <th class="col-description">Açıklama</th>
+            <th class="col-order" pSortableColumn="order"> Sıra <p-sortIcon field="order"></p-sortIcon></th>
+            <th class="col-count">Araç Sayısı</th>
+            <th class="col-status">Durum</th>
+            <th class="col-actions">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="body" let-vehicleType>
+          <tr [ngClass]="{ 'inactive-row': !vehicleType.isActive }">
+            <td class="type-name">
+              <div class="name-wrapper">
+                <i [ngClass]="vehicleType.icon || 'ri-car-line'"></i>
+                <span>{{ vehicleType.name }}</span>
+              </div>
+            </td>
+            <td class="type-description">
+              {{ vehicleType.description || '-' }}
+            </td>
+            <td class="type-order">{{ vehicleType.displayOrder }}</td>
+            <td class="type-count">
+              <p-tag [value]="vehicleType.vehicleCount.toString()"
+                [severity]="vehicleType.vehicleCount > 0 ? 'info' : 'secondary'" [rounded]="true">
+              </p-tag>
+            </td>
+            <td class="type-status">
+              <span class="status-badge" [class.status-active]="vehicleType.isActive"
+                [class.status-inactive]="!vehicleType.isActive" (click)="toggleStatus(vehicleType)">
+                {{ vehicleType.isActive ? 'Aktif' : 'Pasif' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button pButton type="button" class="p-button-text p-button-primary p-button-rounded btn-edit"
+                  icon="ri-edit-line" pTooltip="Düzenle" tooltipPosition="top"
+                  (click)="openEditDialog(vehicleType)"></button>
+                <button pButton type="button" class="p-button-text p-button-danger p-button-rounded btn-delete"
+                  icon="ri-delete-bin-line" pTooltip="Sil" tooltipPosition="top"
+                  (click)="deleteVehicleType(vehicleType.id, vehicleType.name)"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty Message -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="empty-table-message">
+              {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı araç tipi bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+</div>
+
+<!-- Dialog -->
+<app-vehicle-type-dialog
+  [visible]="dialogVisible()"
+  [editId]="selectedVehicleTypeId()"
+  [mode]="dialogMode()"
+  (visibleChange)="dialogVisible.set($event)"
+  (saved)="onDialogSaved()"></app-vehicle-type-dialog>

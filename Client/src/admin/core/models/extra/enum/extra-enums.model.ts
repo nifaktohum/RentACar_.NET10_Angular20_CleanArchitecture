@@ -4,9 +4,14 @@ export const PriceTypeValues = {
   Rental: 2
 } as const;
 
-export const PriceTypeLabels: Record<number, string> = {
-  1: 'Günlük',
-  2: 'Kiralama Başı'
+// export const PriceTypeLabels: Record<number, string> = {
+//   1: 'Günlük',
+//   2: 'Kiralama Başı'
+// };
+
+export const PriceTypeLabels: Record<string, string> = {
+  'Daily': 'Günlük',
+  'Rental': 'Kiralama Başı'
 };
 
 // export const PriceTypeOptions = [
@@ -32,6 +37,20 @@ export const ExtraCategoryValues = {
 //   3: 'Koltuk',
 //   4: 'Diğer'
 // };
+
+export const ExtraCategoryLabels: Record<string, string> = {
+  'Guarantee': 'Güvence',
+  'Driver': 'Sürücü',
+  'Seat': 'Koltuk',
+  'Other': 'Diğer'
+};
+
+export const ExtraCategoriesConfig: Record<string, { label: string, value: number }> = {
+  'Guarantee': { label: 'Güvence', value: 1 },
+  'Driver': { label: 'Sürücü', value: 2 },
+  'Seat': { label: 'Koltuk', value: 3 },
+  'Other': { label: 'Diğer', value: 4 }
+};
 
 
 

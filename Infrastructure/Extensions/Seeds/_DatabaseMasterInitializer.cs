@@ -63,9 +63,13 @@ public static class DatabaseMasterInitializer
         Console.WriteLine("--> [Seed Master] Adım 9 Koruma Paketleri tamamlandı.");
       }
 
-      // Extras'lar
+      // 10 Extras'lar
       await context.ExtrasSeedAsync(configuration);
-      Console.WriteLine("--> [Seed Master] Adım 9 Extras Paketleri tamamlandı.");
+      Console.WriteLine("--> [Seed Master] Adım 10 Extras Paketleri tamamlandı.");
+
+      // 11 VehicleTypes'ler
+      await context.VehicleSeedAsync(configuration);
+      Console.WriteLine("--> [Seed Master] Adım 11 VehicleTypes kategorisi tamamlandı.");
 
 
       // =====================================> 

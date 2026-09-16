@@ -4,26 +4,33 @@ import { BreadCrumbModel } from '../models/breadcrumb';
 @Injectable({
   providedIn: 'root',
 })
+// breadcrumb.service.ts
 export class BreadcrumbService {
 
   readonly breadCrumbData = signal<BreadCrumbModel[]>([]);
 
-  // 🎯 breadCrumbs parametresini boş gelebilir (optional) yaptık
   reset(breadCrumbs: BreadCrumbModel[] = []) {
     const dashboard: BreadCrumbModel = {
       title: 'Dashboard',
       url: '/admin/dashboard',
       icon: 'ri-dashboard-3-line',
-      // Eğer arkasından başka sayfa gelmiyorsa Dashboard aktiftir, geliyorsa inaktiftir
       isActive: breadCrumbs.length === 0
     };
+    this.breadCrumbData.set([dashboard, ...breadCrumbs]);
+  }
 
-    // 🎯 DOĞRU BİRLEŞTİRME: Dizinin ilk elemanı dashboard, sonrakiler parametreden gelenler
+  // ✅ YENİ METOD: update()
+  update(breadCrumbs: BreadCrumbModel[]) {
+    const dashboard: BreadCrumbModel = {
+      title: 'Dashboard',
+      url: '/admin/dashboard',
+      icon: 'ri-dashboard-3-line',
+      isActive: breadCrumbs.length === 0
+    };
     this.breadCrumbData.set([dashboard, ...breadCrumbs]);
   }
 
   addCrumb(crumb: BreadCrumbModel) {
-    // Mevcut array'in sonuna yeni gelen kırıntıyı ekliyoruz
     this.breadCrumbData.update(currentCrumbs => [...currentCrumbs, crumb]);
   }
 }

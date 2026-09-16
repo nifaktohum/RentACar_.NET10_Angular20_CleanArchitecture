@@ -39,7 +39,7 @@ import { CardModule } from 'primeng/card';
 export class ExtrasComponent {
   private extraService = inject(ExtraService);
   private messageService = inject(MessageService);
-    private customConfirmDialogService = inject(CustomConfirmDialogService);
+  private customConfirmDialogService = inject(CustomConfirmDialogService);
   private breadcrumbService = inject(BreadcrumbService);
 
   // ==================== SIGNALS ====================
@@ -70,7 +70,7 @@ export class ExtrasComponent {
     {
       title: 'Ekstra Hizmetler',
       url: '/admin/extras',
-      icon: 'ri-service-line',
+      icon: 'ri-calendar-todo-line',
       isActive: true
     }
   ]);
@@ -79,7 +79,7 @@ export class ExtrasComponent {
 
   ngOnInit(): void {
     this.breadcrumbService.reset(this.breadcrumbs());
-    this.loadExtras();    
+    this.loadExtras();
   }
 
   loadExtras(): void {

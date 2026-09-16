@@ -34,6 +34,10 @@ _builder.Services.AddSwaggerGen(c =>
   c.SwaggerDoc("v1-ProtectionPackages", new() { Title = "RentCar ProtectionPackages", Version = "v1" });
   c.SwaggerDoc("v1-BenefitCategories", new() { Title = "RentCar BenefitCategories", Version = "v1" });
   c.SwaggerDoc("v1-Extras", new() { Title = "RentCar Extras", Version = "v1" });
+  c.SwaggerDoc("v1-Vehicles", new() { Title = "RentCar Vehicles", Version = "v1" });
+  c.SwaggerDoc("v1-VehicleModels", new() { Title = "RentCar VehicleModels", Version = "v1" });
+  c.SwaggerDoc("v1-VehicleTypes", new() { Title = "RentCar VehicleTypes", Version = "v1" });
+  c.SwaggerDoc("v1-VehicleImages", new() { Title = "RentCar VehicleImages", Version = "v1" });
 
   // Endpoint'leri GroupName'e göre doğru sekmeye dağıtan sihirli kural kanka!
   c.DocInclusionPredicate((docName, apiDesc) =>
@@ -91,6 +95,9 @@ app.UseExceptionHandler();
 // 2. GÜVENLİK PROTOKOLÜ: HTTPS Yönlendirmesi
 app.UseHttpsRedirection();
 
+// wwwroot klasörünü dış dünyaya açar
+app.UseStaticFiles();
+
 // 3. PERFORMANS KATMANI: Giden veriyi sıkıştırma
 app.UseResponseCompression();
 
@@ -113,6 +120,10 @@ if (app.Environment.IsDevelopment())
     c.SwaggerEndpoint("/swagger/v1-ProtectionPackages/swagger.json", "RentCar ProtectionPackages");
     c.SwaggerEndpoint("/swagger/v1-BenefitCategories/swagger.json", "RentCar BenefitCategories");
     c.SwaggerEndpoint("/swagger/v1-Extras/swagger.json", "RentCar Extras");
+    c.SwaggerEndpoint("/swagger/v1-Vehicles/swagger.json", "RentCar Vehicles");
+    c.SwaggerEndpoint("/swagger/v1-VehicleModels/swagger.json", "RentCar VehicleModels");
+    c.SwaggerEndpoint("/swagger/v1-VehicleTypes/swagger.json", "RentCar VehicleTypes");
+    c.SwaggerEndpoint("/swagger/v1-VehicleImages/swagger.json", "RentCar VehicleImages");
   });
 }
 

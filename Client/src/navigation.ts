@@ -25,30 +25,46 @@ export const navigations: NavigationModel[] =
       role: 'Dashboard.Read'
     },
     // Vehicles
+    // src/app/core/navigation/navigation.ts
+
+    // src/app/core/navigation/navigation.ts
+
     {
       title: 'Araç Yönetimi',
       key: 'vehicles',
-      url: '/admin/vehicles',
       icon: 'ri-car-line',
       role: 'Vehicles.Read',
-      haveSubMenu: true, // Alt menüsü var dedik
-      subMenus: [        // Alt menü elemanları yine birer NavigationModel'dir
+      haveSubMenu: true,
+      subMenus: [
         {
-          title: 'Araç Listesi',
-          url: '/admin/vehicles/list',
-          icon: 'ri-list-check',
-          role: 'Vehicles.Read',
+          title: "Araç Listesi",
+          url: "/admin/vehicles",
+          icon: "ri-list-check",
+          role: "Vehicles.Read",
           haveSubMenu: false
         },
         {
-          title: 'Yeni Araç Ekle',
-          url: '/admin/vehicles/add',
-          icon: 'ri-add-circle-line',
-          role: 'Vehicles.Create',
+          title: "Yeni Araç Ekle",
+          url: "/admin/vehicles/create-vehicle",
+          icon: "ri-add-circle-line",
+          role: "Vehicles.Create",
+          haveSubMenu: false
+        },
+        {
+          title: "Araç Modelleri",  
+          url: "/admin/vehicles/vehicle-models",
+          icon: "ri-stack-line",
+          role: "VehicleModels.Read",
+          haveSubMenu: false
+        },
+        {
+          title: "Araç Tipleri",
+          url: "/admin/vehicles/vehicle-types",
+          icon: "ri-caravan-line",
+          role: "VehicleTypes.Read",
           haveSubMenu: false
         }
       ],
-
     },
     // Categories 
     {
@@ -121,10 +137,48 @@ export const navigations: NavigationModel[] =
       haveSubMenu: true,
       subMenus: [
         {
+          title: 'Extra Selection',
+          url: '/admin/extras/extra-selector',
+          icon: 'ri-checklist-line',
+          role: 'Extras.Read',
+          haveSubMenu: false
+        },
+        {
           title: 'Ekstra Listesi',
           url: '/admin/extras',
           icon: 'ri-list-check',
           role: 'Extras.Read',
+          haveSubMenu: false
+        }
+      ],
+    },
+    // RENTAL (Kiralama) - ✅ YENİ EKLENDİ
+    {
+      title: 'Kiralama İşlemleri',
+      key: 'rental',
+      icon: 'ri-exchange-box-line',
+      role: 'Rental.Read',
+      haveSubMenu: true,
+      subMenus: [
+        {
+          title: 'Yeni Kiralama',
+          url: '/admin/rental/create',
+          icon: 'ri-add-circle-line',
+          role: 'Rental.Create',
+          haveSubMenu: false
+        },
+        {
+          title: 'Kiralama Listesi',
+          url: '/admin/rental',
+          icon: 'ri-list-check',
+          role: 'Rental.Read',
+          haveSubMenu: false
+        },
+        {
+          title: 'Aktif Kiralamalar',
+          url: '/admin/rental/active',
+          icon: 'ri-checkbox-circle-line',
+          role: 'Rental.Read',
           haveSubMenu: false
         }
       ],

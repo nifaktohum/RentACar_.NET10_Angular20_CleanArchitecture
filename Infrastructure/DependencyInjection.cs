@@ -2,12 +2,14 @@ using Application.Services;
 using Domain.Repositories;
 using Domain.Repositories.Extras;
 using Domain.Repositories.Protection;
+using Domain.Repositories.Vehicles;
 using GenericRepository;
 using Infrastructure.Context;
 using Infrastructure.Options;
 using Infrastructure.Repositories;
 using Infrastructure.Repositories.Extras;
 using Infrastructure.Repositories.Protection;
+using Infrastructure.Repositories.Vehicles;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +28,7 @@ public static class DependencyInjection
     // =============================================================================
     // SaveChangesAsync içinde JWT Token'dan kullanıcı ID'sini (Claim) okuyabilmek için bu servis şart.
     _services.AddHttpContextAccessor();
+    _services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
     _services.AddScoped<IUserContext, UserContext>();
     _services.AddScoped<IPasswordHasher, PasswordHasher>();
     _services.AddScoped<IJwtProvider, JwtProvider>();
@@ -91,6 +94,12 @@ public static class DependencyInjection
     _services.AddScoped<ICategoryRepository, CategoryRepository>();
     _services.AddScoped<IExtraRepository, ExtraRepository>();
     _services.AddScoped<IRentalExtraRepository, RentalExtraRepository>();
+    _services.AddScoped<IVehicleRepository, VehicleRepository>();
+    _services.AddScoped<IVehicleImageRepository, VehicleImageRepository>();
+    _services.AddScoped<IVehicleTypeRepository, VehicleTypeRepository>();
+    _services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
+    _services.AddScoped<IFileSlugifyService, FileSlugifyService>();
+    _services.AddScoped<IVehicleImageService, VehicleImageService>();
 
     return _services;
   }

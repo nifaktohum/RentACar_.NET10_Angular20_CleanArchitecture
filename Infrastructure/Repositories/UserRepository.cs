@@ -24,7 +24,7 @@ public sealed class UserRepository : Repository<User, AppDbContext>, IUserReposi
   //===================================================>
   // sisteme giriş yapmış olan kullanıcının ID'si
 
-  
+
   public Guid GetCurrentUserId()
   {
     var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -32,6 +32,7 @@ public sealed class UserRepository : Repository<User, AppDbContext>, IUserReposi
     // Eğer userId boşsa Guid.Empty döner, aksi halde parse eder.
     return Guid.TryParse(userId, out var id) ? id : Guid.Empty;
   }
+  
   public async Task<User?> GetByEmailWithRolesAsync(string email, CancellationToken _token = default)
   {
     // 1. ADIM: Sadece kullanıcıyı çek (hafif sorgu)
@@ -54,6 +55,7 @@ public sealed class UserRepository : Repository<User, AppDbContext>, IUserReposi
 
     return user;
   }
+  
   public async Task<string?> GetSecurityStampByIdAsync(Guid userId, CancellationToken _token = default)
   {
     // token validation sırasında kullanıcının stamp'ini kontrol ediyorsun. rol değişince token geçersiz olsun

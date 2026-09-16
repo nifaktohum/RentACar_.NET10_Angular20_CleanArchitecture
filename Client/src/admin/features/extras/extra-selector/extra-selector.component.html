@@ -1,0 +1,121 @@
+<!-- modules/rental/components/rental-extra-selector/rental-extra-selector.component.html -->
+
+<div class="rental-extra-selector">
+
+  <!-- Header -->
+  <div class="selector-header">
+    <div class="header-left">
+      <h3>Ekstra Hizmetler</h3>
+      <span class="extra-count">
+        <i class="ri-service-line"></i>
+        {{ selectedCount() }} seçili
+      </span>
+    </div>
+    <div class="header-right">
+      <span class="total-price">
+        <span class="label">Toplam Extra:</span>
+        <strong>{{ totalPrice() | currency:'TRY':'₺':'1.0-2' }}</strong>
+      </span>
+    </div>
+  </div>
+
+  <!-- Kategori Filtreleri -->
+  <div class="category-filters">
+    <button class="filter-btn" [class.active]="filterCategory() === null" (click)="clearFilter()">
+      Tümü
+    </button>
+    @for (cat of categories(); track cat) {
+    <button class="filter-btn" [class.active]="filterCategory() === cat" (click)="setFilter(cat)">
+      {{ getCategoryLabel(cat) }}
+    </button>
+    }
+  </div>
+
+  <!-- Extra Listesi -->
+  @if (isLoading()) {
+  <div class="loading-state">
+    <i class="ri-loader-4-line spin"></i>
+    <span>Ekstra hizmetler yükleniyor...</span>
+  </div>
+  } @else if (filteredExtras().length === 0) {
+  <div class="empty-state">
+    <i class="ri-inbox-line"></i>
+    <span>Bu kategoride ekstra hizmet bulunmuyor.</span>
+  </div>
+  } @else {
+  <div class="extra-grid">
+    @for (extra of filteredExtras(); track extra.id) {
+    <div class="extra-card" [class.selected]="isSelected(extra.id)">
+      <div class="extra-card-content">
+        <!-- Checkbox -->
+        <div class="extra-select">
+          <p-checkbox [value]="extra.id" [ngModel]="isSelected(extra.id)" (onChange)="toggleExtra(extra, $event)"
+            [binary]="true" inputId="{{ extra.id }}"></p-checkbox>
+        </div>
+
+        <!-- Extra Bilgileri -->
+        <div class="extra-info">
+          <div class="extra-header">
+            <i [ngClass]="extra.icon || 'ri-service-line'"></i>
+            <span class="extra-name">{{ extra.name }}</span>
+            @if (extra.isRecommended) {
+            <span class="recommended-badge">
+              <i class="ri-star-fill"></i> Önerilen
+            </span>
+            }
+          </div>
+          <div class="extra-meta">
+            <span class="extra-category">{{ getCategoryLabel(extra.category) }}</span>
+            <span class="extra-price-type">{{ getPriceTypeLabel(extra.priceType) }}</span>
+          </div>
+          <div class="extra-price">
+            <span class="price">
+              {{ extra.price | currency:'TRY':'₺':'1.0-2' }}
+              @if(extra.priceType === "'Daily'") {
+              <small>/ gün</small>
+              }
+            </span>
+            @if (isSelected(extra.id)) {
+            <span class="total-price-hint"> = {{ extra.price * rentalDays() | currency:'TRY':'₺':'1.0-2' }}
+            </span>
+            }
+          </div>
+        </div>
+
+        <!-- Adet Seçimi (Seçili ise) -->
+        @if (isSelected(extra.id)) {
+        <div class="extra-quantity">
+          <p-inputNumber [ngModel]="getQuantity(extra.id)" (ngModelChange)="updateQuantity(extra.id, $event)" [min]="1"
+            [max]="99" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="ri-add-line"
+            decrementButtonIcon="ri-subtract-line" [style]="{ width: '120px' }">
+          </p-inputNumber>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Özet (Seçili Extralar) -->
+  @if (selectedCount() > 0) {
+  <div class="selected-summary">
+    <p-divider></p-divider>
+    <div class="summary-items">
+      @for (item of selectedExtras(); track item.extra.id) {
+      <div class="summary-item">
+        <span class="item-name">
+          <i [ngClass]="item.extra.icon ||'ri-service-line' "></i>
+          {{ item.extra.name }}
+          <span class="item-quantity">x{{ item.quantity }}</span>
+        </span>
+        <span class="item-price">
+          {{ item.totalPrice | currency:'TRY':'₺':'1.0-2' }}
+        </span>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+</div>

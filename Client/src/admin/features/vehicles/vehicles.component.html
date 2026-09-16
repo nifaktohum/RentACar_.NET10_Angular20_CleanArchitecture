@@ -1,0 +1,178 @@
+<!-- src/app/features/admin/vehicle/vehicles.component.html -->
+<div class="vehicles-container">
+  <p-card>
+    <!-- Header -->
+    <div class="header-section">
+      <div class="header-left">
+        <h2>Araç Yönetimi</h2>
+        <p>Araçları listeleyebilir, ekleyebilir, düzenleyebilir ve yönetebilirsin.</p>
+      </div>
+      <div class="header-right">
+        <p-button label="Yeni Araç Ekle" icon="ri-add-line" [raised]="true" (onClick)="navigateToAdd()">
+        </p-button>
+        <p-button severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile" tooltipPosition="top"
+          (onClick)="refreshData()" [loading]="isLoading()">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Ara</label>
+          <input pInputText [(ngModel)]="filterSearch" (ngModelChange)="onFilterChange()"
+            placeholder="Marka, model veya plaka..." class="filter-input" />
+        </div>
+        <div class="filter-field">
+          <label>Marka</label>
+          <p-select [options]="vehicleBrandsDistinct()" [(ngModel)]="selectedBrand" (ngModelChange)="onFilterChange()"
+            placeholder="Marka Seç" [showClear]="true" class="filter-select">
+          </p-select>
+        </div>
+        <div class="filter-field">
+          <label>Model</label> 
+          <p-select [options]="vehicleModelsDistinct()" [(ngModel)]="selectedModel" (ngModelChange)="onFilterChange()"
+            placeholder="Model Seç" [showClear]="true" class="filter-select">
+          </p-select>
+        </div>
+        <div class="filter-field">
+          <label>Araç Tipi</label>
+          <p-select [options]="vehicleTypesDistinct()"  [(ngModel)]="selectedType" (ngModelChange)="onFilterChange()" 
+            placeholder="Araç Tipi Seç" [showClear]="true" class="filter-select">
+          </p-select>
+        </div>
+        <div class="filter-field">
+          <label>Durum</label>
+          <p-select [options]="[
+              { label: 'Tümü', value: null },
+              { label: 'Müsait', value: true },
+              { label: 'Dolu', value: false }
+            ]" optionLabel="label" optionValue="value" [(ngModel)]="filterIsAvailable" 
+            (ngModelChange)="onFilterChange()" placeholder="Durum Seç" [showClear]="true" class="filter-select">
+          </p-select>
+        </div>
+        <div class="filter-field filter-reset">
+          <p-button icon="ri-filter-off-line" severity="secondary" [raised]="true" (onClick)="onResetFilters()">
+          </p-button>
+        </div>
+        <div class="filter-field filter-count">
+          <label>Toplam</label>
+          <p-button severity="contrast" [raised]="true" class="count-badge">{{ totalCount() }}</p-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tablo -->
+    <div class="table-wrapper">
+    <p-table
+      [value]="vehicles()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="pageSize()"
+      [totalRecords]="totalCount()"
+      [loading]="isLoading()"
+      [rowsPerPageOptions]="[5, 10, 20, 50]"
+      [tableStyle]="{ width: '100%' }"
+      [sortField]="sortField()"
+      [sortOrder]="sortOrder()"
+      (onSort)="onSort($event)"
+      (onPage)="onPageChange($event)"
+      dataKey="id"
+      currentPageReportTemplate="Toplam {totalRecords} araçtan {first} - {last} arası gösteriliyor"
+      showCurrentPageReport="true">
+
+        <!-- Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3%">#</th>
+            <th class="col-image">Resim</th>
+            <th class="col-brand" pSortableColumn="brand">Marka <p-sortIcon field="brand"></p-sortIcon></th>
+            <th class="col-model" pSortableColumn="model">Model <p-sortIcon field="model"></p-sortIcon></th>
+            <th class="col-year" pSortableColumn="year">Yıl <p-sortIcon field="year"></p-sortIcon></th>
+            <th class="col-plate">Plaka</th>
+            <th class="col-type">Tip</th>
+            <th class="col-price" pSortableColumn="dailyPrice">Fiyat <p-sortIcon field="dailyPrice"></p-sortIcon></th>
+            <th class="col-availability">Durum</th>
+            <th class="col-status">Aktif</th>
+            <th class="col-actions">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="body" let-vehicle let-i="rowIndex">
+          <tr [ngClass]="{ 'inactive-row': !vehicle.isActive }">
+            <td>{{ i + 1 }}</td>
+            <!-- Resim -->
+            <td class="col-image">
+              <div class="image-wrapper">
+                @if (getMainImageUrl(vehicle)) {
+                <img [src]="getMainImageUrl(vehicle)" [alt]="vehicle.brand" />
+                } @else {
+                <div class="no-image">
+                  <i class="ri-image-line"></i>
+                </div>
+                }
+              </div>
+            </td>
+            <!-- Marka -->
+            <td class="col-brand">
+              <span class="brand-name">{{ vehicle.brand }}</span>
+            </td>
+            <!-- Model -->
+            <td class="col-model">{{ vehicle.model }}</td>
+            <!-- Yıl -->
+            <td class="col-year">{{ vehicle.year }}</td>
+            <!-- Plaka -->
+            <td class="col-plate">
+              <span class="plate-badge">{{ vehicle.plate }}</span>
+            </td>
+            <!-- Tip -->
+            <td class="col-type">
+              <p-tag [value]="vehicle.vehicleTypeName || getVehicleTypeName(vehicle.vehicleTypeId)"
+                ></p-tag>
+            </td>
+            <!-- Fiyat -->
+            <td class="col-price">{{ vehicle.dailyPrice | currency:'TRY':'₺':'1.0-2' }}</td>
+            <!-- Durum -->
+            <td class="col-availability">
+              <p-tag [value]="getAvailabilityLabel(vehicle.isAvailable)"
+                [severity]="getAvailabilitySeverity(vehicle.isAvailable)" [rounded]="true">
+              </p-tag>
+            </td>
+            <!-- Aktif -->
+            <td class="col-status">
+              <span class="status-badge" [class.status-active]="vehicle.isActive"
+                [class.status-inactive]="!vehicle.isActive" (click)="toggleStatus(vehicle)">
+                {{ getStatusLabel(vehicle.isActive) }}
+              </span>
+            </td>
+            <!-- İşlemler -->
+            <td class="col-actions">
+              <div class="action-buttons">
+                <button pButton type="button" class="p-button-text p-button-info p-button-rounded btn-detail"
+                  icon="ri-eye-line" pTooltip="Detay" tooltipPosition="top" (click)="navigateToDetail(vehicle)">
+                </button>
+                <button pButton type="button" class="p-button-text p-button-primary p-button-rounded btn-edit"
+                  icon="ri-edit-line" pTooltip="Düzenle" tooltipPosition="top" (click)="navigateToEdit(vehicle)">
+                </button>
+                <button pButton type="button" class="p-button-text p-button-danger p-button-rounded btn-delete"
+                  icon="ri-delete-bin-line" pTooltip="Sil" tooltipPosition="top" (click)="deleteVehicle(vehicle)">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty Message -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="11" class="empty-table-message">
+              {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı araç bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+</div>

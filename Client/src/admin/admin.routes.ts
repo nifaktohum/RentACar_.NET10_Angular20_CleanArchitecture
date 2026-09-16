@@ -4,13 +4,15 @@ import { permissionAuthGuard } from "../core/guards/permissionAuthGuard.guard";
 
 export const ADMIN_ROUTES: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: '',
+  {
+    path: '',
     component: AdminLayoutComponent,
     canActivate: [permissionAuthGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
-      { path: 'dashboard',
+      {
+        path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
       // --- BRANCHES (ŞUBELER) ROTASI ---
@@ -51,9 +53,23 @@ export const ADMIN_ROUTES: Routes = [
       // --- EXTRA (EKSTRA PAKETLER) ROTASI ---
       {
         path: 'extras',
-        loadChildren: () => import('./features/extras/protection-packages.routes').then(m => m.EXTRA_ROUTES),
+        loadChildren: () => import('./features/extras/extras.routes').then(m => m.EXTRA_ROUTES),
         canActivate: [permissionAuthGuard], // Yetki kontrolü ekledik
         data: { requiredPermission: 'ProtectionPackage.Read' } // İzin kodu
+      },
+      // --- RENTAL --- 
+      {
+        path: 'rental',
+        loadChildren: () => import('./features/rental/rental.routes').then(m => m.RENTAL_ROUTES),
+        canActivate: [permissionAuthGuard],
+        data: { requiredPermission: 'Rental.Read' }
+      },
+      // --- RENTAL --- 
+      {
+        path: 'vehicles',
+        loadChildren: () => import('./features/vehicles/vehicle.routes').then(m => m.VEHICLE_ROUTES),
+        canActivate: [permissionAuthGuard],
+        data: { requiredPermission: 'Vehicle.Read' }
       }
     ]
   },

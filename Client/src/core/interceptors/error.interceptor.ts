@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../services/auth.service';
 
-// 🚀 Interceptor'ı bypass etmek için kullanacağımız sihirli token'ı buraya tanımlıyoruz kanka.
+// 🚀 Interceptor'ı bypass etmek için kullanacağımız sihirli token'ı buraya tanımlıyoruz.
 // Servis dosyasında istek atarken bunu tetikleyeceğiz.
 export const BYPASS_INTERCEPTOR = new HttpContextToken<boolean>(() => false);
 
@@ -34,7 +34,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           (error.error?.error && Array.isArray(error.error.error) ? error.error.error[0] : null);
 
         // Eğer hata 401 ise, nerede olursak olalım 
-        // Arkadan gelen çoklu istekler hafızayı ezmesin diye İSTİSNASIZ temizliyoruz kanka!
+        // Arkadan gelen çoklu istekler hafızayı ezmesin diye İSTİSNASIZ temizliyoruz!
         if (error.status === 401) {
           // ✅ SADECE oturumla ilgili olanları temizle
           // localStorage.clear(); // ❌ BUNU KALDIR
@@ -75,9 +75,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         }
         switch (error.status) {
           case 400:
-            // Şifre yanlış hataları genelde 401 veya 400 düşer, ikisinde de bu mesajı yakala kanka
+            // Şifre yanlış hataları genelde 401 veya 400 düşer, ikisinde de bu mesajı yakala
             // .NET Identity'den gelen "E-posta veya şifre hatalı." mesajını doğrudan yakalayıp basıyoruz!
-            errorMessage = backendMessage || 'Kullanıcı adı veya şifre hatalı kanka!';
+            errorMessage = backendMessage || 'Kullanıcı adı veya şifre hatalı!';
             break;
           case 403:
             errorMessage = 'Bu işlem için yetkiniz bulunmuyor!';

@@ -1,0 +1,410 @@
+// src/app/features/admin/vehicle/vehicles.component.scss
+::ng-deep .vehicles-container {
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  min-height: 100vh;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  p-card {
+    .p-card-body {
+      padding: 5px 10px !important;
+    }
+  }
+
+  // ==================== HEADER ====================
+  .header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1rem 0.5rem 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .header-left {
+      h2 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--admin-text);
+      }
+
+      p {
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+      }
+    }
+
+    .header-right {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+  }
+
+  // ==================== FILTERS ====================
+  .filter-section {
+    padding: 0.5rem 1rem;
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+
+      .filter-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        label {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: var(--text-color-secondary);
+        }
+
+        .filter-input {
+          min-width: 150px;
+          height: 37px;
+          padding: 0.5rem;
+          border-radius: 6px;
+          border: 1px solid var(--admin-border);
+          background: var(--admin-white);
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+          }
+        }
+
+        .filter-select {
+          min-width: 150px;
+
+          ::ng-deep .p-select {
+            width: 100%;
+          }
+        }
+
+        &.filter-count {
+          .count-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 37px;
+            background: var(--admin-primary);
+            color: var(--admin-white);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-top: auto;
+            .p-button {
+              cursor: default !important;
+            }
+          }
+        }
+
+        &.filter-reset {
+          justify-content: flex-end;
+        }
+      }
+    }
+  }
+
+  // ==================== TABLE ====================
+  .table-wrapper {
+    padding: 0.5rem 1rem 1rem 1rem;
+
+    .p-datatable-thead > tr > th {
+      white-space: nowrap;
+      text-align: start;
+      vertical-align: middle;
+      padding: 0.75rem 0.75rem;
+      font-weight: 600;
+      background: var(--admin-primary);
+      color: var(--admin-white);
+      border-bottom: 2px solid var(--surface-border);
+
+      .p-icon {
+        margin-left: 5px;
+        color: #fff;
+      }
+
+      &.col-image {
+        width: 6%;
+        text-align: center;
+      }
+      &.col-brand {
+        width: 12%;
+      }
+      &.col-model {
+        width: 6%;
+      }
+      &.col-year {
+        width: 7%;
+        text-align: center;
+      }
+      &.col-plate {
+        width: 10%;
+        text-align: center;
+      }
+      &.col-type {
+        width: 10%;
+        text-align: center;
+      }
+      &.col-price {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-stock {
+        width: 7%;
+        text-align: center;
+      }
+      &.col-availability {
+        width: 9%;
+        text-align: center;
+      }
+      &.col-status {
+        width: 8%;
+        text-align: center;
+      }
+      &.col-actions {
+        width: 12%;
+        text-align: center;
+      }
+    }
+
+    .p-datatable-tbody > tr {
+      background: var(--admin-white);
+      transition: background-color 0.2s;
+
+      &:nth-child(even) {
+        background: var(--admin-light);
+      }
+
+      &:hover {
+        background: rgba(56, 189, 248, 0.05) !important;
+      }
+
+      &.inactive-row {
+        opacity: 0.6;
+        background: #f1f5f9;
+
+        .brand-name,
+        .col-model,
+        .col-year {
+          text-decoration: line-through;
+        }
+      }
+
+      td {
+        padding: 0.6rem 0.75rem;
+        border-bottom: 1px solid var(--admin-border);
+        vertical-align: middle;
+
+        &.col-type {
+          text-align: center;
+          p-tag {
+            background-color: #fff !important;
+            color: var(--text-dark);
+            text-align: center;
+          }
+        }
+
+        &.col-availability {
+          .p-tag-label {
+            color: var(--white);
+            width: 60px;
+            padding-block: 2px;
+            text-align: center;
+          }
+        }
+      }
+    }
+
+    // Image
+    .image-wrapper {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 0 auto;
+      background: var(--admin-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .no-image {
+        color: var(--admin-text-muted);
+        font-size: 1.5rem;
+      }
+    }
+
+    // Brand
+    .brand-name {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    // Plate
+    .plate-badge {
+      display: inline-block;
+      padding: 0.2rem 0.75rem;
+      background: #e2e8f0;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #1e293b;
+      letter-spacing: 1px;
+    }
+
+    // Stock
+    .stock-badge {
+      display: inline-block;
+      padding: 0.2rem 0.75rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      background: #dcfce7;
+      color: #15803d;
+
+      &.low {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+    }
+
+    // Status
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &.status-active {
+        background: #dcfce7;
+        color: #15803d;
+        width: 65px;
+        height: 25px;
+        text-align: center;
+        border: 1px solid #86efac;
+
+        &:hover {
+          background: #86efac;
+          transform: scale(1.05);
+        }
+      }
+
+      &.status-inactive {
+        background: #fee2e2;
+        color: #dc2626;
+        width: 65px;
+        text-align: center;
+        border: 1px solid #fca5a5;
+
+        &:hover {
+          background: #fca5a5;
+          transform: scale(1.05);
+        }
+      }
+    }
+
+    // Actions
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      font-size: 22px;
+      gap: 0.5rem;
+
+      .p-button-rounded {
+        font-size: 20px;
+
+        &.btn-detail {
+          color: var(--admin-warning) !important;
+          border-bottom: 1px solid var(--admin-warning) !important;
+
+          &:hover {
+            background: rgba(96, 165, 250, 0.15) !important;
+          }
+        }
+
+        &.btn-edit {
+          color: #60a5fa !important;
+          border-bottom: 1px solid #60a5fa !important;
+
+          &:hover {
+            background: rgba(96, 165, 250, 0.15) !important;
+          }
+        }
+
+        &.btn-delete {
+          color: #f87171 !important;
+          border-bottom: 1px solid #f87171 !important;
+
+          &:hover {
+            background: rgba(248, 113, 113, 0.15) !important;
+          }
+        }
+      }
+    }
+
+    // Empty Message
+    .empty-table-message {
+      text-align: center;
+      padding: 2rem;
+      color: #94a3b8;
+    }
+  }
+}
+
+// ==================== RESPONSIVE ====================
+@media (max-width: 768px) {
+  ::ng-deep .vehicles-container {
+    .header-section {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .header-right {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+    }
+
+    .filter-section {
+      .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+
+        .filter-field {
+          .filter-input,
+          .filter-select {
+            min-width: 100%;
+          }
+        }
+      }
+    }
+
+    .table-wrapper {
+      padding: 0.5rem;
+      overflow-x: auto;
+
+      .p-datatable {
+        font-size: 0.8rem;
+
+        th,
+        td {
+          padding: 0.4rem 0.5rem !important;
+        }
+      }
+    }
+  }
+}

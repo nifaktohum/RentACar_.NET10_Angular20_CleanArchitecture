@@ -1,0 +1,155 @@
+<!-- modules/admin/vehicle-models/pages/vehicle-models/vehicle-models.component.html -->
+
+<div class="vehicle-models-container">
+  <p-card>
+    <!-- Header -->
+    <div class="p-button-list">
+      <div class="header-left">
+        <h2>Araç Modelleri</h2>
+        <p>Araç kiralama sisteminde kullanılacak araç modellerini listeleyebilir, ekleyebilir, düzenleyebilir ve
+          yönetebilirsin.</p>
+      </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Ara</label>
+          <input pInputText [(ngModel)]="filterSearch" (ngModelChange)="onFilterChange()"
+            placeholder="Marka veya model ara..." class="filter-input" />
+        </div>
+
+        <div class="filter-field">
+          <label>Araç Tipi</label>
+          <p-select [options]="vehicleTypes()" optionLabel="name" optionValue="id" [(ngModel)]="filterVehicleType"
+            (ngModelChange)="onFilterChange()" placeholder="Tümü" [showClear]="true" class="filter-select"></p-select>
+        </div>
+
+        <div class="filter-field">
+          <label>Stok Durumu</label>
+          <p-select [options]="stockOptions" optionLabel="label" optionValue="value" [(ngModel)]="filterIsInStock"
+            (ngModelChange)="onFilterChange()" placeholder="Tümü" [showClear]="true" class="filter-select"></p-select>
+        </div>
+
+        <div class="filter-field filter-reset">
+          <p-button severity="secondary" icon="ri-filter-off-line" pTooltip="Filtreleri Temizle" tooltipPosition="top"
+            (onClick)="clearFilters()" [raised]="true"></p-button>
+        </div>
+        
+        <div class="filter-field filter-count">
+          <label>Toplam</label>
+          <p-button severity="contrast" class="count-badge .p-button" [raised]="true">{{ totalCount() }}</p-button>
+        </div>
+      </div>
+      <div class="filter-right">
+        <p-button (click)="openCreateDialog()" icon="ri-add-large-line" pTooltip="Yeni Araç Modeli Ekle"
+          tooltipPosition="top" [raised]="true" class="p-button-add"></p-button>
+        <!-- <p-button severity="secondary" icon="ri-filter-off-line" pTooltip="Filtreleri Temizle" tooltipPosition="top"
+          (onClick)="clearFilters()" [raised]="true"></p-button> -->
+        <p-button severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile" tooltipPosition="top"
+          (onClick)="refreshData()" [loading]="isLoading()" [raised]="true" class="p-button-reset"></p-button>
+      </div>
+    </div>
+
+    <!-- Tablo -->
+    <div class="table-wrapper">
+     <p-table
+       [value]="vehicleModels()"
+       [lazy]="true"
+       [paginator]="true"
+       [rows]="pageSize()"
+       [totalRecords]="totalCount()"
+       [loading]="isLoading()"
+       [rowsPerPageOptions]="[5, 10, 20, 50]"
+       [tableStyle]="{ width: '100%' }"
+       [sortField]="sortField()"
+       (onSort)="onSort($event)"
+       (onPage)="onPageChange($event)"
+       [dataKey]="'id'"
+       showCurrentPageReport="true"
+       currentPageReportTemplate="Toplam {totalRecords} araç modelinden {first} - {last} arası gösteriliyor">
+        <!-- Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-brand" pSortableColumn="brand">Marka <p-sortIcon field="brand"></p-sortIcon></th>
+            <th class="col-name" pSortableColumn="name">Model <p-sortIcon field="name"></p-sortIcon></th>
+            <th class="col-type">Araç Tipi</th>
+            <th class="col-stock" pSortableColumn="stock">Stok <p-sortIcon field="stock"></p-sortIcon></th>
+            <th class="col-available" pSortableColumn="available">Müsait <p-sortIcon field="available"></p-sortIcon>
+            </th>
+            <th class="col-status">Durum</th>
+            <th class="col-actions">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="body" let-model>
+          <tr [ngClass]="{ 'inactive-row': !model.isActive }">
+            <!-- Marka -->
+            <td class="model-brand">
+              <div class="brand-wrapper">
+                <i class="ri-car-line"></i>
+                <span>{{ model.brand }}</span>
+              </div>
+            </td>
+            <!-- Model -->
+            <td class="model-name">
+              <div class="name-wrapper">
+                <strong>{{ model.name }}</strong>
+                @if (model.description) {
+                <small class="description">{{ model.description }}</small>
+                }
+              </div>
+            </td>
+            <!-- Araç Tipi -->
+            <td class="model-type">
+              <p-tag [value]="model.vehicleTypeName" severity="info" [rounded]="true"></p-tag>
+            </td>
+            <!-- Stok -->
+            <td class="model-stock">
+              <p-tag [value]="model.stock.toString()" [severity]="getStockSeverity(model.stock)"
+                [rounded]="true"></p-tag>
+            </td>
+            <!-- Musaitlik -->
+            <td class="model-available">
+              <span class="available-badge" [class.available]="model.availableStock > 0"
+                [class.unavailable]="model.availableStock === 0">
+                {{ model.availableStock }}
+              </span>
+            </td>
+            <!-- Durum -->
+            <td class="model-status">
+              <span class="status-badge" [class.status-active]="model.isActive"
+                [class.status-inactive]="!model.isActive" (click)="toggleStatus(model)">
+                {{ model.isActive ? 'Aktif' : 'Pasif' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button pButton type="button" class="p-button-text p-button-primary p-button-rounded btn-edit"
+                  icon="ri-edit-line" pTooltip="Düzenle" tooltipPosition="top" (click)="openEditDialog(model)"></button>
+                <button pButton type="button" class="p-button-text p-button-danger p-button-rounded btn-delete"
+                  icon="ri-delete-bin-line" pTooltip="Sil" tooltipPosition="top"
+                  (click)="deleteVehicleModel(model.id, model.brand + ' ' + model.name)"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty Message -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="empty-table-message">
+              {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı araç modeli bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+</div>
+
+<!-- Dialog -->
+<app-vehicle-model-dialog [visible]="dialogVisible()" [editId]="selectedVehicleModelId()" [mode]="dialogMode()"
+  (visibleChange)="dialogVisible.set($event)" (saved)="onDialogSaved()"></app-vehicle-model-dialog>
