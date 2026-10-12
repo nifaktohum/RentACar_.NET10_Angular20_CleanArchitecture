@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Application.Services;
+using Domain.Entities.Customers;
 using Domain.Entities.Users;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -21,7 +22,8 @@ public sealed class JwtProvider(IConfiguration _config) : IJwtProvider
             new("FullName", user.FullName),
             new("SecurityStamp", user.SecurityStamp),
             new("BranchId", user.BranchId?.ToString() ?? string.Empty),
-            new("BranchName", branchName ?? "Merkez")
+            new("BranchName", branchName ?? "Merkez"),
+            new("UserType", "Staff")
         };
 
 
@@ -66,5 +68,48 @@ public sealed class JwtProvider(IConfiguration _config) : IJwtProvider
     string token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
     return token;
+  }
+
+  public string CreateTokenForCustomer(Customer customer, bool rememberMe = false)
+  {
+    // 1. Customer için claim'leri hazırla
+    var claims = new List<Claim>
+    {
+        new(ClaimTypes.NameIdentifier, customer.Id.ToString()),
+        new("Id", customer.Id.ToString()),
+        new("Email", customer.Email),
+        new("PhoneNumber", customer.PhoneNumber),
+        new("FullName", $"{customer.FirstName} {customer.LastName}".Trim()),
+        new("CustomerType", customer.Type.ToString()),      // "Individual" / "Corporate"
+        new("IsEmailVerified", customer.IsEmailVerified.ToString()),
+        new("IsPhoneVerified", customer.IsPhoneVerified.ToString()),
+        new("IsBlacklisted", customer.IsBlacklisted.ToString()),
+        new("UserType", "Customer"),   // ⭐ Kritik: Personel token'ından ayırt etmek için
+        new("SecurityStamp", customer.SecurityStamp ?? "")
+    };
+
+    // 2. Config'den ayarları oku (User ile aynı)
+    string secretKey = _config["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey bulunamadı.");
+    string issuer = _config["Jwt:Issuer"] ?? "RentACarBackend";
+    string audience = _config["Jwt:Audience"] ?? "RentACarAngular";
+    int expiresInMinutes = int.TryParse(_config["Jwt:ExpiresInMinutes"], out var minutes) ? minutes : 1440;
+
+    // 3. RememberMe mantığı (User ile aynı)
+    DateTime expirationTime = rememberMe
+        ? DateTime.UtcNow.AddDays(7)
+        : DateTime.UtcNow.AddMinutes(expiresInMinutes);
+
+    // 4. Token'ı üret
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+    var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+    var tokenOptions = new JwtSecurityToken(
+        issuer: issuer,
+        audience: audience,
+        claims: claims,
+        expires: expirationTime,
+        signingCredentials: credentials);
+
+    return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
   }
 }

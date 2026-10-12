@@ -1,5 +1,6 @@
 import { Directive, ElementRef, HostListener, Renderer2, inject, input } from '@angular/core';
 
+// E-posta Dedektifi => Bu kutunun içine giren metnin harbi bir e-posta adresi olup olmadığını denetlemek.
 @Directive({
   selector: '[emailValidationDirective]',
 })

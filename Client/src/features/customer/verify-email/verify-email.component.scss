@@ -1,0 +1,381 @@
+::ng-deep {
+  // =============================================================================
+  // VERIFY EMAIL
+  // =============================================================================
+
+  .verify-wrapper {
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  // ==================== SAYFA BAŞLIĞI ====================
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      > i {
+        font-size: 38px;
+        color: var(--primary-color);
+        background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), rgba(0, 168, 204, 0.05));
+        padding: 10px;
+        border-radius: 12px;
+        flex-shrink: 0;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--admin-primary-dark);
+        margin: 0 0 4px 0;
+      }
+
+      p {
+        font-size: 0.875rem;
+        color: var(--admin-text-muted);
+        margin: 0;
+      }
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: white;
+      color: var(--admin-text);
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1.5px solid var(--admin-border);
+      transition: all 0.2s;
+
+      i { font-size: 16px; }
+
+      &:hover {
+        border-color: var(--primary-color);
+        background: rgba(0, 210, 255, 0.05);
+        color: var(--primary-dark);
+      }
+    }
+  }
+
+  // ==================== CONTAINER ====================
+  .verify-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  // ==================== CARD ====================
+  .verify-card {
+    width: 100%;
+    max-width: 560px;
+    background: white;
+    border-radius: 20px;
+    padding: 40px 36px;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    text-align: center;
+
+    @media (max-width: 576px) {
+      padding: 32px 20px;
+    }
+
+    // ICON
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(0, 168, 204, 0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+
+      i {
+        font-size: 42px;
+        color: var(--primary-color);
+      }
+
+      &.success {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(22, 163, 74, 0.05));
+
+        i { color: var(--admin-success); }
+      }
+
+      &.verified {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.08));
+
+        i { color: var(--admin-success); }
+      }
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--admin-primary-dark);
+      margin: 0 0 12px 0;
+    }
+
+    .card-description {
+      font-size: 0.95rem;
+      color: var(--admin-text-muted);
+      line-height: 1.6;
+      margin: 0 0 24px 0;
+
+      strong {
+        color: var(--admin-primary-dark);
+        font-weight: 700;
+      }
+    }
+  }
+
+  // ==================== INFO NOTE ====================
+  .info-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(168, 85, 247, 0.04);
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    color: #7e22ce;
+    line-height: 1.5;
+    text-align: left;
+    margin-bottom: 24px;
+
+    i {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: #a855f7;
+    }
+
+    &.small {
+      margin-top: 16px;
+      margin-bottom: 0;
+      background: rgba(0, 210, 255, 0.04);
+      border-color: rgba(0, 210, 255, 0.1);
+      color: #0369a1;
+
+      i { color: var(--primary-color); }
+    }
+  }
+
+  // ==================== FORM ====================
+  .code-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--admin-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+    }
+
+    .input-custom-group {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--admin-border);
+      border-radius: 12px;
+      background-color: var(--admin-light);
+      transition: all 0.2s;
+
+      &:focus-within {
+        border-color: var(--primary-color);
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.1);
+      }
+
+      .input-icon {
+        padding-left: 16px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+
+      input {
+        border: none;
+        outline: none;
+        padding: 14px 16px;
+        width: 100%;
+        font-size: var(--font-size-base);
+        color: var(--admin-text);
+        background: transparent;
+        font-family: inherit;
+
+        &::placeholder {
+          color: var(--text-muted);
+        }
+      }
+
+      // ⭐ Kod input özel
+      &.code-input input {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 0.5rem;
+        text-align: center;
+        font-family: 'Courier New', monospace;
+        padding: 16px;
+      }
+    }
+  }
+
+  // ==================== RESEND ====================
+  .resend-section {
+    text-align: center;
+
+    p {
+      font-size: 0.85rem;
+      color: var(--admin-text-muted);
+      margin: 0 0 8px 0;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--primary-dark);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+
+      i { font-size: 16px; }
+
+      &:hover {
+        background: rgba(0, 210, 255, 0.08);
+        color: var(--primary-color);
+      }
+    }
+
+    .cooldown-timer {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--admin-text-muted);
+      padding: 6px 12px;
+      background: var(--admin-light);
+      border-radius: 8px;
+
+      i {
+        font-size: 16px;
+        color: var(--admin-text-muted);
+      }
+
+      strong {
+        color: var(--primary-dark);
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+      }
+    }
+  }
+
+  // ==================== ACTIONS ====================
+  .form-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 32px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      width: 100%;
+
+      i { font-size: 20px; }
+
+      &.btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 210, 255, 0.25);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0, 210, 255, 0.35);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          box-shadow: none;
+        }
+
+        .spinning {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+
+  // ==================== SUCCESS CARD ====================
+  .success-card {
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 12px;
+      color: var(--admin-success);
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+
+      i {
+        font-size: 22px;
+      }
+    }
+  }
+
+  // ==================== ANIMATION ====================
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}

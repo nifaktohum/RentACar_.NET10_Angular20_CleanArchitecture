@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.RateLimiting;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
@@ -28,11 +24,14 @@ public class RateLimiterSetupOptions : IConfigureOptions<RateLimiterOptions>
     // 3. GİRİŞ POLİTİKASI (Brute force koruması - AuthController için)
     _opt.AddFixedWindowLimiter(policyName: "LoginFixedWindowPolicy", fixedOptions =>
     {
-      fixedOptions.PermitLimit = 3; // Maksimum 3 istek hakkı
+      fixedOptions.PermitLimit = 5; // Maksimum 3 istek hakkı
       fixedOptions.Window = TimeSpan.FromMinutes(1); // 1 dakikalık bir pencere içinde (Comment'i düzelttik kanka)
       fixedOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-      fixedOptions.QueueLimit = 1; // Kontenjan dolarsa, sıraya alınacak maksimum istek sayısı
+      fixedOptions.QueueLimit = 0; // Kontenjan dolarsa, sıraya alınacak maksimum istek sayısı
     });
+
+    // Limit aşıldığında dönülecek HTTP durum kodu
+    _opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
 
     // 3. ŞİFREMİ UNUTTUM POLİTİKASI (İşte buraya ekliyoruz kanka)
@@ -42,14 +41,16 @@ public class RateLimiterSetupOptions : IConfigureOptions<RateLimiterOptions>
       var userIp = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
       return RateLimitPartition.GetFixedWindowLimiter(
-              partitionKey: userIp, // Her IP'ye özel 3 hak tanımlıyoruz
+              partitionKey: userIp, 
               factory: _ => new FixedWindowRateLimiterOptions
-            {
-              PermitLimit = 3,
-              Window = TimeSpan.FromMinutes(1),
-              QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-              QueueLimit = 1
-            });
+              {
+                PermitLimit = 3, // Her IP'ye özel 3 hak tanımlıyoruz
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 1
+              });
     });
+    
+
   }
 }

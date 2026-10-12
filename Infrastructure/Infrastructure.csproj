@@ -6,13 +6,25 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
+<ItemGroup>
+    <!-- Şifreleri güvenli bir şekilde hash'lemek ve doğrulamak için kullanılan BCrypt kütüphanesi -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+    
+    <!-- ASP.NET Core uygulamalarında JWT (JSON Web Token) tabanlı kimlik doğrulama (Authentication) işlemlerini yönetmek için middleware -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
+    
+    <!-- Entity Framework Core için PostgreSQL veritabanı sağlayıcısı (Database Provider) -->
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+    
+    <!-- ASP.NET Core web framework özelliklerini ve kütüphanelerini projeye dahil eden temel framework referansı -->
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    
+    <!-- JWT token'ları oluşturmak, okumak, imzalamak ve doğrulamak için kullanılan temel kütüphane -->
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
+    
+    <!-- SMS, sesli arama ve bildirim göndermek için Twilio API servislerini kullanmayı sağlayan SDK -->
     <PackageReference Include="Twilio" Version="7.14.9" />
+    <PackageReference Include="Vonage" Version="8.35.0" />
   </ItemGroup>
 
   <ItemGroup>

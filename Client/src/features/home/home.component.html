@@ -1,0 +1,46 @@
+<div style="
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      font-family: Inter, sans-serif;
+      padding: 40px;
+      text-align: center;
+    ">
+  <i class="ri-roadster-fill" style="font-size: 80px; color: #38bdf8; margin-bottom: 20px;"></i>
+  <h1 style="font-size: 3rem; margin: 0 0 16px 0;">RentCar</h1>
+  <p style="font-size: 1.2rem; color: #94a3b8; margin-bottom: 40px;">
+    Hayalinizdeki aracı kiralayın — Hızlı, kolay, güvenli.
+  </p>
+
+  <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+    <a routerLink="/customer/profile" style="
+          padding: 14px 32px;
+          background: #38bdf8;
+          color: #0f172a;
+          text-decoration: none;
+          border-radius: 10px;
+          font-weight: 600;
+        ">
+      <i class="ri-user-line"></i> Profilim
+    </a>
+    <a (click)="this.logout()" style="
+          padding: 14px 32px;
+          background: transparent;
+          color: #94a3b8;
+          text-decoration: none;
+          border-radius: 10px;
+          font-weight: 600;
+          border: 1px solid #475569;
+        ">
+      Çıkış Yap
+    </a>
+  </div>
+
+  <p style="margin-top: 60px; color: #64748b; font-size: 0.85rem;">
+    🚧 Anasayfa yapım aşamasında — Araç listesi, filtreler, öne çıkan araçlar yakında!
+  </p>
+</div>

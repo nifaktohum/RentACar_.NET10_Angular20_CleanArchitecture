@@ -41,4 +41,14 @@ public interface IVehicleRepository : IRepository<Vehicle>
       Expression<Func<Vehicle, bool>>? filter = null,
       CancellationToken cancellationToken = default
   );
+
+  // ⭐ Spec metotları
+  // Şartları (spec) uygularım, filtreleri dizerim, gerekirse sayfalamayı (paging) ve sıralamayı (sorting) yapar, sana pırıl pırıl bir Vehicle listesi teslim ederim.
+  Task<List<Vehicle>> GetListWithSpecAsync(ISpecification<Vehicle> spec, CancellationToken cancellationToken = default);
+
+  //'Şu kriterlere uyan kaç tane araç var?' diye sorduğunda, veritabanını yormadan direkt int sayıyı yapıştırıp geçerim. Dashboard'ların vazgeçilmeziyim."
+  Task<int> CountWithSpecAsync(ISpecification<Vehicle> spec, CancellationToken cancellationToken = default);
+
+  // "Binlerce araç arasından o tek ve biricik aracı mı arıyorsun? İster şasi numarasıyla, ister plaka şartıyla olsun... Şartını bana ver, hedefe tek atış yapıp ya o aracı (Vehicle?) ya da boşluk dönerim."
+  Task<Vehicle?> GetSingleWithSpecAsync(ISpecification<Vehicle> spec, CancellationToken cancellationToken = default);
 }

@@ -1,0 +1,347 @@
+<div class="customer-detail-wrapper">
+
+  <!-- ==================== GERİ BUTONU ==================== -->
+  <div class="page-header">
+    <a routerLink="/admin/customers" class="btn-back">
+      <i class="ri-arrow-left-line"></i>
+      <span>Müşteri Listesine Dön</span>
+    </a>
+  </div>
+
+  <!-- ==================== LOADING ==================== -->
+  @if (isLoading()) {
+  <div class="loading-grid">
+    <p-skeleton height="180px" borderRadius="12px"></p-skeleton>
+    <p-skeleton height="100px" borderRadius="12px"></p-skeleton>
+    <p-skeleton height="200px" borderRadius="12px"></p-skeleton>
+    <p-skeleton height="200px" borderRadius="12px"></p-skeleton>
+  </div>
+  }
+
+  <!-- ==================== İÇERİK ==================== -->
+  @if (!isLoading() && customer(); as c) {
+
+  <!-- ==================== 1. MÜŞTERİ KARTI ==================== -->
+  <div class="customer-card">
+    <div class="customer-card-header">
+      <div class="avatar" [class.corporate]="c.type === 'Corporate'">
+        {{ initials() }}
+      </div>
+      <div class="customer-header-info">
+        <h1>{{ fullName() }}</h1>
+        <div class="header-meta">
+          <p-tag [value]="customerTypeLabel()" [severity]="customerTypeSeverity()" [rounded]="true">
+          </p-tag>
+          <span class="meta-item">
+            <i class="ri-calendar-line"></i>
+            Kayıt: {{ formatDate(c.createdAt) }}
+          </span>
+          @if (!c.isActive) {
+          <p-tag value="Pasif" severity="danger" [rounded]="true"></p-tag>
+          }
+        </div>
+        <div class="header-contacts">
+          <span class="contact-item">
+            <i class="ri-mail-line"></i>
+            {{ c.email }}
+          </span>
+          <span class="contact-item">
+            <i class="ri-phone-line"></i>
+            {{ c.phoneNumber | phoneFormatPipe }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DURUM ROZETLERI -->
+    <div class="status-badges">
+      <div class="status-badge" [class.verified]="c.isEmailVerified" [class.warning]="!c.isEmailVerified">
+        <i [class]="c.isEmailVerified ? 'ri-mail-check-fill' : 'ri-mail-line'"></i>
+        <div class="badge-content">
+          <span class="badge-label">E-posta</span>
+          <span class="badge-value">{{ c.isEmailVerified ? 'Doğrulanmış' : 'Doğrulanmamış' }}</span>
+        </div>
+      </div>
+
+      <div class="status-badge" [class.verified]="c.isPhoneVerified" [class.warning]="!c.isPhoneVerified">
+        <i [class]="c.isPhoneVerified ? 'ri-smartphone-fill' : 'ri-smartphone-line'"></i>
+        <div class="badge-content">
+          <span class="badge-label">Telefon</span>
+          <span class="badge-value">{{ c.isPhoneVerified ? 'Doğrulanmış' : 'Doğrulanmamış' }}</span>
+        </div>
+      </div>
+
+      <div class="status-badge" [class.danger]="c.isBlacklisted" [class.verified]="!c.isBlacklisted">
+        <i [class]="c.isBlacklisted ? 'ri-forbid-2-fill' : 'ri-checkbox-circle-fill'"></i>
+        <div class="badge-content">
+          <span class="badge-label">Kara Liste</span>
+          <span class="badge-value">{{ c.isBlacklisted ? 'Kara Listede' : 'Temiz' }}</span>
+        </div>
+      </div>
+
+      <div class="status-badge" [class.verified]="c.canRent" [class.warning]="!c.canRent">
+        <i [class]="c.canRent ? 'ri-roadster-fill' : 'ri-roadster-line'"></i>
+        <div class="badge-content">
+          <span class="badge-label">Kiralama</span>
+          <span class="badge-value">{{ c.canRent ? 'Kiralayabilir' : 'Kiralayamaz' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. YÖNETİM KARTI ==================== -->
+  <p-card styleClass="admin-card">
+    <div class="admin-card-header">
+      <div class="title">
+        <i class="ri-shield-user-line"></i>
+        <h3>Yönetim Aksiyonları</h3>
+      </div>
+    </div>
+
+    <div class="admin-actions">
+      <!-- KARA LİSTE -->
+      @if (!c.isBlacklisted) {
+      <button type="button" class="action-btn danger" (click)="openBlacklistDialog()">
+        <i class="ri-forbid-2-line"></i>
+        <div class="action-text">
+          <span class="action-title">Kara Listeye Al</span>
+          <span class="action-desc">Müşteriyi kara listeye ekle</span>
+        </div>
+        <i class="ri-arrow-right-line action-arrow"></i>
+      </button>
+      } @else {
+      <button type="button" class="action-btn success" (click)="removeFromBlacklist()">
+        <i class="ri-checkbox-circle-line"></i>
+        <div class="action-text">
+          <span class="action-title">Kara Listeden Çıkar</span>
+          <span class="action-desc">Müşteriyi kara listeden çıkar</span>
+        </div>
+        <i class="ri-arrow-right-line action-arrow"></i>
+      </button>
+      }
+
+      <!-- FINDEKS -->
+      <button type="button" class="action-btn info" (click)="openFindeksDialog()">
+        <i class="ri-line-chart-line"></i>
+        <div class="action-text">
+          <span class="action-title">Findeks Güncelle</span>
+          <span class="action-desc">Kredi skorunu güncelle</span>
+        </div>
+        <i class="ri-arrow-right-line action-arrow"></i>
+      </button>
+    </div>
+
+    <!-- KARA LİSTE NEDENİ -->
+    @if (c.isBlacklisted && c.blacklistReason) {
+    <div class="blacklist-reason">
+      <i class="ri-error-warning-line"></i>
+      <div>
+        <strong>Kara Liste Sebebi:</strong>
+        <span>{{ c.blacklistReason }}</span>
+      </div>
+    </div>
+    }
+  </p-card>
+
+  <!-- ==================== 3. BİLGİ KARTLARI ==================== -->
+  <div class="info-grid">
+
+    <!-- KİMLİK / ŞİRKET -->
+    @if (c.type === 'Individual') {
+    <p-card class="info-card">
+      <div class="info-card-header">
+        <i class="ri-user-line"></i>
+        <h3>Kimlik Bilgileri</h3>
+      </div>
+
+      <div class="info-list">
+        <div class="info-row">
+          <span class="label">Ad Soyad</span>
+          <span class="value">{{ (c.firstName || '') + ' ' + (c.lastName || '') || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">T.C. Kimlik No</span>
+          <span class="value">{{ c.identityNumber || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Doğum Tarihi</span>
+          <span class="value">{{ formatDate(c.birthDate) }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Yaş</span>
+          <span class="value">{{ c.age ? c.age + ' yaş' : '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Cinsiyet</span>
+          <span class="value">{{ genderLabel() }}</span>
+        </div>
+      </div>
+    </p-card>
+    } @else {
+    <p-card styleClass="info-card">
+      <div class="info-card-header">
+        <i class="ri-building-4-line"></i>
+        <h3>Şirket Bilgileri</h3>
+      </div>
+
+      <div class="info-list">
+        <div class="info-row full">
+          <span class="label">Şirket Adı</span>
+          <span class="value">{{ c.companyName || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Vergi No</span>
+          <span class="value">{{ c.taxNumber || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Vergi Dairesi</span>
+          <span class="value">{{ c.taxOffice || '-' }}</span>
+        </div>
+      </div>
+    </p-card>
+    }
+
+    <!-- İLETİŞİM -->
+    <p-card styleClass="info-card">
+      <div class="info-card-header">
+        <i class="ri-contacts-line"></i>
+        <h3>İletişim Bilgileri</h3>
+      </div>
+
+      <div class="info-list">
+        <div class="info-row">
+          <span class="label">E-posta</span>
+          <span class="value">{{ c.email }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Telefon</span>
+          <span class="value">{{ c.phoneNumber | phoneFormatPipe }}</span>
+        </div>
+        <div class="info-row full">
+          <span class="label">Adres</span>
+          <span class="value">{{ c.address }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Şehir</span>
+          <span class="value">{{ c.city }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Ülke</span>
+          <span class="value">{{ c.country }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Posta Kodu</span>
+          <span class="value">{{ c.postalCode || '-' }}</span>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- EHLİYET (Sadece Individual) -->
+    @if (c.type === 'Individual') {
+    <p-card styleClass="info-card">
+      <div class="info-card-header">
+        <i class="ri-steering-2-line"></i>
+        <h3>Ehliyet Bilgileri</h3>
+        @if (c.hasValidDriverLicense) {
+        <p-tag value="Geçerli" severity="success" [rounded]="true"></p-tag>
+        } @else {
+        <p-tag value="Geçersiz" severity="danger" [rounded]="true"></p-tag>
+        }
+      </div>
+
+      <div class="info-list">
+        <div class="info-row">
+          <span class="label">Ehliyet No</span>
+          <span class="value">{{ c.driverLicenseNumber || '-' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Veriliş Tarihi</span>
+          <span class="value">{{ formatDate(c.driverLicenseIssueDate) }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Ehliyet Sınıfı</span>
+          <span class="value">{{ c.driverLicenseClass || '-' }}</span>
+        </div>
+      </div>
+    </p-card>
+    }
+
+    <!-- FINDEKS -->
+    <p-card styleClass="info-card findeks-card">
+      <div class="info-card-header">
+        <i class="ri-line-chart-line"></i>
+        <h3>Findeks Skoru</h3>
+        @if (c.findeksScore != null) {
+        <p-tag [value]="findeksStatus().label" [severity]="findeksStatus().severity" [rounded]="true">
+        </p-tag>
+        }
+      </div>
+
+      @if (c.findeksScore != null) {
+      <div class="findeks-display">
+        <div class="findeks-score">
+          <span class="score-number">{{ c.findeksScore }}</span>
+          <span class="score-max">/ 1900</span>
+        </div>
+        <div class="findeks-bar">
+          <div class="bar-fill" [style.width.%]="findeksPercent()"></div>
+        </div>
+        <div class="findeks-info">
+          @if (c.canRentLuxury) {
+          <i class="ri-checkbox-circle-fill text-success"></i>
+          <span>Lüks araç kiralayabilir</span>
+          } @else {
+          <i class="ri-information-line text-warning"></i>
+          <span>Lüks araç için min. 1200 skor gerekli</span>
+          }
+        </div>
+      </div>
+      } @else {
+      <div class="findeks-empty">
+        <i class="ri-line-chart-line"></i>
+        <p>Findeks skoru henüz hesaplanmamış</p>
+      </div>
+      }
+    </p-card>
+
+  </div>
+
+  <!-- ==================== 4. ZAMAN BİLGİLERİ ==================== -->
+  <p-card styleClass="info-card">
+    <div class="info-card-header">
+      <i class="ri-time-line"></i>
+      <h3>Zaman Bilgileri</h3>
+    </div>
+
+    <div class="info-list">
+      <div class="info-row">
+        <span class="label">Oluşturulma</span>
+        <span class="value">{{ formatDateTime(c.createdAt) }}</span>
+      </div>
+      @if (c.updatedAt) {
+      <div class="info-row">
+        <span class="label">Son Güncelleme</span>
+        <span class="value">{{ formatDateTime(c.updatedAt) }}</span>
+      </div>
+      }
+    </div>
+  </p-card>
+
+  }
+
+</div>
+
+<app-blacklist-dialog
+  [(visible)]="blacklistDialogVisible"
+  [customerId]="customerId()"
+  [customerName]="fullName()"
+  (onSuccess)="onBlacklistSuccess()">
+  </app-blacklist-dialog>
+
+<app-findeks-dialog
+  [(visible)]="findeksDialogVisible"
+  [customerId]="customerId()"
+  [customerName]="fullName()"
+  [currentScore]="customer()?.findeksScore ?? null"
+  (onSuccess)="onFindeksSuccess()">
+  </app-findeks-dialog>

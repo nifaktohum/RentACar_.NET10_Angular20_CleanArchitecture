@@ -20,7 +20,7 @@ public sealed class GetAllVehiclesSpecification : BaseSpecification<Vehicle>
 
   // 1. TÜM MÜSAİT ARAÇLAR
 public GetAllVehiclesSpecification(VehicleSpecParams? specParams)
-         : base(VehicleFilterExtensions.BuildFilter(specParams, includeAll: true))// includeAll: true ==> Tüm araçları getir. musait olmayanlarda!
+         : base(VehicleFilterExtensions.BuildFilter(specParams, includeAll: true))// includeAll: true ==> Tüm Araçları getir. musait olmayanlarda!
   {
     AddInclude(v => v.VehicleModel);
     AddInclude(v => v.VehicleModel.VehicleType);

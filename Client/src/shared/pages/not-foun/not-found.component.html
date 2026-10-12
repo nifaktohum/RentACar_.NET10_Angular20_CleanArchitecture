@@ -1,0 +1,38 @@
+<div class="container">
+
+  <!-- İkon -->
+  <div class="icon-wrapper  animate__bounce">
+    <i class="ri-prohibited-2-line"></i>
+  </div>
+
+  <!-- 404 -->
+  <div class="error-code animate__animated">
+    <div class="error-code-forty animate__animated animate__slideInLeft">4</div>
+    <div class="error-code-forty animate__animated animate__slideInUp">0</div>
+    <div class="error-code-for animate__animated animate__slideInRight">4</div>
+  </div>
+
+  <!-- Başlık -->
+  <h1 class="error-message animate__animated animate__fadeInUp">
+    Sayfa Bulunamadı
+  </h1>
+
+  <!-- Açıklama -->
+  <p class="error-description animate__animated animate__fadeInUp animate__delay-1s">
+    Üzgünüz, aradığınız sayfa mevcut değil veya taşınmış olabilir.
+  </p>
+
+  <!-- Butonlar -->
+  <div class="actions animate__animated animate__fadeInUp animate__delay-2s">
+    <a routerLink="/" class="btn btn--primary animate__animated animate__pulse animate__infinite">
+      <i class="ri-home-4-line"></i>
+      Ana Sayfaya Dön
+    </a>
+
+    <button type="button" class="btn btn--ghost" (click)="goBack()">
+      <i class="ri-arrow-left-line"></i>
+      Geri Git
+    </button>
+  </div>
+
+</div>

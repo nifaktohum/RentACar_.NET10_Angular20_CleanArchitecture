@@ -46,9 +46,11 @@
               }
             ],
             "styles": [
+              "node_modules/animate.css/animate.css",
               "src/styles.scss",
               "node_modules/remixicon/fonts/remixicon.css",
               "node_modules/primeicons/primeicons.css"
+             
             ]
           },
           "configurations": {

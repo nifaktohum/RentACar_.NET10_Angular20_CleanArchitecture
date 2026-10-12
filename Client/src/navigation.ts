@@ -51,7 +51,7 @@ export const navigations: NavigationModel[] =
           haveSubMenu: false
         },
         {
-          title: "Araç Modelleri",  
+          title: "Araç Modelleri",
           url: "/admin/vehicles/vehicle-models",
           icon: "ri-stack-line",
           role: "VehicleModels.Read",
@@ -120,7 +120,7 @@ export const navigations: NavigationModel[] =
           haveSubMenu: false
         },
         {
-          title: 'Kapsam Kategorileri',  
+          title: 'Kapsam Kategorileri',
           url: '/admin/protection-packages/benefit-categories',
           icon: 'ri-price-tag-3-line',
           role: 'BenefitCategories.Read',
@@ -204,9 +204,20 @@ export const navigations: NavigationModel[] =
       role: 'Customers.Read',
       haveSubMenu: true,
       subMenus: [
-        { title: 'Müşteri Listesi', url: '/admin/customers', role: 'Customers.Read' },
-        { title: 'Müşteri Ekle', url: '/admin/customers/add', role: 'Customers.Create' },
-        { title: 'Kara Liste', url: '/admin/customers/blacklist', role: 'Customers.Read' }
+        {
+          title: 'Müşteri Listesi',
+          url: '/admin/customers',
+          icon: 'ri-list-check',
+          role: 'Customers.Read',
+          haveSubMenu: false
+        },
+        {
+          title: 'Kara Liste',
+          url: '/admin/customers/blacklist',  
+          icon: 'ri-forbid-2-line',
+          role: 'Customers.Read',
+          haveSubMenu: false
+        }
       ],
     },
     // Branches

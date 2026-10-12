@@ -8,7 +8,7 @@ export class TogglePasswordDirective {
   private el = inject(ElementRef);
   private renderer = inject(Renderer2);
 
-  // // 🔥 Angular'daki Remix Icon veya tıkladığın göz elementini buraya paslayacağız kanka
+  // // 🔥 Angular'daki Remix Icon veya tıkladığın göz elementini buraya paslayacağız
   @Input('togglePasswordDirective') targetIcon!: HTMLElement;
 
   // // 🔥 İŞTE SİGNAL'İMİZ: Varsayılan olarak şifre gizli (false)
@@ -21,7 +21,7 @@ export class TogglePasswordDirective {
       const isVisible = this.isPasswordVisible();
       const inputType = isVisible ? 'text' : 'password';
 
-      // 1. Input'un tipini güvenle değiştiriyoruz kanka
+      // 1. Input'un tipini güvenle değiştiriyoruz
       this.renderer.setAttribute(this.el.nativeElement, 'type', inputType);
 
       // 2. Remix Icon sınıflarını signal durumuna göre güncelliyoruz
@@ -29,7 +29,7 @@ export class TogglePasswordDirective {
         if (isVisible) {
           this.renderer.removeClass(this.targetIcon, 'ri-eye-off-line');
           this.renderer.addClass(this.targetIcon, 'ri-eye-line');
-          // Renk dokunuşu (İstersen 'crimson' veya tam '#ff4d4d' gibi şık bir kırmızı hex kodu da yazabilirsin kanka)
+          // Renk dokunuşu (İstersen 'crimson' veya tam '#ff4d4d' gibi şık bir kırmızı hex kodu da yazabilirsin)
           this.renderer.setStyle(this.targetIcon, 'color', '#008000');
         } else {
           this.renderer.removeClass(this.targetIcon, 'ri-eye-line');
@@ -38,7 +38,7 @@ export class TogglePasswordDirective {
           this.renderer.setStyle(this.targetIcon, 'color', '#ff0000');
         }
 
-        // İkonun geçişini yumuşatmak için küçük bir CSS transition efekti kanka
+        // İkonun geçişini yumuşatmak için küçük bir CSS transition efekti
         // this.renderer.setStyle(this.targetIcon, 'transition', '.4s ease-in-out');
       }
     });

@@ -1,0 +1,283 @@
+<div class="register-wrapper">
+  <div class="register-container">
+    <div class="register-card">
+
+      <!-- ==================== SOL: FORM ==================== -->
+      <div class="register-form-side">
+
+        <!-- HEADER -->
+        <div class="register-header">
+          <div class="brand">
+            <i class="ri-car-fill"></i>
+            <h1>RentCar</h1>
+            <span class="label">Kurumsal Kayıt</span>
+          </div>
+
+          <a routerLink="/customer-auth/customer-login" class="back-link">
+            <i class="ri-arrow-left-line"></i>
+            Giriş Sayfasına Dön
+          </a>
+
+          <div class="register-title">
+            <h2>Kurumsal Hesap Oluştur</h2>
+            <p>Şirketiniz için hemen hesap açın</p>
+          </div>
+        </div>
+
+        <!-- ==================== TEK SAYFA FORM ==================== -->
+        <form #form="ngForm" (ngSubmit)="onSubmit(form)" autocomplete="off" class="register-form">
+
+          <!-- ==================== BÖLÜM: ŞİRKET BİLGİLERİ ==================== -->
+          <div class="form-section">
+            <div class="section-header">
+              <i class="ri-building-2-line"></i>
+              <h3>Şirket Bilgileri</h3>
+            </div>
+
+            <!-- ŞİRKET ADI -->
+            <div class="form-group">
+              <label class="form-label">Şirket Adı / Ünvan <span class="required">*</span></label>
+              <div class="input-custom-group">
+                <span class="input-icon"><i class="ri-building-2-line"></i></span>
+                <input type="text" name="companyName" [ngModel]="formData().companyName"
+                  (ngModelChange)="updateField('companyName', $event)" placeholder="Lütfen firma adını giriniz."
+                  required maxlength="200" />
+              </div>
+            </div>
+
+            <!-- VERGİ NO + DAİRESİ -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Vergi Numarası (VKN) <span class="required">*</span></label>
+                <div class="input-custom-group">
+                  <span class="input-icon"><i class="ri-file-list-3-line"></i></span>
+                  <input type="text" name="taxNumber" [ngModel]="formData().taxNumber"
+                    (ngModelChange)="updateField('taxNumber', $event)" placeholder="VKN" required
+                    maxlength="10" minlength="10" pattern="^[0-9]+$" (keypress)="onlyNumbers($event)" inputmode="numeric" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Vergi Dairesi <span class="required">*</span></label>
+                <div class="input-custom-group">
+                  <span class="input-icon"><i class="ri-government-line"></i></span>
+                  <input type="text" name="taxOffice" [ngModel]="formData().taxOffice"
+                    (ngModelChange)="updateField('taxOffice', $event)" placeholder="Örn: Nilüfer Vergi Dairesi" required
+                    maxlength="100" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== BÖLÜM: İLETİŞİM ==================== -->
+          <div class="form-section">
+            <div class="section-header">
+              <i class="ri-contacts-line"></i>
+              <h3>İletişim Bilgileri</h3>
+            </div>
+
+            <!-- EMAIL -->
+            <div class="form-group">
+              <label class="form-label">E-posta Adresi <span class="required">*</span></label>
+              <div class="input-custom-group">
+                <span class="input-icon"><i class="ri-mail-line"></i></span>
+                <input type="email" name="email" [ngModel]="formData().email"
+                  (ngModelChange)="updateField('email', $event)" placeholder="ornek@sirket.com" required
+                  [emailValidationDirective]="emailError" />
+              </div>
+              <p #emailError class="error-container"></p>
+            </div>
+
+            <!-- TELEFON -->
+            <div class="form-group">
+              <label class="form-label">Telefon Numarası <span class="required">*</span></label>
+              <div class="input-custom-group">
+                <span class="input-icon"><i class="ri-phone-line"></i></span>
+                <input type="text" name="phoneNumber" [ngModel]="formData().phoneNumber | phoneFormatPipe"
+                  minlength="13" maxlength="19" (ngModelChange)="onPhoneChange($event)"
+                  placeholder="+90 (5XX) XXX XX XX" required />
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== BÖLÜM: ŞİFRE ==================== -->
+          <div class="form-section">
+            <div class="section-header">
+              <i class="ri-lock-password-line"></i>
+              <h3>Hesap Şifresi</h3>
+            </div>
+
+            <div class="form-row-pas">
+              <div class="form-group">
+                <label class="form-label">Şifre <span class="required">*</span></label>
+                <div class="input-custom-group">
+                  <span class="input-icon"><i class="ri-lock-line"></i></span>
+                  <input type="password" name="password" id="password" [ngModel]="formData().password"
+                    (ngModelChange)="updateField('password', $event)" placeholder="Şifrenizi girin" required
+                    [passwordValidationDirective]="passwordError" [togglePasswordDirective]="eyeIcon"
+                    #passwordToggle="toggleDir" #passwordInput />
+                  <button type="button" class="password-toggle" (click)="passwordToggle.toggle()">
+                    <i #eyeIcon class="ri-eye-off-line"></i>
+                  </button>
+                </div>
+                <p #passwordError class="error-container"></p>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Şifre Tekrar <span class="required">*</span></label>
+                <div class="input-custom-group">
+                  <span class="input-icon"><i class="ri-lock-line"></i></span>
+                  <input type="password" name="confirmPassword" [ngModel]="formData().confirmPassword"
+                    (ngModelChange)="updateField('confirmPassword', $event)" placeholder="Şifrenizi tekrar girin"
+                    required [togglePasswordDirective]="confirmEyeIcon" #confirmPasswordToggle="toggleDir"
+                    [confirmPasswordValidationDirective]="confirmPasswordError" [mainPasswordInput]="passwordInput" />
+                  <button type="button" class="password-toggle" (click)="confirmPasswordToggle.toggle()">
+                    <i #confirmEyeIcon class="ri-eye-off-line"></i>
+                  </button>
+                </div>
+                <p #confirmPasswordError class="error-container"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== BÖLÜM: ADRES ==================== -->
+          <div class="form-section">
+            <div class="section-header">
+              <i class="ri-map-pin-2-line"></i>
+              <h3>Şirket Adresi</h3>
+            </div>
+
+            <!-- ADRES -->
+            <div class="form-group">
+              <label class="form-label">Açık Adres <span class="required">*</span></label>
+              <div class="input-custom-group textarea">
+                <span class="input-icon"><i class="ri-map-pin-line"></i></span>
+                <textarea name="address" [ngModel]="formData().address" (ngModelChange)="updateField('address', $event)"
+                  placeholder="Şirket açık adresini girin" rows="2" required maxlength="500">
+                </textarea>
+              </div>
+            </div>
+
+            <!-- İL / İLÇE -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">İl <span class="required">*</span></label>
+                <p-select name="city" [(ngModel)]="selectedCityCode" [options]="cities" optionLabel="name"
+                  optionValue="code" placeholder="İl seçiniz" [filter]="true" filterBy="name"
+                  (onChange)="onCityChange($event.value)" [style]="{ width: '100%' }" required>
+                </p-select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">İlçe <span class="required">*</span></label>
+                <p-select name="district" [(ngModel)]="selectedDistrict" [options]="districts" optionLabel="name"
+                  optionValue="name" placeholder="İlçe seçiniz" [filter]="true" filterBy="name"
+                  [disabled]="!selectedCityCode" (onChange)="onDistrictChange($event.value)" [style]="{ width: '100%' }"
+                  required>
+                </p-select>
+              </div>
+            </div>
+
+            <!-- ÜLKE / POSTA KODU -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Ülke <span class="required">*</span></label>
+                <div class="input-custom-group">
+                  <span class="input-icon"><i class="ri-earth-line"></i></span>
+                  <input type="text" name="country" [ngModel]="formData().country"
+                    (ngModelChange)="updateField('country', $event)" placeholder="Ülke" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Posta Kodu</label>
+                <div class="input-custom-group">
+                  <span class="input-icon"><i class="ri-hashtag"></i></span>
+                  <input type="text" name="postalCode" [ngModel]="formData().postalCode"
+                    (ngModelChange)="updateField('postalCode', $event)" placeholder="Posta Kodu" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== TERMS ==================== -->
+          <div class="terms-checkbox">
+            <p-checkbox name="terms" [ngModel]="termsAccepted()" (ngModelChange)="termsAccepted.set($event)"
+              [binary]="true" inputId="terms" required>
+            </p-checkbox>
+            <label for="terms">
+              <a href="#" target="_blank">Kullanım Koşulları</a> ve
+              <a href="#" target="_blank">Gizlilik Politikası</a>'nı okudum, kabul ediyorum.
+            </label>
+          </div>
+
+          <!-- ==================== ACTIONS ==================== -->
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary full"
+              [disabled]="loading() || !termsAccepted() || form.invalid">
+              @if (loading()) {
+              <i class="ri-loader-4-line spinning"></i>
+              Kayıt yapılıyor...
+              } @else {
+              <i class="ri-check-line"></i>
+              Kurumsal Hesap Oluştur
+              }
+            </button>
+          </div>
+        </form>
+
+        <!-- FOOTER -->
+        <div class="register-footer">
+          <p>Zaten hesabınız var mı?
+            <a (click)="goToLogin()" class="login-link">Giriş yapın</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== SAĞ: BİLGİ PANELİ ==================== -->
+      <div class="register-info-side">
+        <div class="info-content">
+          <div class="info-header">
+            <div class="icon-badge">
+              <i class="ri-building-4-line"></i>
+            </div>
+            <h3>Kurumsal Çözümler</h3>
+            <p>Şirketiniz için özel filo kiralama</p>
+          </div>
+
+          <div class="features">
+            <div class="feature-item">
+              <i class="ri-file-list-3-fill"></i>
+              <div>
+                <h6>Kurumsal Fatura</h6>
+                <p>E-fatura ve kurumsal ödeme kolaylığı</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="ri-percent-fill"></i>
+              <div>
+                <h6>Özel İndirimler</h6>
+                <p>Kurumsal müşterilere özel fiyatlar</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="ri-team-fill"></i>
+              <div>
+                <h6>Filo Yönetimi</h6>
+                <p>Şirket araçlarınızı tek panelden yönetin</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="ri-customer-service-2-fill"></i>
+              <div>
+                <h6>Özel Hesap Yöneticisi</h6>
+                <p>Size özel kurumsal destek hattı</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

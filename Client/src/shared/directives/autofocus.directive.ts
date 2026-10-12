@@ -7,10 +7,13 @@ export class AutofocusDirective implements AfterViewInit {
   private el = inject(ElementRef);
 
   ngAfterViewInit() {
-    // // 🔥 Sihirli dokunuş: DOM tamamen yüklendiği an elementi yakalayıp odağı çakıyoruz kanka!
-    // // setTimeout kullanmamızın sebebi Angular'ın render döngüsünü (ExpressionChangedAfterItHasBeenCheckedError) riske atmamak.
     setTimeout(() => {
       this.el.nativeElement.focus();
     }, 50);
   }
 }
+
+/*
+    imleci kutunun içinde yakıp söndürmeye başlar. 
+    Kullanıcıya tıkla-yaz hamlesi yapmaz, direkt yazmaya başlasın diye arkada yaparım.
+*/

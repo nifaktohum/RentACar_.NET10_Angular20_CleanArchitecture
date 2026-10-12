@@ -64,12 +64,19 @@ export const ADMIN_ROUTES: Routes = [
         canActivate: [permissionAuthGuard],
         data: { requiredPermission: 'Rental.Read' }
       },
-      // --- RENTAL --- 
+      // --- VEHİCLE --- 
       {
         path: 'vehicles',
         loadChildren: () => import('./features/vehicles/vehicle.routes').then(m => m.VEHICLE_ROUTES),
         canActivate: [permissionAuthGuard],
         data: { requiredPermission: 'Vehicle.Read' }
+      },
+      // --- CUSTOMER --- 
+      {
+        path: 'customers',
+        loadChildren: () => import('./features/customers/customers.routes').then(m => m.CUSTOMER_ROUTES),
+        canActivate: [permissionAuthGuard],
+        data: { requiredPermission: 'Customers.Read' }
       }
     ]
   },

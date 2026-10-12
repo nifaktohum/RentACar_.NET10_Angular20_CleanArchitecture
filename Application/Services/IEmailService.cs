@@ -7,6 +7,6 @@ namespace Application.Services;
 
 public interface IEmailService
 {
-  // // 🔥 Kurumsal mail motorumuzun asenkron kontratı kanka
   Task SendEmailAsync(string to, string subject, string body);
+  Task<bool> SendVerificationCodeAsync(string to, string code, CancellationToken cancellationToken = default);
 }

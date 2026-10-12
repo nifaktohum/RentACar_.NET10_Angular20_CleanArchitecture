@@ -4,7 +4,14 @@ namespace Application.Specifications;
 
 public record VehicleSpecParams : BasePagedRequest
 {
-  public string? Sort { get; set; }
+  // public string? Sort { get; set; }
+
+  private string? _sort;
+  public string? Sort
+  {
+    get => _sort;
+    set => _sort = string.IsNullOrWhiteSpace(value) ? null : value.Trim().ToLower();
+  }
 
   private List<string> _brands = [];   // Gelen ham verileri arka planda güvenle saklar.
   public List<string> Brands      // dış dünyaya açılan kapı Vehicles property'si

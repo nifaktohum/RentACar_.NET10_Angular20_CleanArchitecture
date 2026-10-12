@@ -32,7 +32,6 @@ public static class DependencyInjection
     _services.AddScoped<IUserContext, UserContext>();
     _services.AddScoped<IPasswordHasher, PasswordHasher>();
     _services.AddScoped<IJwtProvider, JwtProvider>();
-    _services.AddScoped<IEmailService, EmailService>();
     _services.AddScoped<IRoleRepository, RoleRepository>();
     _services.AddScoped<IProtectionPackageRepository, ProtectionPackageRepository>();
     _services.AddScoped<IProtectionBenefitRepository, ProtectionBenefitRepository>();
@@ -44,6 +43,9 @@ public static class DependencyInjection
     _services.AddRateLimiter();
     _services.ConfigureOptions<JwtSetupOptions>();
     _services.ConfigureOptions<RateLimiterSetupOptions>();
+    // Twilio ayarlarını IConfiguration üzerinden oku ve TwilioSettings nesnesine bağla
+    // _services.Configure<TwilioSettings>(_config.GetSection(TwilioSettings.SectionName));
+    _services.Configure<IletimerkeziSettings>(_config.GetSection(IletimerkeziSettings.SectionName));
 
     // Kimlik doğrulama şemasını sisteme bomboş tanıtıyoruz, ayarları zaten JwtSetupOptions yapacak 
     _services.AddAuthentication(options =>
@@ -87,9 +89,12 @@ public static class DependencyInjection
     // =============================================================================
     // Proje büyüdükçe buraya yeni repository'ler eklenecek.
     // En altta toplu durmaları kod takibini kolaylaştırır.
+    // _services.AddTransient<ISmsService, SmsTwilioService>();
+    _services.AddTransient<IEmailService, EmailService>();
+    _services.AddHttpClient<ISmsService, IletimerkeziSmsService>();
+
     _services.AddScoped<IUserRepository, UserRepository>();
     _services.AddScoped<IBranchRepository, BranchRepository>();
-    _services.AddScoped<ISmsService, SmsTwilioService>();
     _services.AddScoped<IPermissionRepository, PermissionRepository>();
     _services.AddScoped<ICategoryRepository, CategoryRepository>();
     _services.AddScoped<IExtraRepository, ExtraRepository>();
@@ -100,6 +105,8 @@ public static class DependencyInjection
     _services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
     _services.AddScoped<IFileSlugifyService, FileSlugifyService>();
     _services.AddScoped<IVehicleImageService, VehicleImageService>();
+    _services.AddScoped<ICustomerRepository, CustomerRepository>();
+    _services.AddScoped<ICustomerContext, CustomerContext>();
 
     return _services;
   }

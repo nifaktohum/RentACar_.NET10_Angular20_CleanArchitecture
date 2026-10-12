@@ -10,8 +10,8 @@
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />    <!-- tüm validator sınıflarını tek bir satırla IoC Container'a kaydeder -->
     <!-- filter = filter.And(v => brands.Contains(v.Brand.ToLower())); .And ==>  İki Expression<Func<T, bool>> ifadesini güvenli bir şekilde && ile birleştirmek için ya LinqKit kütüphanesini kullanman gerekir --> 
-    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="10.0.11" /> <!--  -->
-    <PackageReference Include="Mapster" Version="10.0.7" />  <!-- nesneleri birbirine dönüştürme -->
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="10.0.11" /> <!--  -->  <!-- nesneleri birbirine dönüştürme --> 
+    <PackageReference Include="Mapster" Version="10.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />  
     <PackageReference Include="TS.Result" Version="10.0.0" />

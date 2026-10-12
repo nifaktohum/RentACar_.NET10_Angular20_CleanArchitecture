@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 using Application.Services;
 using Microsoft.Extensions.Configuration;
 
@@ -48,5 +44,37 @@ public sealed class EmailService(IConfiguration _config ) : IEmailService
 
     // 🚀 Ve zurnanın hırt dediği yerde maili şak diye fırlatıyoruz kanka!
     await smtpClient.SendMailAsync(mailMessage);
+  }
+
+  public async Task<bool> SendVerificationCodeAsync(string to, string code, CancellationToken cancellationToken = default)
+  {
+    try
+    {
+      // 3-3 bölerek görsel okunabilirliği zirveye çıkarıyoruz (Örn: "482-915")
+      string formattedCode = $"{code[..3]}-{code[3..]}";
+
+      string subject = "Rent A Car - E-Posta Doğrulama Kodu";
+
+      string body = $@"
+            <div style='font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; border: 1px solid #eee; border-radius: 8px;'>
+                <h2 style='color: #2c3e50; text-align: center;'>Doğrulama Kodunuz</h2>
+                <p style='text-align: center;'>Merhaba,</p>
+                <p style='text-align: center;'>Rent A Car hesabınızı doğrulamak için aşağıdaki kodu kullanabilirsin:</p>
+                
+                <!-- Tek bakışta okunabilir büyük ve tireli tasarım -->
+                <div style='background-color: #f8f9fa; border: 1px dashed #007bff; padding: 15px; font-size: 32px; font-weight: bold; letter-spacing: 4px; text-align: center; color: #007bff; margin: 20px 0; border-radius: 6px;'>
+                    {formattedCode}
+                </div>
+
+                <p style='font-size: 13px; color: #777;'>Bu kod güvenliğiniz için 5 dakika boyunca geçerlidir.</p>
+            </div>";
+
+      await SendEmailAsync(to, subject, body);
+      return true;
+    }
+    catch
+    {
+      return false;
+    }
   }
 }

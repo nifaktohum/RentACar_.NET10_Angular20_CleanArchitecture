@@ -1,0 +1,194 @@
+// ==========================================
+// Ana Bileşen
+// ==========================================
+.container {
+  max-width: 600px;
+  margin: 150px auto 0;
+  font-family: var(--font-family-main);
+  color: var(--text-dark);
+  text-align: center;
+
+  // ---------- İkon ----------
+  .icon-wrapper {
+    margin-bottom: 30px;
+
+    i {
+      font-size: 120px;
+        color: var(--admin-danger);
+      opacity: 0.9;
+    }
+  }
+
+  // ---------- 404 Kodu ----------
+  .error-code {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 120px;
+    font-weight: bold;
+    line-height: 1;
+    color: var(--primary-color);
+    text-shadow: 0 5px 20px rgba(0, 210, 255, 0.3);
+  }
+
+  // ---------- Başlık ----------
+  .error-message {
+    margin-bottom: 15px;
+    font-size: var(--font-size-xxl);
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+
+  // ---------- Açıklama ----------
+  .error-description {
+    margin-bottom: 40px;
+    font-size: var(--font-size-lg);
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  // ---------- Buton Grubu ----------
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+}
+
+// ==========================================
+// Buton
+// ==========================================
+.btn {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  padding: 15px 35px;
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+
+  i { font-size: 20px; }
+
+  &:hover  { transform: translateY(-3px); }
+  &:active { transform: translateY(0); }
+  &:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 3px;
+  }
+
+  &--primary {
+    color: var(--white);
+    background: var(--primary-color);
+    box-shadow: 0 10px 30px rgba(0, 210, 255, 0.25);
+--animate-duration: 2s;
+    &:hover {
+      background: var(--primary-dark);
+      box-shadow: 0 15px 40px rgba(0, 168, 204, 0.35);
+    }
+  }
+
+  &--ghost {
+    color: var(--primary-color);
+    background: transparent;
+    border-color: var(--primary-color);
+
+    &:hover { background: var(--bg-light); }
+  }
+}
+
+// ==========================================
+// Admin Teması
+// ==========================================
+:host-context(.admin-theme) {
+  .container {
+    color: var(--admin-text);
+
+    .icon-wrapper i { color: var(--admin-accent); }
+
+    .error-code {
+      color: var(--admin-accent);
+      text-shadow: 0 5px 20px rgba(56, 189, 248, 0.35);
+    }
+
+    .error-message { color: var(--admin-text); }
+    .error-description { color: var(--admin-text-muted); }
+  }
+
+  .btn {
+    &--primary {
+      color: var(--admin-white);
+      background: var(--admin-accent);
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.25);
+
+      &:hover {
+        background: var(--admin-accent-dark);
+        box-shadow: 0 15px 40px rgba(2, 132, 199, 0.35);
+      }
+    }
+
+    &--ghost {
+      color: var(--admin-text);
+      border-color: var(--admin-border);
+
+      &:hover { background: var(--admin-light); }
+    }
+
+    &:focus-visible { outline-color: var(--admin-accent); }
+  }
+}
+
+// ==========================================
+// Responsive
+// ==========================================
+@media (max-width: 768px) {
+  .container {
+    margin-top: 80px;
+
+    .icon-wrapper i { font-size: 80px; }
+    .error-code { font-size: 80px; }
+    .error-message { font-size: var(--font-size-xl); }
+    .error-description { font-size: var(--font-size-base); }
+  }
+
+  .actions {
+    flex-direction: column;
+    width: 100%;
+
+  }
+  
+  .btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+.animate__bounce{
+  animation: bounce 5s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-40px);
+  }
+}
+
+// ==========================================
+// Erişilebilirlik — animate.css'i de kapsar
+// ==========================================
+@media (prefers-reduced-motion: reduce) {
+  .container * {
+    animation: none !important;
+  }
+}
+

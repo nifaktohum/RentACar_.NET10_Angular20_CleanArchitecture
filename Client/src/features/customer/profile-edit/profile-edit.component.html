@@ -1,0 +1,345 @@
+<div class="edit-wrapper">
+
+  <!-- ==================== SAYFA BAŞLIĞI ==================== -->
+  <div class="page-header">
+    <div class="page-title">
+      <i class="ri-edit-box-line"></i>
+      <div>
+        <h1>{{ pageTitle() }}</h1>
+        <p>Bilgilerinizi güncelleyebilirsiniz</p>
+      </div>
+    </div>
+
+    <a routerLink="/customer/profile" class="btn-back">
+      <i class="ri-arrow-left-line"></i>
+      <span>Profile Dön</span>
+    </a>
+  </div>
+
+  <!-- ==================== LOADING ==================== -->
+  @if (isLoading()) {
+  <div class="edit-loading">
+    <p-skeleton height="200px" borderRadius="16px"></p-skeleton>
+    <p-skeleton height="200px" borderRadius="16px"></p-skeleton>
+    <p-skeleton height="200px" borderRadius="16px"></p-skeleton>
+  </div>
+  }
+
+  <!-- ==================== FORM ==================== -->
+  @if (!isLoading() && profile()) {
+  <form #form="ngForm" (ngSubmit)="onSubmit(form)" autocomplete="off" class="edit-form">
+
+    <!-- ==================== KİMLİK / ŞİRKET ==================== -->
+    @if (isIndividual()) {
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="ri-user-line"></i>
+        </div>
+        <div class="section-title">
+          <h2>Kimlik Bilgileri</h2>
+          <p>Kişisel bilgilerinizi güncelleyin</p>
+        </div>
+      </div>
+
+      <div class="section-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Ad <span class="required">*</span></label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-user-line"></i></span>
+              <input type="text" name="firstName" [ngModel]="formModel().firstName"
+                (ngModelChange)="updateField('firstName', $event)" placeholder="Adınızı girin" required
+                maxlength="100" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Soyad <span class="required">*</span></label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-user-line"></i></span>
+              <input type="text" name="lastName" [ngModel]="formModel().lastName"
+                (ngModelChange)="updateField('lastName', $event)" placeholder="Soyadınızı girin" required
+                maxlength="100" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">T.C. Kimlik No <span class="required">*</span></label>
+          <div class="input-custom-group">
+            <span class="input-icon"><i class="ri-id-card-line"></i></span>
+            <input
+              type="text"
+              name="identityNumber"
+              [ngModel]="formModel().identityNumber"
+              (ngModelChange)="updateField('identityNumber', $event)"
+              placeholder="11 haneli T.C. Kimlik No"
+              required
+              maxlength="11"
+              minlength="11"
+              pattern="^[0-9]{11}$"
+              (keypress)="onlyNumbers($event)"
+              inputmode="numeric" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Doğum Tarihi <span class="required">*</span></label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-calendar-line"></i></span>
+              <input type="text" name="birthDate" [ngModel]="formModel().birthDate"
+                (ngModelChange)="updateField('birthDate', $event)" placeholder="GG/AA/YYYY" maxlength="10" required
+                PrimeDateMaskDirective />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cinsiyet</label>
+            <p-select name="gender" [ngModel]="formModel().gender" (ngModelChange)="updateField('gender', $event)"
+              [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Seçiniz" appendTo="body"
+              [showClear]="true" [style]="{ width: '50%' }">
+            </p-select>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    @if (isCorporate()) {
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="ri-building-4-line"></i>
+        </div>
+        <div class="section-title">
+          <h2>Şirket Bilgileri</h2>
+          <p>Kurumsal hesap bilgilerinizi güncelleyin</p>
+        </div>
+      </div>
+
+      <div class="section-body">
+        <div class="form-group">
+          <label class="form-label">Şirket Adı / Ünvan <span class="required">*</span></label>
+          <div class="input-custom-group">
+            <span class="input-icon"><i class="ri-building-2-line"></i></span>
+            <input type="text" name="companyName" [ngModel]="formModel().companyName"
+              (ngModelChange)="updateField('companyName', $event)" placeholder="Şirket adı" required maxlength="200" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Vergi Numarası <span class="required">*</span></label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-file-list-3-line"></i></span>
+              <input type="text" name="taxNumber" [ngModel]="formModel().taxNumber"
+                (ngModelChange)="updateField('taxNumber', $event)" placeholder="VKN" required maxlength="20"
+                pattern="^[0-9]+$" (keypress)="onlyNumbers($event)" inputmode="numeric" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Vergi Dairesi <span class="required">*</span></label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-government-line"></i></span>
+              <input type="text" name="taxOffice" [ngModel]="formModel().taxOffice"
+                (ngModelChange)="updateField('taxOffice', $event)" placeholder="Vergi dairesi" required
+                maxlength="100" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- ==================== İLETİŞİM ==================== -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="ri-contacts-line"></i>
+        </div>
+        <div class="section-title">
+          <h2>İletişim Bilgileri</h2>
+          <p>Size nasıl ulaşabileceğimizi güncelleyin</p>
+        </div>
+      </div>
+
+      <div class="section-body">
+        <div class="form-group">
+          <label class="form-label">Telefon Numarası <span class="required">*</span></label>
+          <div class="input-custom-group">
+            <span class="input-icon"><i class="ri-phone-line"></i></span>
+            <input type="text" name="phoneNumber" [ngModel]="formModel().phoneNumber | phoneFormatPipe" minlength="13"
+              maxlength="19" (ngModelChange)="onPhoneChange($event)" placeholder="+90 (5XX) XXX XX XX" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Adres <span class="required">*</span></label>
+          <div class="input-custom-group textarea">
+            <span class="input-icon"><i class="ri-map-pin-line"></i></span>
+            <textarea name="address" [ngModel]="formModel().address" (ngModelChange)="updateField('address', $event)"
+              placeholder="Açık adresinizi girin" rows="2" required maxlength="500">
+              </textarea>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <!-- <label class="form-label">Şehir <span class="required">*</span></label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-building-line"></i></span>
+              <input type="text" name="city" [ngModel]="formModel().city" (ngModelChange)="updateField('city', $event)"
+                placeholder="İl" required />
+            </div> -->
+
+            <label class="form-label">İl <span class="required">*</span></label>
+            <p-select
+              name="city"
+              [(ngModel)]="selectedCityCode"
+              [options]="cities"
+              optionLabel="name"
+              optionValue="code"
+              placeholder="İl seçiniz"
+              filterBy="name"
+              appendTo="body"
+              (onChange)="onCityChange($event.value)"
+              required>
+              </p-select>
+          </div>
+
+          <!-- İlçe Seçimi (İl Seçimine Bağımlı) -->
+          <div class="form-group">
+            <label class="form-label">İlçe <span class="required">*</span></label>
+            <p-select
+              name="district"
+              [(ngModel)]="selectedDistrict"
+              [options]="districts"
+              optionLabel="name"
+              optionValue="name"
+              placeholder="İlçe seçiniz"
+              filterBy="name"
+              appendTo="body"
+              [disabled]="!selectedCityCode"
+              (onChange)="onDistrictChange($event.value)"
+              required>
+              </p-select>
+          </div>
+
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Ülke <span class="required">*</span></label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-earth-line"></i></span>
+              <input type="text" name="country" [ngModel]="formModel().country"
+                (ngModelChange)="updateField('country', $event)" placeholder="Ülke" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Posta Kodu</label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-hashtag"></i></span>
+              <input type="text" name="postalCode" [ngModel]="formModel().postalCode"
+                (ngModelChange)="updateField('postalCode', $event)" placeholder="Posta kodu" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== EHLİYET ==================== -->
+    @if (isIndividual()) {
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-icon">
+          <i class="ri-steering-2-line"></i>
+        </div>
+        <div class="section-title">
+          <h2>Ehliyet Bilgileri</h2>
+          <p>Araç kiralamak için gerekli</p>
+        </div>
+      </div>
+
+      <div class="section-body">
+        <div class="form-group">
+          <label class="form-label">Ehliyet Numarası</label>
+          <div class="input-custom-group">
+            <span class="input-icon"><i class="ri-file-user-line"></i></span>
+            <input type="text" name="driverLicenseNumber" [ngModel]="formModel().driverLicenseNumber"
+              (ngModelChange)="updateField('driverLicenseNumber', $event)" placeholder="Ehliyet numaranız"
+              maxlength="6" minlength="6"/>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Veriliş Tarihi</label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-calendar-line"></i></span>
+              <input type="text" name="driverLicenseIssueDate" [ngModel]="formModel().driverLicenseIssueDate"
+                (ngModelChange)="updateField('driverLicenseIssueDate', $event)" placeholder="GG/AA/YYYY" maxlength="10"
+                PrimeDateMaskDirective />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ehliyet Sınıfı</label>
+            <p-select
+              name="driverLicenseClass"
+              [ngModel]="formModel().driverLicenseClass"
+              (ngModelChange)="updateField('driverLicenseClass', $event)"
+              [options]="driverLicenseClassOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Ehliyet Sınıfı Seçiniz"
+              [showClear]="true"
+              filterPlaceholder="Ara..."
+              [appendTo]="'body'"
+              [style]="{ width: '100%' }">
+              </p-select>
+            <!-- <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-award-line"></i></span>
+              <input
+                type="text"
+                name="driverLicenseClass"
+                [ngModel]="formModel().driverLicenseClass"
+                (ngModelChange)="updateField('driverLicenseClass', $event)"
+                placeholder="Örn: B, C, D"
+                maxlength="10" />
+            </div> -->
+          </div>
+        </div>
+
+        <div class="info-note">
+          <i class="ri-information-line"></i>
+          <span>Araç kiralamak için en az 1 yıllık ehliyet gereklidir. Ehliyet bilgileriniz doğrulanacaktır.</span>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- ==================== ACTION BUTTONS ==================== -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isSaving()">
+        <i class="ri-close-line"></i>
+        <span>Vazgeç</span>
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isSaving() || form.invalid">
+        @if (isSaving()) {
+        <i class="ri-loader-4-line spinning"></i>
+        <span>Kaydediliyor...</span>
+        } @else {
+        <i class="ri-save-line"></i>
+        <span>Değişiklikleri Kaydet</span>
+        }
+      </button>
+    </div>
+
+  </form>
+  }
+
+</div>

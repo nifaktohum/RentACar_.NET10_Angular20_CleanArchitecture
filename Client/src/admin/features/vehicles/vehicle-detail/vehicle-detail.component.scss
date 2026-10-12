@@ -1,0 +1,327 @@
+
+.vehicle-detail-container {
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+
+    ::ng-deep .p-card {
+        background: var(--admin-white);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+        .p-card-body {
+            padding: 2rem;
+        }
+    }
+}
+
+// ==================== LOADING ====================
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1rem;
+
+    i {
+        font-size: 2.5rem;
+        color: var(--admin-primary);
+
+        &.spin {
+            animation: spin 1s linear infinite;
+        }
+    }
+
+    span {
+        color: var(--admin-text-muted);
+        font-size: 0.9rem;
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+// ==================== HEADER ====================
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .header-left {
+        h2 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--admin-text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            i {
+                color: var(--admin-primary);
+                font-size: 2rem;
+            }
+        }
+
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+
+            .plate-badge {
+                display: inline-block;
+                padding: 0.25rem 0.75rem;
+                background: #e2e8f0;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 0.85rem;
+                color: #1e293b;
+                letter-spacing: 1px;
+            }
+        }
+    }
+
+    .header-right {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+    }
+}
+
+// ==================== CONTENT ====================
+.detail-content {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// ==================== IMAGES ====================
+.images-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .main-image-container {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--admin-light);
+        aspect-ratio: 4/3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-count-badge {
+            position: absolute;
+            bottom: 0.75rem;
+            right: 0.75rem;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            backdrop-filter: blur(4px);
+        }
+    }
+
+    .thumbnail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.5rem;
+
+        .thumbnail-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            aspect-ratio: 1;
+
+            &:hover {
+                border-color: var(--admin-primary);
+                transform: scale(1.05);
+            }
+
+            &.main-thumbnail {
+                border-color: #f59e0b;
+                box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .thumbnail-badge {
+                position: absolute;
+                top: 0.25rem;
+                right: 0.25rem;
+                width: 22px;
+                height: 22px;
+                background: #f59e0b;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.7rem;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+        }
+    }
+
+    .no-image {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+        background: var(--admin-light);
+        border-radius: 12px;
+        gap: 0.5rem;
+        color: var(--admin-text-muted);
+
+        i {
+            font-size: 3rem;
+        }
+
+        span {
+            font-size: 0.9rem;
+        }
+    }
+}
+
+// ==================== INFO ====================
+.info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.info-group {
+    background: var(--admin-light);
+    border-radius: 12px;
+    padding: 1.25rem;
+
+    .info-title {
+        margin: 0 0 1rem 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--admin-text);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--admin-border);
+
+        i {
+            color: var(--admin-accent);
+            font-size: 1.15rem;
+        }
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+
+        @media (max-width: 640px) {
+            grid-template-columns: 1fr;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+
+            .info-label {
+                font-size: 0.75rem;
+                color: var(--admin-text-muted);
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .info-value {
+                font-size: 0.95rem;
+                color: var(--admin-text);
+                font-weight: 600;
+
+                &.plate-value {
+                    display: inline-block;
+                    background: #e2e8f0;
+                    padding: 0.15rem 0.6rem;
+                    border-radius: 6px;
+                    letter-spacing: 1px;
+                    width: fit-content;
+                }
+
+                &.price-value {
+                    color: var(--admin-success);
+                    font-size: 1.1rem;
+                }
+            }
+        }
+    }
+
+    .description-text {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--admin-text);
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+}
+
+// ==================== RESPONSIVE ====================
+@media (max-width: 768px) {
+    .vehicle-detail-container {
+        padding: 0.5rem;
+
+        ::ng-deep .p-card .p-card-body {
+            padding: 1rem;
+        }
+    }
+
+    .header-section {
+        flex-direction: column;
+        align-items: stretch;
+
+        .header-right {
+            width: 100%;
+
+            button {
+                flex: 1;
+            }
+        }
+    }
+
+    .detail-content {
+        grid-template-columns: 1fr;
+    }
+}

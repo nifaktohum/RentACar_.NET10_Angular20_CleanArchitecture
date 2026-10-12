@@ -116,10 +116,21 @@ export class CustomConfirmDialogService {
     rejectLabel: string = 'Hayır',
     acceptButtonStyle: string = 'p-button-primary'
   ): void {
+
+    const confirmationMessage = `
+      <div class="dialog-IsMain-container">
+        <div class="target-card">
+          <div class="card-value">
+            <i class="ri-information-line"></i>
+            <span class="ismain-highlight">${message}</span>
+          </div>
+        </div>
+      </div>
+    `;
     this.confirmationServiceDialog.confirm({
-      message: message,
+      message: confirmationMessage,
       header: title,
-      icon: 'ri-question-line',
+      icon: '',
       acceptLabel: acceptLabel,
       rejectLabel: rejectLabel,
       acceptButtonStyleClass: `${acceptButtonStyle} p-button-text`,

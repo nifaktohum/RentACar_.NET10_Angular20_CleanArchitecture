@@ -1,4 +1,3 @@
-import { CreateVehicleRequest } from "./create-vehicle-request";
 import { VehicleImage } from "./vehicle-image.model";
 
 export interface Vehicle {
@@ -15,6 +14,7 @@ export interface Vehicle {
   doorCount: number;
   minAge: number | null;
   dailyPrice: number;
+  isAvailable: boolean;
   description: string | null;
   imageUrl: string | null;       // ⭐ Ana resim URL'i
   isActive: boolean;

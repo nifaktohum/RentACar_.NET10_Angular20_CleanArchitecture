@@ -24,6 +24,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
 import { InputText } from 'primeng/inputtext';
 import { UpdateVehicleRequest } from '../../../core/models/vehicle/UpdateVehicleRequest';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-vehicle-form',
@@ -38,6 +39,7 @@ import { UpdateVehicleRequest } from '../../../core/models/vehicle/UpdateVehicle
     FileUploadModule,
     ButtonModule,
     InputText,
+    TooltipModule
 
   ],
   templateUrl: './vehicle-form.component.html',
@@ -113,6 +115,9 @@ export class VehicleFormComponent implements OnInit {
     this.loadVehicleModels();
     this.loadDistinctOptions();
     this.checkEditMode();
+    console.log(this.isEditMode());
+    console.log(this.mainImagePreview());
+    
   }
 
   // ==================== FORM INIT ====================

@@ -33,6 +33,7 @@
     "@angular/router": "^20.3.24",
     "@primeng/themes": "^21.0.4",
     "@primeuix/themes": "^2.0.3",
+    "animate.css": "^4.1.1",
     "jwt-decode": "^4.0.0",
     "primeicons": "^7.0.0",
     "primeng": "^20.4.0",

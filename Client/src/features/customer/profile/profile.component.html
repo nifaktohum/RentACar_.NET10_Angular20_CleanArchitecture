@@ -1,0 +1,395 @@
+<div class="profile-wrapper">
+
+  <!-- ==================== HERO ==================== -->
+  @if (!isLoading() && profile(); as p) {
+  <div class="profile-hero">
+
+    <div class="hero-top">
+      <div class="breadcrumb">
+        <i class="ri-home-4-line"></i>
+        <span>Hesabım</span>
+        <i class="ri-arrow-right-s-line sep"></i>
+        <span class="current">Profil</span>
+      </div>
+
+      <a routerLink="/customer/profile/edit" class="btn-edit">
+        <i class="ri-edit-line"></i>
+        <span>Profili Düzenle</span>
+      </a>
+    </div>
+
+    <div class="hero-body">
+      <div class="avatar-wrap">
+        <div class="avatar-big">{{ initials() }}</div>
+        <span class="online-dot"></span>
+      </div>
+
+      <div class="hero-info">
+        <h1>{{ fullName() }}</h1>
+        <div class="hero-meta">
+          <span class="type-chip" [class.corporate]="p.type === 'Corporate'">
+            <i [class]="p.type === 'Corporate' ? 'ri-building-4-line' : 'ri-user-line'"></i>
+            {{ customerTypeLabel() }}
+          </span>
+          <span class="member-chip">
+            <i class="ri-calendar-line"></i>
+            {{ formatDate(p.createdAt) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-value">{{ p.findeksScore ?? '—' }}</span>
+          <span class="stat-label">Findeks</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ p.age ?? '—' }}</span>
+          <span class="stat-label">Yaş</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  }
+
+  <!-- ==================== LOADING ==================== -->
+  @if (isLoading()) {
+  <div class="loading-stack">
+    <p-skeleton height="220px" borderRadius="28px"></p-skeleton>
+    <p-skeleton height="170px" borderRadius="22px"></p-skeleton>
+    <p-skeleton height="220px" borderRadius="22px"></p-skeleton>
+    <p-skeleton height="200px" borderRadius="22px"></p-skeleton>
+  </div>
+  }
+
+  <!-- ==================== İÇERİK ==================== -->
+  @if (!isLoading() && profile(); as p) {
+
+  <!-- ==================== HESAP DURUMU ==================== -->
+  <div class="section section-purple">
+    <div class="section-head">
+      <div class="head-icon">
+        <i class="ri-shield-check-line"></i>
+      </div>
+      <div class="head-text">
+        <h3>Hesap Durumu</h3>
+        <p>Doğrulama ve erişim bilgileriniz</p>
+      </div>
+    </div>
+
+    <div class="status-grid">
+
+      <div class="status-tile" [class.verified]="p.isEmailVerified" [class.warning]="!p.isEmailVerified">
+        <div class="tile-icon">
+          <i [class]="p.isEmailVerified ? 'ri-mail-check-fill' : 'ri-mail-line'"></i>
+        </div>
+        <div class="tile-content">
+          <span class="tile-label">E-posta</span>
+          <span class="tile-value">
+            @if (p.isEmailVerified) {
+            Doğrulanmış
+            } @else {
+            Doğrulanmamış
+            <a routerLink="/customer/verify-email">Doğrula →</a>
+            }
+          </span>
+        </div>
+      </div>
+
+      <div class="status-tile" [class.verified]="p.isPhoneVerified" [class.warning]="!p.isPhoneVerified">
+        <div class="tile-icon">
+          <i [class]="p.isPhoneVerified ? 'ri-smartphone-fill' : 'ri-smartphone-line'"></i>
+        </div>
+        <div class="tile-content">
+          <span class="tile-label">Telefon</span>
+          <span class="tile-value">
+            @if (p.isPhoneVerified) {
+            Doğrulanmış
+            } @else {
+            Doğrulanmamış
+            <a routerLink="/customer/verify-phone">Doğrula →</a>
+            }
+          </span>
+        </div>
+      </div>
+
+      <div class="status-tile" [class.danger]="p.isBlacklisted" [class.verified]="!p.isBlacklisted">
+        <div class="tile-icon">
+          <i [class]="p.isBlacklisted ? 'ri-forbid-2-fill' : 'ri-checkbox-circle-fill'"></i>
+        </div>
+        <div class="tile-content">
+          <span class="tile-label">Kara Liste</span>
+          <span class="tile-value">
+            @if (p.isBlacklisted) {
+            {{ p.blacklistReason || 'Kara listede' }}
+            } @else {
+            Temiz
+            }
+          </span>
+        </div>
+      </div>
+
+      <div class="status-tile" [class.verified]="p.canRent" [class.warning]="!p.canRent">
+        <div class="tile-icon">
+          <i [class]="p.canRent ? 'ri-roadster-fill' : 'ri-roadster-line'"></i>
+        </div>
+        <div class="tile-content">
+          <span class="tile-label">Araç Kiralama</span>
+          <span class="tile-value">
+            @if (p.canRent) { Kiralayabilir } @else { Kiralayamaz }
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== KİMLİK BİLGİLERİ ==================== -->
+  @if (p.type === 'Individual') {
+  <div class="section section-blue">
+    <div class="section-head">
+      <div class="head-icon">
+        <i class="ri-user-line"></i>
+      </div>
+      <div class="head-text">
+        <h3>Kimlik Bilgileri</h3>
+        <p>Kişisel bilgileriniz</p>
+      </div>
+    </div>
+
+    <div class="data-grid">
+      <div class="data-row">
+        <span class="data-label"><i class="ri-user-line"></i> Ad</span>
+        <span class="data-value">{{ p.firstName || '-' }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-user-line"></i> Soyad</span>
+        <span class="data-value">{{ p.lastName || '-' }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-id-card-line"></i> T.C. Kimlik No</span>
+        <span class="data-value mono">{{ p.identityNumber || '-' }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-cake-2-line"></i> Doğum Tarihi</span>
+        <span class="data-value">{{ formatDate(p.birthDate) }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-calendar-line"></i> Yaş</span>
+        <span class="data-value">{{ p.age ? p.age + ' yaş' : '-' }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-genderless-line"></i> Cinsiyet</span>
+        <span class="data-value">{{ genderLabel() }}</span>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ==================== ŞİRKET BİLGİLERİ ==================== -->
+  @if (p.type === 'Corporate') {
+  <div class="section section-purple">
+    <div class="section-head">
+      <div class="head-icon">
+        <i class="ri-building-4-line"></i>
+      </div>
+      <div class="head-text">
+        <h3>Şirket Bilgileri</h3>
+        <p>Kurumsal hesap detayları</p>
+      </div>
+    </div>
+
+    <div class="data-grid">
+      <div class="data-row full">
+        <span class="data-label"><i class="ri-building-line"></i> Şirket Adı / Ünvan</span>
+        <span class="data-value">{{ p.companyName || '-' }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-file-list-3-line"></i> Vergi Numarası</span>
+        <span class="data-value mono">{{ p.taxNumber || '-' }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-government-line"></i> Vergi Dairesi</span>
+        <span class="data-value">{{ p.taxOffice || '-' }}</span>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ==================== İLETİŞİM ==================== -->
+  <div class="section section-green">
+    <div class="section-head">
+      <div class="head-icon">
+        <i class="ri-contacts-line"></i>
+      </div>
+      <div class="head-text">
+        <h3>İletişim Bilgileri</h3>
+        <p>Size ulaşabileceğimiz kanallar</p>
+      </div>
+    </div>
+
+    <div class="data-grid">
+      <div class="data-row">
+        <span class="data-label"><i class="ri-mail-line"></i> E-posta</span>
+        <span class="data-value">{{ p.email }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-phone-line"></i> Telefon</span>
+        <span class="data-value mono">{{ p.phoneNumber }}</span>
+      </div>
+      <div class="data-row full">
+        <span class="data-label"><i class="ri-map-pin-line"></i> Adres</span>
+        <span class="data-value">{{ p.address }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-map-pin-2-line"></i> Şehir</span>
+        <span class="data-value">{{ p.city }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-earth-line"></i> Ülke</span>
+        <span class="data-value">{{ p.country }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-mail-send-line"></i> Posta Kodu</span>
+        <span class="data-value mono">{{ p.postalCode || '-' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== EHLİYET ==================== -->
+  @if (p.type === 'Individual') {
+  <div class="section section-orange">
+    <div class="section-head">
+      <div class="head-icon">
+        <i class="ri-steering-2-line"></i>
+      </div>
+      <div class="head-text">
+        <h3>Ehliyet Bilgileri</h3>
+        <p>Sürücü belgesi detayları</p>
+      </div>
+      @if (p.hasValidDriverLicense) {
+      <p-tag value="Geçerli" severity="success" [rounded]="true"></p-tag>
+      } @else {
+      <p-tag value="Geçersiz" severity="danger" [rounded]="true"></p-tag>
+      }
+    </div>
+
+    <div class="data-grid">
+      <div class="data-row">
+        <span class="data-label"><i class="ri-id-card-line"></i> Ehliyet No</span>
+        <span class="data-value mono">{{ p.driverLicenseNumber || '-' }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-calendar-check-line"></i> Veriliş Tarihi</span>
+        <span class="data-value">{{ formatDate(p.driverLicenseIssueDate) }}</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label"><i class="ri-award-line"></i> Ehliyet Sınıfı</span>
+        <span class="data-value">{{ p.driverLicenseClass || '-' }}</span>
+      </div>
+    </div>
+
+    @if (!p.hasValidDriverLicense) {
+    <div class="alert alert-warn">
+      <i class="ri-information-line"></i>
+      <span>
+        {{ p.driverLicenseNumber
+        ? 'Ehliyetiniz 1 yıldan daha yeni. Araç kiralamak için en az 1 yıllık ehliyet gereklidir.'
+        : 'Araç kiralamak için ehliyet bilgilerinizi eklemeniz gerekiyor.'
+        }}
+      </span>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- ==================== FINDEKS ==================== -->
+  <div class="section section-pink">
+    <div class="section-head">
+      <div class="head-icon">
+        <i class="ri-line-chart-line"></i>
+      </div>
+      <div class="head-text">
+        <h3>Findeks Skoru</h3>
+        <p>Kredi risk puanınız</p>
+      </div>
+      @if (p.findeksScore != null) {
+      <p-tag [value]="findeksStatus().label" [severity]="findeksStatus().severity" [rounded]="true"></p-tag>
+      }
+    </div>
+
+    @if (p.findeksScore != null) {
+    <div class="findeks-block">
+
+      <div class="findeks-circle">
+        <svg viewBox="0 0 120 120">
+          <defs>
+            <linearGradient id="findeksGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ef4444" />
+              <stop offset="35%" stop-color="#f97316" />
+              <stop offset="65%" stop-color="#eab308" />
+              <stop offset="100%" stop-color="#10b981" />
+            </linearGradient>
+          </defs>
+          <circle class="bg" cx="60" cy="60" r="52" />
+          <circle class="fill" cx="60" cy="60" r="52" [attr.stroke-dasharray]="2 * 3.14159 * 52"
+            [attr.stroke-dashoffset]="2 * 3.14159 * 52 * (1 - p.findeksScore / 1900)" />
+        </svg>
+        <div class="findeks-center">
+          <span class="findeks-num">{{ p.findeksScore }}</span>
+          <span class="findeks-max">/ 1900</span>
+        </div>
+      </div>
+
+      <div class="findeks-detail">
+        <span class="findeks-status" [class.excellent]="p.findeksScore >= 1500"
+          [class.good]="p.findeksScore >= 1200 && p.findeksScore < 1500"
+          [class.fair]="p.findeksScore >= 800 && p.findeksScore < 1200" [class.poor]="p.findeksScore < 800">
+          <i class="ri-award-fill"></i>
+          {{ findeksStatus().label }}
+        </span>
+
+        @if (p.canRentLuxury) {
+        <div class="findeks-note ok">
+          <i class="ri-checkbox-circle-fill"></i>
+          <span>Lüks araç kiralama yetkiniz aktif. Premium filomuzdan yararlanabilirsiniz.</span>
+        </div>
+        } @else {
+        <div class="findeks-note warn">
+          <i class="ri-information-line"></i>
+          <span>Lüks araç kiralamak için en az <strong>1200</strong> Findeks skoru gereklidir.</span>
+        </div>
+        }
+      </div>
+
+    </div>
+    } @else {
+    <div class="findeks-empty">
+      <div class="empty-icon">
+        <i class="ri-line-chart-line"></i>
+      </div>
+      <p>Findeks skorunuz henüz hesaplanmadı</p>
+      <small>Personelimiz skorunuzu güncellediğinde burada görüntülenecektir.</small>
+    </div>
+    }
+  </div>
+
+  }
+
+  <!-- ==================== HATA ==================== -->
+  @if (!isLoading() && !profile()) {
+  <div class="empty-state">
+    <div class="empty-icon">
+      <i class="ri-error-warning-line"></i>
+    </div>
+    <h3>Profil bilgileri yüklenemedi</h3>
+    <p>Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
+    <button class="btn-reload" (click)="loadProfile()">
+      <i class="ri-refresh-line"></i>
+      Tekrar Dene
+    </button>
+  </div>
+  }
+
+</div>

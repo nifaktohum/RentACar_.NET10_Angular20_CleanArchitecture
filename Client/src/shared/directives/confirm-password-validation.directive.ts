@@ -1,5 +1,8 @@
 import { Directive, ElementRef, HostListener, Renderer2, inject, input } from '@angular/core';
 
+
+// Kullanıcının 'Şifre Tekrar' kutusuna yazdığı şey ile esas şifre kutusuna yazdığı şeyin tıpatıp aynı olup olmadığını denetlemek.
+
 @Directive({
   selector: '[confirmPasswordValidationDirective]',
 })
@@ -10,7 +13,7 @@ export class ConfirmPasswordValidationDirective {
   // 🔥 1. Hata mesajını basacağımız asil kutu (Signal Input)
   errorTarget = input.required<HTMLElement>({ alias: 'confirmPasswordValidationDirective' });
 
-  // 🔥 2. Karşılaştıracağımız ana şifrenin input elementi (Bunu da dışarıdan signal ile alıyoruz kanka)
+  // 🔥 2. Karşılaştıracağımız ana şifrenin input elementi (Bunu da dışarıdan signal ile alıyoruz)
   mainPasswordInput = input.required<HTMLInputElement>();
 
   @HostListener('blur')
@@ -31,13 +34,13 @@ export class ConfirmPasswordValidationDirective {
 
     // Kural 1: Boş bırakılamaz kuralı
     if (!value.trim()) {
-      this.applyError('* Şifre tekrar alanı boş bırakılamaz kanka.');
+      this.applyError('* Şifre tekrar alanı boş bırakılamaz.');
       return;
     }
 
     // Kural 2: 🔥 Şifre bir önceki şifre ile aynı olmalı / uyuşmalı kontrolü!
     if (value !== mainPasswordValue) {
-      this.applyError('* Girdiğiniz şifreler birbiriyle uyuşmuyor kanka.');
+      this.applyError('* Girdiğiniz şifreler birbiriyle uyuşmuyor.');
       return;
     }
   }

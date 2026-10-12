@@ -15,6 +15,10 @@ public sealed class UserContext(IHttpContextAccessor _http) : IUserContext
     var httpContext = _http.HttpContext;
     if (httpContext is null) return Guid.Empty;
 
+    // Customer token'ı ise User ID dönme
+    var userType = httpContext.User.FindFirst("UserType")?.Value;
+    if (userType == "Customer") return Guid.Empty;
+
     // 2. Kullanıcının claims listesinden NameIdentifier (User ID) olanı cımbızla çekiyoruz.
     // .FindFirst() metodu FirstOrDefault'a göre bu işlem için daha performanslı ve standardı temsil eder.
     var userIdClaim = httpContext.User.FindFirst("Id");

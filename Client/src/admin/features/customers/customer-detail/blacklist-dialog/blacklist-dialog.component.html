@@ -1,0 +1,66 @@
+<p-dialog header="Müşteriyi Kara Listeye Al" [visible]="visible" (visibleChange)="onDialogHide()" [modal]="true"
+  [style]="{ width: '520px' }" [draggable]="false" [resizable]="false" [closable]="!isLoading()"
+  styleClass="modern-dialog blacklist-dialog">
+
+  <div class="dialog-content">
+
+    <!-- ==================== UYARI ==================== -->
+    <div class="warning-box">
+      <div class="warning-icon">
+        <i class="ri-error-warning-line"></i>
+      </div>
+      <div class="warning-content">
+        <h4>Dikkat!</h4>
+        <p>
+          Müşteri: <strong>{{ customerName }}</strong>
+          <br> Kara listeye almak üzeresiniz.
+          <br> Müşterinin <strong>araç kiralamasını engelleyecektir</strong>.
+        </p>
+      </div>
+    </div>
+
+    <!-- ==================== SEBEP ==================== -->
+    <div class="form-group">
+      <label class="form-label">
+        Kara Liste Sebebi <span class="required">*</span>
+      </label>
+
+      <textarea pTextarea [(ngModel)]="reason" [ngModelOptions]="{ standalone: true }"
+        placeholder="Kara listeye alma sebebini detaylı yazın (min. 10 karakter)" rows="5" maxlength="500"
+        class="w-full" [autoResize]="false">
+      </textarea>
+
+      <div class="form-hint">
+        <span class="char-count" [class.warning]="reason().length < 10">
+          {{ reason().length }} / 500 karakter
+        </span>
+        @if (reason().length > 0 && reason().length < 10) { <span class="hint-text">
+          <i class="ri-information-line"></i>
+          En az 10 karakter gerekli
+          </span>
+          }
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button pButton type="button" label="İptal" icon="ri-close-line" class="p-button-text p-button-secondary"
+        (click)="close()" [disabled]="isLoading()">
+      </button>
+
+      <button pButton type="button" class="p-button-danger" (click)="onSubmit()" [disabled]="!canSubmit">
+        @if (isLoading()) {
+        <i class="ri-loader-4-line spinning"></i>
+        Kaydediliyor...
+        } @else {
+        <i class="ri-forbid-2-line"></i>
+        Kara Listeye Al
+        }
+      </button>
+    </div>
+  </ng-template>
+
+</p-dialog>

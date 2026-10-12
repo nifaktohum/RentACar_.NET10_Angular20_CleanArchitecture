@@ -1,0 +1,535 @@
+::ng-deep {
+  // =============================================================================
+  // CUSTOMER REGISTER CORPORATE
+  // =============================================================================
+
+  .register-wrapper {
+    font-family: var(--font-family-main);
+    font-size: var(--font-size-base);
+    color: var(--admin-text);
+    background: radial-gradient(
+      circle at 0% 0%,
+      var(--admin-primary-dark) 0%,
+      var(--secondary-color) 100%
+    );
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+  }
+
+  .register-container {
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .register-card {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    background: var(--admin-white);
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    min-height: 700px;
+
+    @media (max-width: 992px) {
+      grid-template-columns: 1fr;
+      max-width: 560px;
+    }
+  }
+
+  // ==================== SOL: FORM ====================
+  .register-form-side {
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    background: var(--admin-white);
+
+    @media (max-width: 576px) {
+      padding: 30px 20px;
+    }
+  }
+
+  .register-header {
+    margin-bottom: 25px;
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+
+      i {
+        font-size: 28px;
+        color: var(--primary-color);
+      }
+
+      h1 {
+        font-size: var(--font-size-lg);
+        font-weight: 800;
+        margin: 0;
+        text-transform: uppercase;
+      }
+
+      .label {
+        background: var(--border-color);
+        color: var(--text-dark);
+        font-size: var(--font-size-sm);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        margin-left: auto;
+      }
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--admin-text-muted);
+      text-decoration: none;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      margin-bottom: 15px;
+      transition: color 0.2s;
+
+      &:hover {
+        color: var(--primary-color);
+      }
+      i {
+        font-size: 1rem;
+      }
+    }
+
+    .register-title {
+      text-align: center;
+
+      h2 {
+        font-size: var(--font-size-xl);
+        font-weight: 700;
+        color: var(--admin-primary-dark);
+        margin-bottom: 6px;
+      }
+
+      p {
+        color: var(--admin-text-muted);
+        font-size: var(--font-size-base);
+        margin: 0;
+      }
+    }
+  }
+
+  // ==================== FORM ====================
+  .register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  // ⭐ BÖLÜM (SECTION)
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 8px;
+    background: var(--admin-light);
+    border-radius: 12px;
+    border: 1px solid var(--admin-accent);
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--admin-border);
+
+      i {
+        font-size: 20px;
+        color: var(--primary-color);
+      }
+
+      h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--admin-text);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+
+  // ==================== FORM GRIDS ====================
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .form-row-pas {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ==================== INPUTS & INPUT GROUPS ====================
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .form-label {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--admin-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--admin-border);
+
+      .required {
+        color: var(--admin-danger);
+        font-weight: 700;
+      }
+    }
+
+    .input-custom-group {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--admin-border);
+      border-radius: 10px;
+      background-color: var(--admin-white);   // ⭐ Section içinde olduğu için beyaz
+      transition: all 0.2s;
+
+      &.textarea {
+        align-items: flex-start;
+        .input-icon {
+          padding-top: 12px;
+        }
+      }
+
+      &:focus-within {
+        border-color: var(--primary-color);
+        background-color: var(--admin-white);
+        box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.1);
+      }
+
+      .input-icon {
+        padding-left: 14px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+
+      input,
+      textarea {
+        border: none;
+        outline: none;
+        padding: 12px 14px;
+        width: 100%;
+        font-size: var(--font-size-base);
+        color: var(--admin-text);
+        background: transparent;
+        font-family: inherit;
+
+        &::placeholder {
+          color: var(--text-muted);
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 60px;
+      }
+
+      .password-toggle {
+        border: none;
+        background: transparent;
+        padding: 0 14px;
+        color: var(--text-muted);
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+
+        &:hover {
+          color: var(--admin-text);
+        }
+      }
+    }
+
+    // PRIMENG SELECT (v18+) UYUMLULUĞU
+    p-select {
+      width: 100%;
+
+      .p-select {
+        width: 100%;
+        border: 1.5px solid var(--admin-border);
+        border-radius: 10px;
+        background-color: var(--admin-white);
+        transition: all 0.2s;
+        box-shadow: none;
+
+        &:not(.p-disabled):hover {
+          border-color: var(--primary-color);
+        }
+
+        &.p-focus {
+          border-color: var(--primary-color);
+          background-color: var(--admin-white);
+          box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.1);
+        }
+
+        .p-select-label {
+          padding: 10px 14px;
+          font-size: var(--font-size-base);
+          color: var(--admin-text);
+
+          &.p-placeholder {
+            color: var(--text-muted);
+          }
+        }
+      }
+    }
+  }
+
+  // ==================== ERROR CONTAINER ====================
+  .error-container {
+    margin: 0;
+    min-height: 0;
+    transition: all 0.2s ease;
+  }
+
+  // ==================== TERMS ====================
+  .terms-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    background: var(--admin-light);
+    border-radius: 10px;
+
+    label {
+      font-size: 0.85rem;
+      color: var(--admin-text-muted);
+      cursor: pointer;
+      line-height: 1.5;
+
+      a {
+        color: var(--primary-dark);
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  // ==================== ACTIONS ====================
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+
+    .btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 24px;
+      font-size: var(--font-size-base);
+      font-weight: 600;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+      i {
+        font-size: 18px;
+      }
+
+      &.full {
+        flex: none;
+        width: 100%;
+      }
+
+      &.btn-primary {
+        background-color: var(--admin-primary);
+        color: var(--admin-white);
+
+        &:hover:not(:disabled) {
+          background-color: var(--admin-primary-dark);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+      }
+
+      .spinning {
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+
+  // ==================== FOOTER ====================
+  .register-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--admin-text-muted);
+
+    p {
+      margin: 0;
+    }
+
+    .login-link {
+      color: var(--primary-dark);
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      margin-left: 4px;
+
+      &:hover {
+        color: var(--primary-color);
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // ==================== SAĞ: BİLGİ PANELİ ====================
+  .register-info-side {
+    background: linear-gradient(
+      135deg,
+      var(--admin-primary) 0%,
+      var(--admin-primary-dark) 100%
+    );
+    color: var(--admin-white);
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(
+        circle,
+        rgba(56, 189, 248, 0.15) 0%,
+        transparent 70%
+      );
+      pointer-events: none;
+    }
+
+    @media (max-width: 992px) {
+      display: none;
+    }
+
+    .info-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .info-header {
+      text-align: center;
+      margin-bottom: 35px;
+
+      .icon-badge {
+        width: 70px;
+        height: 70px;
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 18px;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+          font-size: 38px;
+          color: var(--admin-accent);
+        }
+      }
+
+      h3 {
+        font-size: var(--font-size-lg);
+        font-weight: 700;
+        margin-bottom: 10px;
+        letter-spacing: -0.3px;
+      }
+
+      p {
+        color: #94a3b8;
+        font-size: var(--font-size-base);
+        line-height: 1.5;
+        margin: 0;
+      }
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+
+      .feature-item {
+        display: flex;
+        gap: 14px;
+
+        i {
+          color: var(--admin-accent);
+          font-size: 22px;
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+
+        h6 {
+          font-size: var(--font-size-base);
+          font-weight: 600;
+          color: var(--admin-white);
+          margin: 0 0 3px 0;
+        }
+
+        p {
+          font-size: var(--font-size-sm);
+          color: #64748b;
+          margin: 0;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+
+  // ==================== ANIMATION ====================
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}

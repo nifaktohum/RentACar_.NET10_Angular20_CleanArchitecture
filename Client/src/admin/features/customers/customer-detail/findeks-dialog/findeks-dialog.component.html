@@ -1,0 +1,117 @@
+<p-dialog
+  header="Findeks Skoru Güncelle"
+  [visible]="visible"
+  (visibleChange)="onDialogHide()"
+  (onShow)="onDialogShow()"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isLoading()"
+  styleClass="modern-dialog findeks-dialog">
+
+  <div class="dialog-content">
+
+    <!-- ==================== MÜŞTERİ BİLGİSİ ==================== -->
+    <div class="customer-info">
+      <div class="info-icon">
+        <i class="ri-user-line"></i>
+      </div>
+      <div class="info-content">
+        <span class="info-label">Müşteri</span>
+        <span class="info-value">{{ customerName }}</span>
+      </div>
+
+      @if (currentScore != null) {
+      <div class="current-score">
+        <span class="current-label">Mevcut</span>
+        <span class="current-value">{{ currentScore }}</span>
+      </div>
+      } @else {
+      <div class="current-score no-score">
+        <span class="current-label">Mevcut</span>
+        <span class="current-value">-</span>
+      </div>
+      }
+    </div>
+
+    <!-- ==================== YENİ SKOR ==================== -->
+    <div class="form-group">
+      <label class="form-label">
+        Yeni Findeks Skoru <span class="required">*</span>
+      </label>
+
+    <p-inputNumber
+      [(ngModel)]="newScore"
+      [min]="0"
+      [max]="1900"
+      [showButtons]="true"
+      buttonLayout="horizontal"
+      incrementButtonIcon="ri-add-line"
+      decrementButtonIcon="ri-subtract-line"
+      [step]="50"
+      placeholder="0 - 1900"
+      styleClass="w-full"
+      inputStyleClass="score-input">
+      </p-inputNumber>
+
+      <div class="form-hint">
+        <i class="ri-information-line"></i>
+        <span>Skor 0-1900 arasında olmalıdır. Lüks araç için min. 1200 gerekli.</span>
+      </div>
+    </div>
+
+    <!-- ==================== ÖNİZLEME ==================== -->
+    @if (newScore() != null) {
+    <div class="preview-box">
+      <div class="preview-header">
+        <span class="preview-label">Önizleme</span>
+        <p-tag [value]="previewStatus().label" [severity]="previewStatus().severity" [rounded]="true">
+        </p-tag>
+      </div>
+
+      <div class="preview-score">
+        <span class="score-value">{{ newScore() }}</span>
+        <span class="score-max">/ 1900</span>
+      </div>
+
+      <div class="preview-bar">
+        <div class="bar-fill" [style.width.%]="previewPercent()"></div>
+      </div>
+
+      @if (newScore()! >= 1200) {
+      <div class="preview-info success">
+        <i class="ri-checkbox-circle-fill"></i>
+        <span>Lüks araç kiralayabilir</span>
+      </div>
+      } @else {
+      <div class="preview-info warning">
+        <i class="ri-information-line"></i>
+        <span>Lüks araç kiralayamaz</span>
+      </div>
+      }
+    </div>
+    }
+
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button pButton type="button" label="İptal" icon="ri-close-line" class="p-button-text p-button-secondary"
+        (click)="close()" [disabled]="isLoading()">
+      </button>
+
+      <button pButton type="button" class="p-button-primary" (click)="onSubmit()" [disabled]="!canSubmit()">
+        @if (isLoading()) {
+        <i class="ri-loader-4-line spinning"></i>
+        Güncelleniyor...
+        } @else {
+        <i class="ri-save-line"></i>
+        Güncelle
+        }
+      </button>
+    </div>
+  </ng-template>
+
+</p-dialog>

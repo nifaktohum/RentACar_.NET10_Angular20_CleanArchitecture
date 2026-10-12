@@ -10,7 +10,7 @@ export class PhoneFormatPipe implements PipeTransform {
 
   transform(value: string | number | null | undefined): string {
     if (value === null || value === undefined || value.toString().trim() === '') {
-      return '----------';
+      return '';
     }
 
     // // 1. Gelen veriyi string'e çevir ve sadece sayıları ayıkla 
@@ -36,7 +36,7 @@ export class PhoneFormatPipe implements PipeTransform {
 
       return `+${countryCode} (${areaCode}) ${part1} ${part2} ${part3}`;
     } else if (cleaned.length === 0) {
-      return '+----------'; // Telefon formatı için boş şablon
+      return ''; // Telefon formatı için boş şablon
     }
     
     

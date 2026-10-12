@@ -1,18 +1,17 @@
-using Application.Features.Auth.Register.Commands;
-using Application.Features.Login.Commands;
+using Application.Features.Auth.Users.Register.Commands;
+using Application.Features.Auth.Users.Login.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using TS.Result; // TS.Result paketinin nimetleri için
 
 namespace API.Controllers;
 
 [ApiExplorerSettings(GroupName = "v1-Auth")]
-[AllowAnonymous]
 public sealed class AuthController : BaseApiController // 👈 Constructor enjeksiyonunu tlı. :) temizlendi!
 {
   // ==================> 🔥 KAYIT OLMA lı. :)) <================== //
   [HttpPost("register")]
+  [AllowAnonymous]
   public async Task<IActionResult> Register([FromBody] RegisterCommand registerCommand, CancellationToken token)
   {
     var result = await Mediator.Send(registerCommand, token);
@@ -25,9 +24,10 @@ public sealed class AuthController : BaseApiController // 👈 Constructor enjek
     var statusCode = result.StatusCode == 0 ? 400 : result.StatusCode;
     return StatusCode(statusCode, new { error = result.ErrorMessages });
   }
-  
+
   // ==================> GİRİŞ İŞLEMİ <================== //
   [HttpPost("login")]
+  [AllowAnonymous]
   [EnableRateLimiting("LoginFixedWindowPolicy")]
   public async Task<IActionResult> Login([FromBody] LoginCommand loginCommand, CancellationToken token)
   {
@@ -47,6 +47,7 @@ public sealed class AuthController : BaseApiController // 👈 Constructor enjek
 
   // 1. AŞAMA: KOD TALEP ETME
   [HttpPost("forgot-password")]
+  [AllowAnonymous]
   [EnableRateLimiting("ForgotPasswordFixedWindowPolicy")]
   public async Task<IActionResult> ForgotPassword([FromBody] EmailResetCodeCommand forgotPasswordCommand, CancellationToken token)
   {
@@ -63,6 +64,7 @@ public sealed class AuthController : BaseApiController // 👈 Constructor enjek
 
   // 2. AŞAMA: YENİ ŞİFRE BELİRLEME
   [HttpPost("reset-password")]
+  [AllowAnonymous]
   public async Task<IActionResult> ResetPassword([FromBody] EmailResetPasswordCommand resetPasswordCommand, CancellationToken token)
   {
     var result = await Mediator.Send(resetPasswordCommand, token);
@@ -79,6 +81,7 @@ public sealed class AuthController : BaseApiController // 👈 Constructor enjek
   // ==================> SMS İLE ŞİFRE SIFIRLAMA <================== //
 
   [HttpPost("sms-reset-code")]
+  [AllowAnonymous]
   public async Task<IActionResult> SendSmsResetCode([FromBody] SmsResetCodeCommand command, CancellationToken cancellationToken)
   {
     var result = await Mediator.Send(command, cancellationToken);
@@ -91,6 +94,7 @@ public sealed class AuthController : BaseApiController // 👈 Constructor enjek
   }
 
   [HttpPost("sms-reset-password")]
+  [AllowAnonymous]
   public async Task<IActionResult> ResetPasswordBySms([FromBody] SmsResetPasswordCommand command, CancellationToken cancellationToken)
   {
     var result = await Mediator.Send(command, cancellationToken);
@@ -105,6 +109,7 @@ public sealed class AuthController : BaseApiController // 👈 Constructor enjek
   // ==================> GÜVENLİK VE ÇIKIŞ <================== //
 
   [HttpPost("logout-all-devices")]
+  [Authorize]
   public async Task<IActionResult> LogoutAllDevices(CancellationToken cancellationToken)
   {
     var result = await Mediator.Send(new LogoutAllDevicesCommand(), cancellationToken);

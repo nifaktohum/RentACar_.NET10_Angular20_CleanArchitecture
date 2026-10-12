@@ -1,0 +1,397 @@
+::ng-deep {
+  // =============================================================================
+  // PROFILE EDIT
+  // =============================================================================
+
+  .edit-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  // ==================== SAYFA BAŞLIĞI ====================
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      > i {
+        font-size: 38px;
+        color: var(--primary-color);
+        background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), rgba(0, 168, 204, 0.05));
+        padding: 10px;
+        border-radius: 12px;
+        flex-shrink: 0;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--admin-primary-dark);
+        margin: 0 0 4px 0;
+      }
+
+      p {
+        font-size: 0.875rem;
+        color: var(--admin-text-muted);
+        margin: 0;
+      }
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: white;
+      color: var(--admin-text);
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1.5px solid var(--admin-border);
+      transition: all 0.2s;
+
+      i { font-size: 16px; }
+
+      &:hover {
+        border-color: var(--primary-color);
+        background: rgba(0, 210, 255, 0.05);
+        color: var(--primary-dark);
+      }
+    }
+  }
+
+  // ==================== LOADING ====================
+  .edit-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  // ==================== FORM ====================
+  .edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  // ==================== FORM SECTION ====================
+  .form-section {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--admin-border);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #f8fafc, #ffffff);
+      border-bottom: 1px solid var(--admin-border);
+
+      .section-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(0, 168, 204, 0.05));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i {
+          font-size: 24px;
+          color: var(--primary-color);
+        }
+      }
+
+      .section-title {
+        h2 {
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: var(--admin-primary-dark);
+          margin: 0 0 2px 0;
+        }
+
+        p {
+          font-size: 0.8rem;
+          color: var(--admin-text-muted);
+          margin: 0;
+        }
+      }
+    }
+
+    .section-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+  }
+
+  // ==================== FORM ROW ====================
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ==================== FORM GROUP ====================
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--admin-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      
+      .required {
+        color: var(--admin-danger);
+        font-weight: 700;
+      }
+    }
+    
+    .input-custom-group {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--admin-border);
+      border-radius: 10px;
+      background-color: var(--admin-light);
+      transition: all 0.2s;
+
+      &.textarea {
+        align-items: flex-start;
+
+        .input-icon {
+          padding-top: 12px;
+        }
+      }
+
+      &:focus-within {
+        border-color: var(--primary-color);
+        background-color: white;
+        box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.1);
+      }
+
+      .input-icon {
+        padding-left: 14px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+
+      input,
+      textarea {
+        border: none;
+        outline: none;
+        padding: 12px 14px;
+        width: 100%;
+        font-size: var(--font-size-base);
+        color: var(--admin-text);
+        background: transparent;
+        font-family: inherit;
+
+        &::placeholder {
+          color: var(--text-muted);
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 60px;
+      }
+    }
+
+    // PrimeNG Select
+    p-select {
+      width: 100%;
+
+      .p-select {
+        width: 100%;
+        border: 1.5px solid var(--admin-border);
+        border-radius: 10px;
+        background-color: var(--admin-light);
+        transition: all 0.2s;
+        box-shadow: none;
+
+        &:not(.p-disabled):hover {
+          border-color: var(--primary-color);
+        }
+
+        &.p-focus {
+          border-color: var(--primary-color);
+          background-color: white;
+          box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.1);
+        }
+
+        .p-select-label {
+          padding: 10px 14px;
+          font-size: var(--font-size-base);
+          color: var(--admin-text);
+
+          &.p-placeholder {
+            color: var(--text-muted);
+          }
+        }
+      }
+    }
+
+    // PrimeNG DatePicker
+    p-datepicker {
+      width: 100%;
+
+      .p-datepicker {
+        width: 100%;
+
+        .p-inputtext {
+          width: 100%;
+          border: 1.5px solid var(--admin-border);
+          border-radius: 10px;
+          background-color: var(--admin-light);
+          padding: 11px 14px;
+          font-size: var(--font-size-base);
+          color: var(--admin-text);
+          transition: all 0.2s;
+
+          &:focus {
+            border-color: var(--primary-color);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.1);
+          }
+
+          &::placeholder {
+            color: var(--text-muted);
+          }
+        }
+      }
+    }
+  }
+
+  // ==================== INFO NOTE ====================
+  .info-note {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: rgba(168, 85, 247, 0.04);
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    color: #7e22ce;
+
+    i {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: #a855f7;
+    }
+  }
+
+  // ==================== FORM ACTIONS ====================
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--admin-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+    @media (max-width: 576px) {
+      flex-direction: column-reverse;
+
+      .btn {
+        width: 100%;
+      }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      min-width: 160px;
+
+      i { font-size: 18px; }
+
+      &.btn-secondary {
+        background: white;
+        border-color: var(--admin-border);
+        color: var(--admin-text);
+
+        &:hover:not(:disabled) {
+          background: var(--admin-light);
+          border-color: var(--admin-text-muted);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+
+      &.btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 210, 255, 0.25);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0, 210, 255, 0.35);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0);
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          box-shadow: none;
+        }
+
+        .spinning {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+
+  // ==================== ANIMATION ====================
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}

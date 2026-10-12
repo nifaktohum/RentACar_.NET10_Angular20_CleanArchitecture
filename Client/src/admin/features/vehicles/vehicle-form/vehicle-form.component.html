@@ -275,13 +275,13 @@
               <!-- Silme butonu -->
               @if (!image.isMain) {
               <div class="image-actions">
-                <button pButton type="button" class="p-button-text p-button-danger" icon="ri-delete-bin-line"
+                <button pButton type="button" class="p-button-text p-button-danger" icon="ri-delete-bin-line ri-xl"
                   pTooltip="Sil" tooltipPosition="top" (click)="removeExistingImage(image, $event)">
                 </button>
               </div>
               } @else {
               <div class="image-actions">
-                <button pButton disabled type="button" class="p-button-text p-button-info" icon="ri-lock-line"
+                <button pButton disabled type="button" class="p-button-text p-button-info" icon="ri-lock-line ri-xl"
                   pTooltip="Vitrin resmi silinemez" tooltipPosition="top">
                 </button>
               </div>
@@ -293,7 +293,7 @@
         }
 
         <!-- ⭐ VİTRİN RESMİ SEÇ (Create Mode veya Edit Mode'da yeni vitrin) -->
-        @if (!isEditMode() || !mainImagePreview()) {
+        @if (!isEditMode()) {
         <div class="main-image-section">
           <div class="main-image-header">
             <h4>

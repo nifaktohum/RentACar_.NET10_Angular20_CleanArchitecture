@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit {
     }
 
     // // Eğer url'de bir yönlendirme adresi varsa onu 'returnUrl' değişkenine atıyoruz, yoksa varsayılan '/' (ana sayfa) kalıyor.
-    const url = this.route.snapshot.queryParams['returnUrl'] || '/';
+    const url = this.route.snapshot.queryParams['returnUrl'] || '/admin/dashboard';
     if (url) this.returnUrl = url;
   }
 
@@ -87,18 +87,17 @@ export class LoginComponent implements OnInit {
     };
 
 
-    this.authService.login(credentials).pipe(finalize(() => this.loading.set(false))).subscribe({
+    this.authService.login(credentials, this.isRememberMeChecked).pipe(finalize(() => this.loading.set(false))).subscribe({
       next: (res: Result<LoginResponse>) => {
         if (res.isSuccessful && res.data) {
           // Servis metodu çağrıldı, komponent rahatladı
           this.authService.saveUserSession(res.data, this.isRememberMeChecked);
-
           this.messageServiceToast.add({
             severity: 'success',
             summary: 'Giriş Başarılı :)',
             detail: `Hoş geldiniz - ${res.data.fullName}!`
           });
-          this.router.navigateByUrl(this.returnUrl || '/');
+          this.router.navigateByUrl(this.returnUrl || '/admin/dashboard');
           return;
         }
         this.messageServiceToast.add({
@@ -110,11 +109,11 @@ export class LoginComponent implements OnInit {
         // this.snackbarService.warning('Sunucudan geçersiz veri döndü, lütfen tekrar deneyin.');
 
       }, error: (err) => {
-
+        const errorMessage = err?.error?.error?.[0] || err?.error?.message || 'Sunucu hatası, lütfen tekrar deneyin.';
         this.messageServiceToast.add({
           severity: 'error',
           summary: 'Hata',
-          detail: `${err.error.error[0]}` || 'Sunucu hatası, lütfen tekrar deneyin.'
+          detail: errorMessage
         })
         console.log(err.error.error[0]);
       }

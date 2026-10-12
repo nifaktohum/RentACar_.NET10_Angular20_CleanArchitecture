@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
 import { Vehicle } from '../../core/models/vehicle/vehicle.model';
 import { VehicleType } from '../../core/models/vehicle/vehicle-type.model';
 import { VehicleService } from '../../core/services/vehicle.service';
@@ -19,6 +19,8 @@ import { environment } from '../../../environments/environment';
 import { forkJoin } from 'rxjs';
 import { VehicleTypeService } from '../../core/services/vehicle-type.service';
 import { VehicleStateService } from '../../core/services/state-services/vehicle-state.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { VehicleImage } from '../../core/models/vehicle/vehicle-image.model';
 
 @Component({
   selector: 'app-vehicles',
@@ -41,13 +43,16 @@ export class VehiclesComponent implements OnInit {
   public vehicleService = inject(VehicleService);
   private vehicleTypeService = inject(VehicleTypeService);
   private vehicleStateService = inject(VehicleStateService);
+  private vehicleImageService = inject(VehicleImageService);
   private messageService = inject(MessageService);
   private customConfirmDialogService = inject(CustomConfirmDialogService);
   private breadcrumbService = inject(BreadcrumbService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   // ==================== SIGNALS ====================
   readonly vehicles = signal<Vehicle[]>([]);
+  readonly vehicleImages = signal<VehicleImage[]>([]);
   readonly totalCount = signal<number>(0);
   readonly isLoading = signal<boolean>(false);
   // readonly vehicleTypes = signal<VehicleType[]>([]);
@@ -131,7 +136,6 @@ export class VehiclesComponent implements OnInit {
 
 
     const params = this.vehicleStateService.filterParams();
-    console.log(params.sort);
     
     this.vehicleService.getAll(params).subscribe({
       next: (response) => {
@@ -297,35 +301,16 @@ export class VehiclesComponent implements OnInit {
     return type?.name || '-';
   }
 
-  getMainImageUrl(vehicle: Vehicle): string | null {
-    let imagePath: string | null = null;
+  // ==================== LOAD IMAGES ====================
 
-    // 1. Önce vehicle.images dizisinden isMain: true olan resmi bul
-    if (vehicle.images && vehicle.images.length > 0) {
-      const mainImage = vehicle.images.find(img => img.isMain);
-      if (mainImage) {
-        imagePath = mainImage.imageUrl;
-      }
-    }
+  getImageUrl(imageUrl: string | null | undefined): string {
+    if (!imageUrl) return 'assets/no-image.png';
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) return imageUrl;
 
-    // 2. Eğer images dizisinde yoksa vehicle.mainImageUrl değerine bak
-    if (!imagePath && vehicle.imageUrl) {
-      imagePath = vehicle.imageUrl;
-    }
+    const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+    const path = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
 
-    if (!imagePath) return null;
-
-    // 3. Eğer yol zaten 'http' ile başlıyorsa direkt döndür
-    if (imagePath.startsWith('http')) {
-      return imagePath;
-    }
-
-    // 4. environment.apiUrl içindeki '/api' ifadesini temizleyip anahost adresini alıyoruz
-    // Örn: "https://localhost:7200/api" -> "https://localhost:7200"
-    const baseUrl = environment.apiUrl.replace('/api', '');
-
-    // Backend'in static dosyaları sunacağı tam URL'i oluşturuyoruz
-    return `${baseUrl}${imagePath}`;
+    return `${baseUrl}${path}`;
   }
 
 }

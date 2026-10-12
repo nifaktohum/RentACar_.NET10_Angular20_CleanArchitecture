@@ -1,0 +1,170 @@
+<div class="blacklist-container">
+  <p-card>
+
+    <!-- ==================== HEADER ==================== -->
+    <div class="header-section">
+      <div class="header-left">
+        <div class="header-icon">
+          <i class="ri-forbid-2-line"></i>
+        </div>
+        <div>
+          <h2>Kara Liste</h2>
+          <p>Araç kiralaması engellenen müşteriler</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <p-button severity="contrast" icon="ri-refresh-line" pTooltip="Yenile" tooltipPosition="top"
+          (onClick)="loadBlacklistedCustomers()" [loading]="isLoading()" [raised]="true">
+        </p-button>
+      </div>
+    </div>
+
+    <!-- ==================== FİLTRELER ==================== -->
+    <div class="filter-section">
+      <div class="filter-row">
+
+        <!-- ARAMA -->
+        <div class="filter-field">
+          <label>Ara</label>
+          <input pInputText [ngModel]="state.filterSearch()"
+            (ngModelChange)="state.filterSearch.set($event); onFilterChange()" placeholder="İsim, email, telefon..."
+            class="filter-input" />
+        </div>
+
+        <!-- SIRALAMA -->
+        <div class="filter-field">
+          <label>Sıralama</label>
+          <p-select [options]="sortOptions" optionLabel="label" [ngModel]="selectedSortOption()"
+            (ngModelChange)="onSortChange($event)" placeholder="Sırala" class="filter-select">
+          </p-select>
+        </div>
+
+        <!-- TİP -->
+        <div class="filter-field">
+          <label>Tip</label>
+          <p-select [options]="typeOptions" optionLabel="label" optionValue="value" [(ngModel)]="filterType"
+            (ngModelChange)="onFilterChange()" placeholder="Tip Seç" [showClear]="true" class="filter-select">
+          </p-select>
+        </div>
+
+        <!-- SIFIRLA -->
+        <div class="filter-field filter-reset">
+          <p-button icon="ri-filter-off-line" severity="secondary" pTooltip="Filtreleri Sıfırla" tooltipPosition="top"
+            [raised]="true" [disabled]="!state.hasActiveFilters()" (onClick)="onResetFilters()">
+          </p-button>
+        </div>
+
+        <!-- TOPLAM -->
+        <div class="filter-field filter-count">
+          <label>Toplam</label>
+          <span class="count-badge danger">{{ totalCount() }}</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== TABLO ==================== -->
+    <div class="table-wrapper">
+      <p-table [value]="customers()" [lazy]="true" [paginator]="true" [rows]="state.pageSize()"
+        [totalRecords]="totalCount()" [loading]="isLoading()" [rowsPerPageOptions]="[5, 10, 20, 50]"
+        [tableStyle]="{ width: '100%' }" (onPage)="onPageChange($event)" dataKey="id"
+        currentPageReportTemplate="Toplam {totalRecords} müşteriden {first} - {last} arası gösteriliyor"
+        showCurrentPageReport="true">
+
+        <!-- HEADER -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3%">#</th>
+            <th style="width: 25%">Müşteri</th>
+            <th style="width: 20%">İletişim</th>
+            <th style="width: 12%">Tip</th>
+            <th style="width: 15%">Kara Liste Sebebi</th>
+            <th style="width: 10%; text-align: center;">Kayıt</th>
+            <th style="width: 15%; text-align: center;">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <!-- BODY -->
+        <ng-template pTemplate="body" let-customer let-i="rowIndex">
+          <tr>
+            <td>{{ i + 1 }}</td>
+
+            <!-- MÜŞTERİ -->
+            <td>
+              <div class="customer-info">
+                <div class="avatar" [class.corporate]="customer.type === 'Corporate'">
+                  {{ getInitials(customer) }}
+                </div>
+                <div class="info-text">
+                  <span class="name">{{ getFullName(customer) }}</span>
+                  <span class="city">{{ customer.city }} / {{ customer.country }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- İLETİŞİM -->
+            <td>
+              <div class="contact-info">
+                <span class="contact-item">
+                  <i class="ri-mail-line"></i>
+                  {{ customer.email }}
+                </span>
+                <span class="contact-item">
+                  <i class="ri-phone-line"></i>
+                  {{ customer.phoneNumber | phoneFormatPipe }}
+                </span>
+              </div>
+            </td>
+
+            <!-- TİP -->
+            <td>
+              <p-tag [value]="getTypeLabel(customer.type)"
+                [severity]="customer.type === 'Corporate' ? 'info' : 'success'" [rounded]="true">
+              </p-tag>
+            </td>
+
+            <!-- KARA LİSTE SEBEBİ -->
+            <td>
+              <span class="blacklist-reason">
+                {{ customer.blacklistReason || 'Sebep belirtilmemiş' }}
+              </span>
+            </td>
+
+            <!-- KAYIT TARİHİ -->
+            <td class="date-cell">{{ formatDate(customer.createdAt) }}</td>
+
+            <!-- İŞLEMLER -->
+            <td class="actions-cell">
+              <div class="action-buttons">
+                <button pButton type="button" class="p-button-text p-button-info p-button-rounded btn-detail"
+                  icon="ri-eye-line" pTooltip="Detay" tooltipPosition="top" (click)="viewDetail(customer)">
+                </button>
+                <button pButton type="button" class="p-button-text p-button-success p-button-rounded btn-remove"
+                  icon="ri-checkbox-circle-line" pTooltip="Kara Listeden Çıkar" tooltipPosition="top"
+                  (click)="removeFromBlacklist(customer)">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- EMPTY -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="empty-table-message">
+              @if (isLoading()) {
+              <i class="ri-loader-4-line spinning"></i>
+              Yükleniyor...
+              } @else {
+              <i class="ri-checkbox-circle-line"></i>
+              Harika! Kara listede müşteri yok.
+              }
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </div>
+
+  </p-card>
+</div>

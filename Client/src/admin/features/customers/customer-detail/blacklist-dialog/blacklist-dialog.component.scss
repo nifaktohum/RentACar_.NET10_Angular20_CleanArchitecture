@@ -1,0 +1,196 @@
+::ng-deep {
+  .blacklist-dialog {
+    .p-dialog-header {
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      border-bottom: 1px solid rgba(244, 63, 94, 0.2);
+
+      .p-dialog-title {
+        color: #991b1b;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &::before {
+          content: '\ea1f'; // ri-forbid-2-line
+          font-family: 'remixicon';
+          font-size: 1.2rem;
+        }
+      }
+    }
+
+    .p-dialog-content {
+      padding: 0 !important;
+    }
+
+    .dialog-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    // ==================== UYARI ====================
+    .warning-box {
+      display: flex;
+      gap: 14px;
+      padding: 16px;
+      background: rgba(244, 63, 94, 0.06);
+      border: 1px solid rgba(244, 63, 94, 0.15);
+      border-radius: 12px;
+
+      .warning-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: rgba(244, 63, 94, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-block: auto;
+
+        i {
+          font-size: 24px;
+          color: #dc2626;
+        }
+      }
+
+      .warning-content {
+        flex: 1;
+        min-width: 0;
+
+        h4 {
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: #991b1b;
+          margin: 0 0 6px 0;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+        }
+
+        p {
+          font-size: 0.85rem;
+          color: #7f1d1d;
+          margin: 0;
+          line-height: 1.5;
+
+          strong {
+            color: #991b1b;
+          }
+        }
+      }
+    }
+
+    // ==================== FORM ====================
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .form-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--admin-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        .required {
+          color: var(--admin-danger);
+          font-weight: 700;
+        }
+      }
+
+      textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid var(--admin-border);
+        border-radius: 10px;
+        background: var(--admin-light);
+        font-family: inherit;
+        font-size: 0.9rem;
+        color: var(--admin-text);
+        resize: vertical;
+        transition: all 0.2s;
+
+        &::placeholder {
+          color: var(--text-muted);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: var(--admin-danger);
+          background: white;
+          box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.1);
+        }
+      }
+
+      .form-hint {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.75rem;
+
+        .char-count {
+          color: var(--admin-text-muted);
+          font-weight: 500;
+
+          &.warning {
+            color: var(--admin-warning);
+            font-weight: 600;
+          }
+        }
+
+        .hint-text {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          color: var(--admin-warning);
+
+          i {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    // ==================== FOOTER ====================
+    .p-dialog-footer {
+      border-top: 1px solid var(--admin-border);
+      padding: 16px 24px;
+      background: var(--admin-light);
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+
+      .p-button-danger {
+        background: linear-gradient(135deg, #f43f5e, #e11d48);
+        border: none;
+        box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
+
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 8px 20px rgba(244, 63, 94, 0.35);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .spinning {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  }
+}

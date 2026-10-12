@@ -4,6 +4,7 @@ import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../services/auth.service';
+import { TokenService } from '../services/token.service';
 
 // 🚀 Interceptor'ı bypass etmek için kullanacağımız sihirli token'ı buraya tanımlıyoruz.
 // Servis dosyasında istek atarken bunu tetikleyeceğiz.
@@ -13,6 +14,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const messageServiceToast = inject(MessageService);
   const authService = inject(AuthService)
   const router = inject(Router);
+  const _url = req.url.toLowerCase();
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -36,8 +38,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         // Eğer hata 401 ise, nerede olursak olalım 
         // Arkadan gelen çoklu istekler hafızayı ezmesin diye İSTİSNASIZ temizliyoruz!
         if (error.status === 401) {
-          // ✅ SADECE oturumla ilgili olanları temizle
-          // localStorage.clear(); // ❌ BUNU KALDIR
+          // Hangi token 401 aldı?
+          // const isCustomerRequest = req.url.includes('/customersauth')
+          //                        || req.url.includes('/customersprofile')
+          //   || req.url.includes('/customersmanagement');
+          
+          const isCustomerRequest = _url.includes('customer');
+          
+          const tokenService = inject(TokenService);
 
           // ✅ SADECE auth ile ilgili olanları temizle
           const rememberMe = localStorage.getItem('rememberedEmail');

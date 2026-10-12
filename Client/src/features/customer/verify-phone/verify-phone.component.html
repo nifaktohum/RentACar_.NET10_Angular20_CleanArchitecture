@@ -1,0 +1,140 @@
+<div class="verify-wrapper">
+
+  <!-- ==================== SAYFA BAŞLIĞI ==================== -->
+  <div class="page-header">
+    <div class="page-title phone">
+      <i class="ri-smartphone-line"></i>
+      <div>
+        <h1>Telefon Doğrulama</h1>
+        <p>Hesabınızı güvende tutun</p>
+      </div>
+    </div>
+
+    <a routerLink="/customer/profile" class="btn-back">
+      <i class="ri-arrow-left-line"></i>
+      <span>Profile Dön</span>
+    </a>
+  </div>
+
+  <!-- ==================== İÇERİK ==================== -->
+  <div class="verify-container">
+
+    <!-- ==================== STATE: PENDING ==================== -->
+    @if (state() === 'pending') {
+    <div class="verify-card">
+      <div class="card-icon phone">
+        <i class="ri-smartphone-line"></i>
+      </div>
+
+      <h2>Telefon Numaranızı Doğrulayın</h2>
+
+      <p class="card-description">
+        Kayıtlı telefon numaranıza 6 haneli bir doğrulama kodu göndereceğiz.
+        Kodu girerek numaranızı doğrulayabilirsiniz.
+      </p>
+
+      <div class="info-note">
+        <i class="ri-information-line"></i>
+        <span>Kod 5 dakika boyunca geçerlidir. Doğrulama tamamlanmadan araç kiralayamazsınız.</span>
+      </div>
+
+      <p-button type="button" class="btn btn-primary" (click)="sendCode()" [disabled]="loading()">
+        @if (loading()) {
+        <i class="ri-loader-4-line spinning"></i>
+        <span>Gönderiliyor...</span>
+        } @else {
+        <i class="ri-send-plane-line"></i>
+        <span>Doğrulama Kodu Gönder</span>
+        }
+      </p-button>
+    </div>
+    }
+
+    <!-- ==================== STATE: CODE_SENT ==================== -->
+    @if (state() === 'code_sent') {
+    <div class="verify-card">
+      <div class="card-icon success">
+        <i class="ri-message-2-line"></i>
+      </div>
+
+      <h2>Doğrulama Kodunu Girin</h2>
+
+      <p class="card-description">
+        Telefon numaranıza SMS ile gönderilen 6 haneli kodu aşağıya girin.
+      </p>
+
+      <!-- KOD INPUT -->
+      <form #form="ngForm" (ngSubmit)="verifyCode(form)" autocomplete="off" class="code-form">
+        <div class="form-group">
+          <label class="form-label">Doğrulama Kodu</label>
+          <div class="input-custom-group code-input phone">
+            <span class="input-icon"><i class="ri-lock-password-line"></i></span>
+            <input type="text" name="code" [ngModel]="code() | codeFormatPipe" (ngModelChange)="updateCode($event)"
+              placeholder="123-456" maxlength="7" required autofocus autocomplete="one-time-code" inputmode="numeric" />
+          </div>
+        </div>
+
+        <!-- RESEND -->
+        <div class="resend-section">
+          <p>Kod gelmedi mi?</p>
+          @if (canResend()) {
+          <button type="button" class="btn-link" (click)="resendCode()">
+            <i class="ri-refresh-line"></i>
+            Yeniden Gönder
+          </button>
+          } @else {
+          <span class="cooldown-timer">
+            <i class="ri-time-line"></i>
+            Yeniden gönder: <strong>{{ formattedCooldown() }}</strong>
+          </span>
+          }
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="!canVerify()">
+            @if (loading()) {
+            <i class="ri-loader-4-line spinning"></i>
+            <span>Doğrulanıyor...</span>
+            } @else {
+            <i class="ri-checkbox-circle-line"></i>
+            <span>Doğrula</span>
+            }
+          </button>
+        </div>
+      </form>
+
+      <div class="info-note small">
+        <i class="ri-information-line"></i>
+        <span>SMS gelmediyse birkaç dakika bekleyin veya yeniden gönderin.</span>
+      </div>
+    </div>
+    }
+
+    <!-- ==================== STATE: VERIFIED ==================== -->
+    @if (state() === 'verified') {
+    <div class="verify-card success-card">
+      <div class="card-icon verified">
+        <i class="ri-verified-badge-line"></i>
+      </div>
+
+      <h2>Telefon Doğrulandı!</h2>
+
+      <p class="card-description">
+        Telefon numaranız başarıyla doğrulandı. Artık tüm RentCar özelliklerini kullanabilirsiniz.
+      </p>
+
+      <div class="verified-badge">
+        <i class="ri-shield-check-fill"></i>
+        <span>Hesabınız güvende</span>
+      </div>
+
+      <p-button type="button" class="btn btn-primary" (click)="goToProfile()">
+        <i class="ri-user-line"></i>
+        <span>Profile Dön</span>
+      </p-button>
+    </div>
+    }
+
+  </div>
+</div>

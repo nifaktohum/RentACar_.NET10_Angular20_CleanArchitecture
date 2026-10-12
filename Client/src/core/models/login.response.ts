@@ -3,4 +3,5 @@ export interface LoginResponse {
   email: string;
   fullName: string;
   permissions?: string[];
+  refreshToken?: string;
 }

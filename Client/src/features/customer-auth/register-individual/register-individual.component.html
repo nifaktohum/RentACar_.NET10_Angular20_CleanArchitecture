@@ -1,0 +1,361 @@
+<!-- ==================== GENEL WRAPPER & CONTAINER ==================== -->
+<!-- Tüm kayıt sayfasını kaplayan dış kapsayıcı -->
+<div class="register-wrapper">
+  <!-- İçerik merkezleme ve sınırlar için genişlik kapsayıcısı -->
+  <div class="register-container">
+    <!-- Sol form ve sağ bilgi panelini tutan ana kart -->
+    <div class="register-card">
+
+      <!-- ==================== SOL PANEL: FORM ALANI ==================== -->
+      <div class="register-form-side">
+
+        <!-- HEADER: Logo, Geri Dönüş Linki ve Başlık -->
+        <div class="register-header">
+          <!-- Marka ve Logo -->
+          <div class="brand">
+            <i class="ri-car-fill"></i>
+            <h1>RentCar</h1>
+            <span class="label">Bireysel Kayıt</span>
+          </div>
+
+          <!-- Giriş Sayfasına Yönlendiren Link -->
+          <a routerLink="/customer-auth/customer-login" class="back-link">
+            <i class="ri-arrow-left-line"></i>
+            Giriş Sayfasına Dön
+          </a>
+
+          <!-- Sayfa Alt Başlığı -->
+          <div class="register-title">
+            <h2>Hesap Oluştur</h2>
+            <p>2 adımda hızlıca kayıt olun</p>
+          </div>
+        </div>
+
+        <!-- STEPPER: Form Adımlarını Gösteren İlerleme Çubuğu -->
+        <div class="stepper">
+          <!-- Adım 1 Göstergesi (Aktiflik ve Tamamlanma Durumu Kontrolü) -->
+          <div class="step" [class.active]="currentStep() === 1" [class.completed]="currentStep() > 1">
+            <div class="step-circle">
+              @if (currentStep() > 1) {
+              <i class="ri-check-line"></i>
+              } @else {
+              1
+              }
+            </div>
+            <div class="step-info">
+              <span class="step-title">Kimlik Bilgileri</span>
+              <span class="step-desc">Ad, T.C., doğum tarihi</span>
+            </div>
+          </div>
+
+          <!-- Adımlar Arası Bağlantı Çizgisi -->
+          <div class="step-line" [class.completed]="currentStep() > 1"></div>
+
+          <!-- Adım 2 Göstergesi -->
+          <div class="step" [class.active]="currentStep() === 2" [class.completed]="isStep2Valid">
+            <div class="step-circle">
+              @if (isStep2Valid) {
+              <i class="ri-check-line"></i>
+              } @else {
+              2
+              }
+            </div>
+            <div class="step-info">
+              <span class="step-title">İletişim & Şifre</span>
+              <span class="step-desc">E-posta, telefon, adres</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== ADIM 1: KİMLİK BİLGİLERİ FORM BÖLÜMÜ ==================== -->
+        @if (currentStep() === 1) {
+        <form #step1Form="ngForm" (ngSubmit)="nextStep(step1Form)" autocomplete="off" class="register-form">
+          <div class="form-section">
+            <!-- AD - SOYAD YAN YANA SATIR -->
+            <div class="form-row">
+              <!-- Ad Input -->
+              <div class="form-group">
+                <label class="form-label">Ad <span class="required">*</span></label>
+                <div class="input-custom-group">
+                  <span class="input-icon"><i class="ri-user-line"></i></span>
+                  <input type="text" name="firstName" [ngModel]="step1Data().firstName"
+                    (ngModelChange)="updateStep1Field('firstName', $event)" placeholder="Adınızı girin" required
+                    maxlength="100" />
+                </div>
+              </div>
+
+              <!-- Soyad Input -->
+              <div class="form-group">
+                <label class="form-label">Soyad <span class="required">*</span></label>
+                <div class="input-custom-group">
+                  <span class="input-icon"><i class="ri-user-line"></i></span>
+                  <input type="text" name="lastName" [ngModel]="step1Data().lastName"
+                    (ngModelChange)="updateStep1Field('lastName', $event)" placeholder="Soyadınızı girin" required
+                    maxlength="100" />
+                </div>
+              </div>
+            </div>
+
+            <!-- T.C. KİMLİK NO INPUT -->
+            <div class="form-group">
+              <label class="form-label">T.C. Kimlik No <span class="required">*</span></label>
+              <div class="input-custom-group">
+                <span class="input-icon"><i class="ri-id-card-line"></i></span>
+                <input type="text" name="identityNumber" [ngModel]="step1Data().identityNumber"
+                  (ngModelChange)="updateStep1Field('identityNumber', $event)" maxlength="11" minlength="11"
+                  placeholder="11 haneli T.C. Kimlik No" pattern="^[0-9]{11}$" required (keypress)="onlyNumbers($event)"
+                  inputmode="numeric" />
+              </div>
+            </div>
+
+            <!-- DOĞUM TARİHİ VE CİNSİYET SATIRI -->
+            <div class="form-row">
+              <!-- PrimeNG DatePicker (Doğum Tarihi) -->
+              <div class="form-group">
+                <label class="form-label">Doğum Tarihi <span class="required">*</span></label>
+                <div class="input-custom-group">
+                  <span class="input-icon"><i class="ri-calendar-line"></i></span>
+                <input
+                  type="text"
+                  name="birthDate"
+                  [ngModel]="step1Data().birthDate"
+                  (ngModelChange)="updateStep1Field('birthDate', $event)"
+                  placeholder="gg/aa/yyyy"
+                  PrimeDateMaskDirective
+                  required />
+                </div>
+              </div>
+
+              <!-- PrimeNG Select (Cinsiyet Seçimi) -->
+              <div class="form-group">
+                <label class="form-label">Cinsiyet</label>
+                <p-select
+                  name="gender"
+                  [ngModel]="step1Data().gender"
+                  (ngModelChange)="updateStep1Field('gender', $event)"
+                  [options]="genderOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Seçiniz"
+                  [showClear]="true"
+                  [style]="{ width: '100%' }"
+                  required>
+                  </p-select>
+              </div>
+            </div>
+          </div>
+          <!-- ADIM 1 AKSİYON BUTONLARI -->
+          <div class="form-actions single">
+            <button type="submit" class="btn btn-primary" [disabled]="step1Form.invalid">
+              <span>Devam Et</span>
+              <i class="ri-arrow-right-line"></i>
+            </button>
+          </div>
+        </form>
+        }
+
+        <!-- ==================== ADIM 2: İLETİŞİM VE ŞİFRE FORM BÖLÜMÜ ==================== -->
+        @if (currentStep() === 2) {
+        <form #step2Form="ngForm" (ngSubmit)="onSubmit(step2Form)" autocomplete="off" class="register-form">
+
+          <!-- E-POSTA INPUT & DİREKTİF İLE VALİDASYON -->
+          <div class="form-group">
+            <label class="form-label">E-posta Adresi <span class="required">*</span></label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-mail-line"></i></span>
+              <input type="email" name="email" [ngModel]="step2Data().email"
+                (ngModelChange)="updateStep2Field('email', $event)" placeholder="ornek@email.com" required
+                [emailValidationDirective]="emailError" />
+            </div>
+            <p #emailError class="error-container"></p>
+          </div>
+
+          <!-- TELEFON NUMARASI (Format Pipe + Maske Entegrasyonu) -->
+          <div class="form-group">
+            <label class="form-label">Telefon Numarası <span class="required">*</span></label>
+            <div class="input-custom-group">
+              <span class="input-icon"><i class="ri-phone-line"></i></span>
+              <input type="text" name="phoneNumber" [ngModel]="step2Data().phoneNumber | phoneFormatPipe" minlength="13"
+                maxlength="19" (ngModelChange)="onPhoneChange($event)" placeholder="+90 (5XX) XXX XX XX" required />
+            </div>
+          </div>
+
+          <!-- ŞİFRE VE ŞİFRE TEKRAR SATIRI (Şifre Görünürlük Ve Eşleşme Direktifli) -->
+          <div class="form-row-pass">
+            <!-- Şifre -->
+            <div class="form-group">
+              <label class="form-label">Şifre <span class="required">*</span></label>
+              <div class="input-custom-group">
+                <span class="input-icon"><i class="ri-lock-line"></i></span>
+                <input type="password" name="password" id="password" [ngModel]="step2Data().password"
+                  (ngModelChange)="updateStep2Field('password', $event)" placeholder="Şifrenizi girin" required
+                  [passwordValidationDirective]="passwordError" [togglePasswordDirective]="eyeIcon"
+                  #passwordToggle="toggleDir" #passwordInput />
+                <button type="button" class="password-toggle" (click)="passwordToggle.toggle()">
+                  <i #eyeIcon class="ri-eye-off-line"></i>
+                </button>
+              </div>
+              <p #passwordError class="error-container"></p>
+            </div>
+
+            <!-- Şifre Tekrar -->
+            <div class="form-group">
+              <label class="form-label">Şifre Tekrar <span class="required">*</span></label>
+              <div class="input-custom-group">
+                <span class="input-icon"><i class="ri-lock-line"></i></span>
+                <input type="password" name="confirmPassword" [ngModel]="step2Data().confirmPassword"
+                  (ngModelChange)="updateStep2Field('confirmPassword', $event)" placeholder="Şifrenizi tekrar girin"
+                  required [togglePasswordDirective]="confirmEyeIcon" #confirmPasswordToggle="toggleDir"
+                  [confirmPasswordValidationDirective]="confirmPasswordError" [mainPasswordInput]="passwordInput" />
+                <button type="button" class="password-toggle" (click)="confirmPasswordToggle.toggle()">
+                  <i #confirmEyeIcon class="ri-eye-off-line"></i>
+                </button>
+              </div>
+              <p #confirmPasswordError class="error-container"></p>
+            </div>
+          </div>
+
+          <!-- AÇIK ADRES TEXTAREA -->
+          <div class="form-group">
+            <label class="form-label">Adres <span class="required">*</span></label>
+            <div class="input-custom-group textarea">
+              <span class="input-icon"><i class="ri-map-pin-line"></i></span>
+              <textarea name="address" [ngModel]="step2Data().address"
+                (ngModelChange)="updateStep2Field('address', $event)" placeholder="Açık adresinizi girin" rows="2"
+                required maxlength="500">
+                </textarea>
+            </div>
+          </div>
+
+          <!-- İL / İLÇE / ÜLKE / POSTA KODU DÖRT LÜ GRUP -->
+          <div class="form-row-3">
+            <!-- İl Seçimi (PrimeNG Select) -->
+            <div class="form-group">
+              <label class="form-label">İl <span class="required">*</span></label>
+              <p-select name="city" [(ngModel)]="selectedCityCode" [options]="cities" optionLabel="name"
+                optionValue="code" placeholder="İl seçiniz" [filter]="true" filterBy="name"
+                (onChange)="onCityChange($event.value)" [style]="{ width: '100%' }" required>
+              </p-select>
+            </div>
+
+            <!-- İlçe Seçimi (İl Seçimine Bağımlı) -->
+            <div class="form-group">
+              <label class="form-label">İlçe <span class="required">*</span></label>
+              <p-select name="district" [(ngModel)]="selectedDistrict" [options]="districts" optionLabel="name"
+                optionValue="name" placeholder="İlçe seçiniz" [filter]="true" filterBy="name"
+                [disabled]="!selectedCityCode" (onChange)="onDistrictChange($event.value)" [style]="{ width: '100%' }"
+                required>
+              </p-select>
+            </div>
+
+            <!-- Ülke Input -->
+            <div class="form-group">
+              <label class="form-label">Ülke <span class="required">*</span></label>
+              <div class="input-custom-group">
+                <span class="input-icon"><i class="ri-earth-line"></i></span>
+                <input type="text" name="country" [ngModel]="step2Data().country"
+                  (ngModelChange)="updateStep2Field('country', $event)" placeholder="Ülke" required />
+              </div>
+            </div>
+
+            <!-- Posta Kodu Input -->
+            <div class="form-group">
+              <label class="form-label">Posta Kodu</label>
+              <div class="input-custom-group">
+                <span class="input-icon"><i class="ri-hashtag"></i></span>
+                <input type="text" name="postalCode" [ngModel]="step2Data().postalCode"
+                  (ngModelChange)="updateStep2Field('postalCode', $event)" placeholder="Posta Kodu" required />
+              </div>
+            </div>
+          </div>
+
+          <!-- KULLANIM KOŞULLARI ONAY CHECKBOX (PrimeNG Checkbox) -->
+          <div class="terms-checkbox">
+            <p-checkbox name="terms" [ngModel]="termsAccepted()" (ngModelChange)="termsAccepted.set($event)"
+              [binary]="true" inputId="terms" required>
+            </p-checkbox>
+            <label for="terms">
+              <a href="#" target="_blank">Kullanım Koşulları</a> ve
+              <a href="#" target="_blank">Gizlilik Politikası</a>'nı okudum, kabul ediyorum.
+            </label>
+          </div>
+
+          <!-- ADIM 2 AKSİYON BUTONLARI (Geri & Kayıt Ol) -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="previousStep()" [disabled]="loading()">
+              <i class="ri-arrow-left-line"></i>
+              Geri
+            </button>
+            <button type="submit" class="btn btn-primary"
+              [disabled]="loading() || !termsAccepted() || step2Form.invalid ">
+              @if (loading()) {
+              <i class="ri-loader-4-line spinning"></i>
+              Kayıt yapılıyor...
+              } @else {
+              <i class="ri-check-line"></i>
+              Hesap Oluştur
+              }
+            </button>
+
+          </div>
+        </form>
+        }
+
+
+        <!-- FOOTER: Zaten Hesabı Olanlar İçin Giriş Linki -->
+        <div class="register-footer">
+          <p>Zaten hesabınız var mı?
+            <a (click)="goToLogin()" class="login-link">Giriş yapın</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== SAĞ PANEL: BİLGİ VE AVANTAJLAR ==================== -->
+      <div class="register-info-side">
+        <div class="info-content">
+          <!-- Bilgi Paneli Başlığı -->
+          <div class="info-header">
+            <div class="icon-badge">
+              <i class="ri-user-add-line"></i>
+            </div>
+            <h3>Neden RentCar?</h3>
+            <p>Binlerce mutlu müşteriye katılın</p>
+          </div>
+
+          <!-- Öne Çıkan Özellikler Listesi -->
+          <div class="features">
+            <div class="feature-item">
+              <i class="ri-shield-check-fill"></i>
+              <div>
+                <h6>Güvenli Ödeme</h6>
+                <p>256-bit SSL şifreleme ile korunur</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="ri-flashlight-fill"></i>
+              <div>
+                <h6>Hızlı Rezervasyon</h6>
+                <p>3 dakikada aracınızı ayırtın</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="ri-money-dollar-circle-fill"></i>
+              <div>
+                <h6>Uygun Fiyatlar</h6>
+                <p>Gizli ücret yok, şeffaf fiyatlandırma</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="ri-customer-service-2-fill"></i>
+              <div>
+                <h6>7/24 Destek</h6>
+                <p>Her an yanınızdayız</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

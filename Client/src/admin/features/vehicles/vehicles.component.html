@@ -106,8 +106,8 @@
             <!-- Resim -->
             <td class="col-image">
               <div class="image-wrapper">
-                @if (getMainImageUrl(vehicle)) {
-                <img [src]="getMainImageUrl(vehicle)" [alt]="vehicle.brand" />
+                @if (vehicle.mainImageUrl) {
+                <img [src]="getImageUrl(vehicle.mainImageUrl)" [alt]="vehicle.brand" />
                 } @else {
                 <div class="no-image">
                   <i class="ri-image-line"></i>
@@ -151,10 +151,10 @@
             <td class="col-actions">
               <div class="action-buttons">
                 <button pButton type="button" class="p-button-text p-button-info p-button-rounded btn-detail"
-                  icon="ri-eye-line" pTooltip="Detay" tooltipPosition="top" (click)="navigateToDetail(vehicle)">
+                  icon="ri-eye-line" pTooltip="Detay" [disabled]="!vehicle.isActive" tooltipPosition="top" (click)="navigateToDetail(vehicle)">
                 </button>
                 <button pButton type="button" class="p-button-text p-button-primary p-button-rounded btn-edit"
-                  icon="ri-edit-line" pTooltip="Düzenle" tooltipPosition="top" (click)="navigateToEdit(vehicle)">
+                  icon="ri-edit-line" pTooltip="Düzenle" [disabled]="!vehicle.isActive" tooltipPosition="top" (click)="navigateToEdit(vehicle)">
                 </button>
                 <button pButton type="button" class="p-button-text p-button-danger p-button-rounded btn-delete"
                   icon="ri-delete-bin-line" pTooltip="Sil" tooltipPosition="top" (click)="deleteVehicle(vehicle)">

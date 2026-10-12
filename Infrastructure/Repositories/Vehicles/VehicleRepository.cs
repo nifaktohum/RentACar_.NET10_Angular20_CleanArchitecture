@@ -1,8 +1,11 @@
 using System.Linq.Expressions;
+using Application.Common.Extensions;
 using Domain.Entities.Vehicles;
+using Domain.Repositories;
 using Domain.Repositories.Vehicles;
 using GenericRepository;
 using Infrastructure.Context;
+using Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Vehicles;
@@ -154,6 +157,37 @@ public sealed class VehicleRepository : Repository<Vehicle, AppDbContext>, IVehi
       query = query.Take(take.Value);
 
     return await query.AsNoTracking().ToListAsync(cancellationToken);
+  }
+
+  // ==================== SPECIFICATION ====================
+
+  public async Task<List<Vehicle>> GetListWithSpecAsync(ISpecification<Vehicle> spec, CancellationToken cancellationToken = default)
+  {
+    return await ApplySpecification(spec).ToListAsync(cancellationToken);
+  }
+
+  public async Task<int> CountWithSpecAsync(ISpecification<Vehicle> spec, CancellationToken cancellationToken = default)
+  {
+    var query = _context.Set<Vehicle>().AsQueryable();
+
+    if (spec.Criteria != null)
+      query = query.Where(spec.Criteria);
+
+    if (spec.IsDistinct)
+      query = query.Distinct();
+
+    return await query.CountAsync(cancellationToken);
+  }
+
+  public async Task<Vehicle?> GetSingleWithSpecAsync(ISpecification<Vehicle> spec, CancellationToken cancellationToken = default)
+  {
+    return await ApplySpecification(spec).FirstOrDefaultAsync(cancellationToken);
+  }
+
+  // Ortak Specification (Where, Include, OrderBy, Paging vb.) mantığını tek yerde topladığımız yardımcı metodumuz
+  private IQueryable<Vehicle> ApplySpecification(ISpecification<Vehicle> spec)
+  {
+    return SpecificationEvaluator<Vehicle>.GetQuery(_context.Set<Vehicle>().AsQueryable(), spec);
   }
 
 

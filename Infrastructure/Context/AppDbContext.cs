@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Domain.Abstractions;
 using Domain.Entities.Branchs;
 using Domain.Entities.Categories;
+using Domain.Entities.Customers;
 using Domain.Entities.Extras;
 using Domain.Entities.Protection;
 using Domain.Entities.Roles;
@@ -45,6 +46,7 @@ public class AppDbContext : DbContext, IUnitOfWork
   public DbSet<VehicleModel> VehicleModels { get; set; }
   public DbSet<VehicleType> VehicleTypes { get; set; }
   public DbSet<VehicleImage> VehicleImages { get; set; }
+  public DbSet<Customer> Customers { get; set; }
 
   protected override void OnModelCreating(ModelBuilder _modelBuilder)
   {

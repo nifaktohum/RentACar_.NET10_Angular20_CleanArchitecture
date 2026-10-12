@@ -1,5 +1,6 @@
 import { Directive, ElementRef, HostListener, Renderer2, inject, input } from '@angular/core';
 
+// şifre kontrou!
 @Directive({
   selector: '[passwordValidationDirective]',
 })

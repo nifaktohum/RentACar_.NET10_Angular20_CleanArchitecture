@@ -1,0 +1,132 @@
+<div class="customer-layout">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="customer-header">
+    <div class="header-left">
+      <!-- Drawer Açma/Kapatma Butonu -->
+      <button class="menu-toggle" (click)="toggleSidebar()" pTooltip="Menü" tooltipPosition="bottom">
+        <i class="ri-menu-line"></i>
+      </button>
+
+      <a routerLink="/customer/profile" class="brand">
+        <i class="ri-car-fill"></i>
+        <h1>RentCar</h1>
+        <span class="label">Müşteri Paneli</span>
+      </a>
+    </div>
+
+    <div class="header-right">
+      <!-- Araç Kirala Butonu -->
+      <a routerLink="/" class="btn-rent">
+        <i class="ri-roadster-line"></i>
+        <span>Araç Kirala</span>
+      </a>
+
+      <!-- User Menu (Popup Dropdown) -->
+      <div class="user-menu" (click)="userMenu.toggle($event)">
+        <p-avatar [label]="initials()" shape="circle" styleClass="user-avatar"></p-avatar>
+        <div class="user-info">
+          <span class="user-name">{{ customerFullName() }}</span>
+          <span class="user-type">
+            {{ customerTypeLabel() }}
+            @if (isEmailVerified()) {
+            <i class="ri-verified-badge-fill verified" pTooltip="Doğrulanmış"></i>
+            }
+          </span>
+        </div>
+        <i class="ri-arrow-down-s-line" [class.rotated]="userMenuOpen()"></i>
+
+        <p-menu #userMenu [model]="userMenuItems" [popup]="true" [appendTo]="'body'" (onShow)="userMenuOpen.set(true)"
+          (onHide)="userMenuOpen.set(false)" styleClass="user-menu-popud">
+        </p-menu>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== BODY & DRAWER ==================== -->
+  <div class="customer-body">
+
+    <!-- HEADER'IN ALTINDA AÇILAN DRAWER -->
+    <p-drawer [(visible)]="sidebarOpen" position="left" [dismissible]="true" [modal]="true"
+      styleClass="customer-header-drawer">
+
+      <nav class="sidebar-nav">
+
+        <!-- HESABIM -->
+        <div class="nav-section">
+          <span class="nav-title">Hesabım</span>
+
+          <a routerLink="/customer/profile" routerLinkActive="active" class="nav-item" (click)="sidebarOpen.set(false)">
+            <i class="ri-user-3-line"></i>
+            <span>Profil Bilgilerim</span>
+          </a>
+
+          <a routerLink="/customer/profile/edit" routerLinkActive="active" class="nav-item"
+            (click)="sidebarOpen.set(false)">
+            <i class="ri-edit-line"></i>
+            <span>Profili Düzenle</span>
+          </a>
+        </div>
+
+        <!-- DOĞRULAMA -->
+        <div class="nav-section">
+          <span class="nav-title">Doğrulama</span>
+
+          <a routerLink="/customer/verify-email" routerLinkActive="active" class="nav-item"
+            (click)="sidebarOpen.set(false)">
+            <i class="ri-mail-check-line"></i>
+            <span>E-posta Doğrula</span>
+            @if (isEmailVerified()) {
+            <i class="ri-verified-badge-fill status-verified"></i>
+            } @else {
+            <i class="ri-error-warning-line status-warning"></i>
+            }
+          </a>
+
+          <a routerLink="/customer/verify-phone" routerLinkActive="active" class="nav-item"
+            (click)="sidebarOpen.set(false)">
+            <i class="ri-smartphone-line"></i>
+            <span>Telefon Doğrula</span>
+            @if (isPhoneVerified()) {
+            <i class="ri-verified-badge-fill status-verified"></i>
+            } @else {
+            <i class="ri-error-warning-line status-warning"></i>
+            }
+          </a>
+        </div>
+
+        <!-- İŞLEMLER -->
+        <div class="nav-section">
+          <span class="nav-title">İşlemler</span>
+
+          <a routerLink="/" class="nav-item" (click)="sidebarOpen.set(false)">
+            <i class="ri-roadster-line"></i>
+            <span>Araç Kirala</span>
+          </a>
+
+          <a class="nav-item disabled">
+            <i class="ri-history-line"></i>
+            <span>Kiralamalarım</span>
+            <span class="badge-soon">Yakında</span>
+          </a>
+        </div>
+
+      </nav>
+
+      <!-- SIDEBAR FOOTER -->
+      <div class="sidebar-footer">
+        <button class="btn-logout" (click)="logout(); sidebarOpen.set(false)">
+          <i class="ri-logout-box-r-line"></i>
+          <span>Çıkış Yap</span>
+        </button>
+      </div>
+
+    </p-drawer>
+
+    <!-- ANA İÇERİK -->
+    <main class="customer-content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+</div>
