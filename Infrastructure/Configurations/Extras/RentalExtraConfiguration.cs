@@ -1,4 +1,5 @@
 using Domain.Entities.Extras;
+using Domain.Entities.Extras.Enum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -6,43 +7,77 @@ namespace Infrastructure.Configurations.Extras;
 
 public sealed class RentalExtraConfiguration : IEntityTypeConfiguration<RentalExtra>
 {
-  public void Configure(EntityTypeBuilder<RentalExtra> _builder)
+  public void Configure(EntityTypeBuilder<RentalExtra> builder)
   {
-    // Tablo adını açıkça "RentalExtras" olarak belirliyoruz
-    _builder.ToTable("RentalExtras");
+    // ==================== TABLE ====================
+    builder.ToTable("RentalExtras");
 
-    // Primary Key (Birincil Anahtar) olarak Id alanını seçiyoruz
-    _builder.HasKey(re => re.Id);
+    // ==================== PRIMARY KEY ====================
+    builder.HasKey(re => re.Id);
 
-    // UnitPrice (Birim fiyat) alanı zorunlu ve parasal işlemler için 18,2 hassasiyetinde olacak
-    _builder.Property(re => re.UnitPrice)
+    builder.Property(re => re.Id)
+        .HasColumnName("Id")
+        .HasColumnOrder(0);
+
+    // ==================== FK ====================
+    builder.Property(re => re.RentalId)
         .IsRequired()
-        .HasPrecision(18, 2);
+        .HasColumnName("RentalId")
+        .HasColumnOrder(1);
 
-    // Quantity (Adet/Miktar) alanı zorunlu ve varsayılan olarak 1 atanacak
-    _builder.Property(re => re.Quantity)
+    builder.Property(re => re.ExtraId)
         .IsRequired()
-        .HasDefaultValue(1);
+        .HasColumnName("ExtraId")
+        .HasColumnOrder(2);
 
-    // TotalPrice (Toplam fiyat) alanı zorunlu ve parasal işlemler için 18,2 hassasiyetinde olacak
-    _builder.Property(re => re.TotalPrice)
+    // ==================== FİYATLANDIRMA ====================
+    builder.Property(re => re.UnitPrice)
         .IsRequired()
-        .HasPrecision(18, 2);
+        .HasPrecision(18, 2)
+        .HasColumnName("UnitPrice")
+        .HasColumnOrder(3);
 
-    // Performans için RentalId ve ExtraId alanlarına tekli indeksler ekliyoruz
-    _builder.HasIndex(re => re.RentalId);
-    _builder.HasIndex(re => re.ExtraId);
+    builder.Property(re => re.Quantity)
+        .IsRequired()
+        .HasDefaultValue(1)
+        .HasColumnName("Quantity")
+        .HasColumnOrder(4);
 
-    // Aynı ürünün aynı kiralamaya birden fazla eklenmesini önlemek için birleşik (composite) unique index
-    _builder.HasIndex(re => new { re.RentalId, re.ExtraId })
-        .IsUnique()
-        .HasFilter("\"IsDeleted\" = false");  // Yalnızca silinmemiş olan kayıtlar için geçerli
+    builder.Property(re => re.RentalDayCount)
+        .IsRequired()
+        .HasDefaultValue(1)
+        .HasColumnName("RentalDayCount")
+        .HasColumnOrder(5);
 
-    // Extra tablosu ile ilişki (Foreign Key) tanımlıyoruz
-    _builder.HasOne(re => re.Extra)
+    builder.Property(re => re.PriceType)
+        .IsRequired()
+        .HasDefaultValue(PriceType.Daily)
+        .HasColumnName("PriceType")
+        .HasColumnOrder(6);
+
+    builder.Property(re => re.TotalPrice)
+        .IsRequired()
+        .HasPrecision(18, 2)
+        .HasColumnName("TotalPrice")
+        .HasColumnOrder(7);
+
+    // ==================== RELATIONSHIPS ====================
+    builder.HasOne(re => re.Extra)
         .WithMany(e => e.RentalExtras)
         .HasForeignKey(re => re.ExtraId)
-        .OnDelete(DeleteBehavior.Restrict);  // Bir ekstra silindiğinde geçmiş kiralama kayıtlarının silinmesini engeller
+        .OnDelete(DeleteBehavior.Restrict)
+        .IsRequired();
+
+    // ==================== INDEXES ====================
+    builder.HasIndex(re => re.RentalId)
+        .HasDatabaseName("IX_RentalExtras_RentalId");
+
+    builder.HasIndex(re => re.ExtraId)
+        .HasDatabaseName("IX_RentalExtras_ExtraId");
+
+    builder.HasIndex("RentalId", "ExtraId")
+        .IsUnique()
+        .HasDatabaseName("IX_RentalExtras_Rental_Extra")  // ✅ bu olmalı
+        .HasFilter("\"IsDeleted\" = false");
   }
 }
-

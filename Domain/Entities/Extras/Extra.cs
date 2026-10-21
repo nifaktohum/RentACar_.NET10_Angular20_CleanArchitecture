@@ -1,5 +1,6 @@
 using Domain.Abstractions;
 using Domain.Entities.Extras.Enum;
+using Domain.Exceptions;
 
 namespace Domain.Entities.Extras;
 // Bu sınıf, araç kiralama sistemindeki ekstra ürünleri temsil eder.
@@ -101,14 +102,17 @@ public sealed class Extra : BaseEntity
 
   public void DecreaseStock(int quantity = 1)
   {
-    if (StockLimit.HasValue && StockLimit.Value >= quantity)
+    if (quantity <= 0)
+      throw new DomainValidationException("Miktar 0'dan büyük olmalıdır!", nameof(quantity));
+
+    if (StockLimit.HasValue)
     {
+      if (StockLimit.Value < quantity)
+        throw new InvalidOperationException("Yeterli stok yok!");
+
       StockLimit -= quantity;
     }
-    else
-    {
-      throw new InvalidOperationException("Yeterli stok yok!");
-    }
+    // StockLimit null ise → sınırsız stok, hiçbir şey yapma
   }
 
   public void IncreaseStock(int quantity = 1)
@@ -130,6 +134,8 @@ public sealed class Extra : BaseEntity
   {
     RentalExtras.Remove(rentalExtra);
   }
+
+  
 }
 
 /*     DTO'lar (Data Transfer Objects)

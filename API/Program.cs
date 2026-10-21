@@ -41,6 +41,7 @@ _builder.Services.AddSwaggerGen(c =>
   c.SwaggerDoc("v1-Customers-Auth", new() { Title = "RentCar Customers-Auth", Version = "v1" });
   c.SwaggerDoc("v1-Customers-Profile", new() { Title = "RentCar Customers-Profile", Version = "v1" });
   c.SwaggerDoc("v1-Customers-Management", new() { Title = "RentCar Customers-Management", Version = "v1" });
+  c.SwaggerDoc("v1-Reservations", new() { Title = "RentCar Reservations", Version = "v1" });
 
   // Endpoint'leri GroupName'e göre doğru sekmeye dağıtan sihirli kural kanka!
   c.DocInclusionPredicate((docName, apiDesc) =>
@@ -130,6 +131,9 @@ if (app.Environment.IsDevelopment())
     c.SwaggerEndpoint("/swagger/v1-Customers-Auth/swagger.json", "RentCar Customers-Auth");
     c.SwaggerEndpoint("/swagger/v1-Customers-Profile/swagger.json", "RentCar Customers-Profile");
     c.SwaggerEndpoint("/swagger/v1-Customers-Management/swagger.json", "RentCar Customers-Management");
+    c.SwaggerEndpoint("/swagger/v1-Reservations/swagger.json", "RentCar Reservations");
+
+
   });
 }
 

@@ -347,8 +347,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<int>("Category")
-                        .HasColumnType("integer");
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -398,8 +399,9 @@ namespace Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
-                    b.Property<int>("PriceType")
-                        .HasColumnType("integer");
+                    b.Property<string>("PriceType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("StockLimit")
                         .HasColumnType("integer");
@@ -433,7 +435,9 @@ namespace Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(0);
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -448,7 +452,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ExtraId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("ExtraId")
+                        .HasColumnOrder(2);
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -456,21 +462,44 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("PriceType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Daily")
+                        .HasColumnName("PriceType")
+                        .HasColumnOrder(6);
+
                     b.Property<int>("Quantity")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(1);
+                        .HasDefaultValue(1)
+                        .HasColumnName("Quantity")
+                        .HasColumnOrder(4);
+
+                    b.Property<int>("RentalDayCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("RentalDayCount")
+                        .HasColumnOrder(5);
 
                     b.Property<Guid>("RentalId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("RentalId")
+                        .HasColumnOrder(1);
 
                     b.Property<decimal>("TotalPrice")
                         .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("TotalPrice")
+                        .HasColumnOrder(7);
 
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("UnitPrice")
+                        .HasColumnOrder(3);
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -480,12 +509,15 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExtraId");
+                    b.HasIndex("ExtraId")
+                        .HasDatabaseName("IX_RentalExtras_ExtraId");
 
-                    b.HasIndex("RentalId");
+                    b.HasIndex("RentalId")
+                        .HasDatabaseName("IX_RentalExtras_RentalId");
 
                     b.HasIndex("RentalId", "ExtraId")
                         .IsUnique()
+                        .HasDatabaseName("IX_RentalExtras_Rental_Extra")
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("RentalExtras", (string)null);
@@ -784,6 +816,240 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ProtectionPackageId", "IsDefault");
 
                     b.ToTable("ProtectionPricings", "protection");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Reservations.Reservation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(0);
+
+                    b.Property<DateTimeOffset?>("ActualPickupAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ActualPickupAt")
+                        .HasColumnOrder(9);
+
+                    b.Property<DateTimeOffset?>("ActualReturnAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ActualReturnAt")
+                        .HasColumnOrder(10);
+
+                    b.Property<string>("AdminNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("AdminNotes")
+                        .HasColumnOrder(27);
+
+                    b.Property<decimal?>("BillablePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("BillablePrice")
+                        .HasColumnOrder(13);
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("CancellationReason")
+                        .HasColumnOrder(25);
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CancelledAt")
+                        .HasColumnOrder(24);
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CompletedAt")
+                        .HasColumnOrder(23);
+
+                    b.Property<DateTimeOffset?>("ConfirmedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ConfirmedAt")
+                        .HasColumnOrder(22);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("CustomerId")
+                        .HasColumnOrder(2);
+
+                    b.Property<decimal>("DailyPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("DailyPrice")
+                        .HasColumnOrder(11);
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("DepositAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("DepositAmount")
+                        .HasColumnOrder(14);
+
+                    b.Property<bool>("DepositPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("DepositPaid")
+                        .HasColumnOrder(16);
+
+                    b.Property<DateTimeOffset?>("DepositPaidAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("DepositPaidAt")
+                        .HasColumnOrder(17);
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("Notes")
+                        .HasColumnOrder(26);
+
+                    b.Property<DateTimeOffset>("PaymentDeadline")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("PaymentDeadline")
+                        .HasColumnOrder(20);
+
+                    b.Property<string>("PaymentId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("PaymentId")
+                        .HasColumnOrder(18);
+
+                    b.Property<Guid>("PickupBranchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("PickupBranchId")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTimeOffset?>("PickupDeadline")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("PickupDeadline")
+                        .HasColumnOrder(21);
+
+                    b.Property<int>("PlannedDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("PlannedDays")
+                        .HasColumnOrder(8);
+
+                    b.Property<DateTimeOffset>("PlannedEndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("PlannedEndDate")
+                        .HasColumnOrder(7);
+
+                    b.Property<DateTimeOffset>("PlannedStartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("PlannedStartDate")
+                        .HasColumnOrder(6);
+
+                    b.Property<decimal>("RemainingAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("RemainingAmount")
+                        .HasColumnOrder(15);
+
+                    b.Property<string>("ReservationNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("ReservationNumber")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid?>("ReturnBranchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ReturnBranchId")
+                        .HasColumnOrder(5);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("Status")
+                        .HasColumnOrder(19)
+                        .HasComment("PendingPayment, Confirmed, Active, Completed, Expired, NoShow, Cancelled");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("TotalPrice")
+                        .HasColumnOrder(12);
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("VehicleId")
+                        .HasColumnOrder(3);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_Reservations_CustomerId");
+
+                    b.HasIndex("PaymentDeadline")
+                        .HasDatabaseName("IX_Reservations_PaymentDeadline");
+
+                    b.HasIndex("PickupBranchId");
+
+                    b.HasIndex("PickupDeadline")
+                        .HasDatabaseName("IX_Reservations_PickupDeadline");
+
+                    b.HasIndex("ReservationNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Reservations_ReservationNumber")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("ReturnBranchId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Reservations_Status");
+
+                    b.HasIndex("CustomerId", "Status")
+                        .HasDatabaseName("IX_Reservations_Customer_Status");
+
+                    b.HasIndex("VehicleId", "Status", "PlannedStartDate", "PlannedEndDate")
+                        .HasDatabaseName("IX_Reservations_Vehicle_Status_DateRange");
+
+                    b.ToTable("Reservations", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Reservations.ReservationSequence", b =>
+                {
+                    b.Property<int>("Year")
+                        .HasColumnType("integer")
+                        .HasColumnName("Year")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("LastNumber")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("LastNumber")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("Year");
+
+                    b.ToTable("ReservationSequences", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Roles.Permission", b =>
@@ -1444,6 +1710,12 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.Reservations.Reservation", null)
+                        .WithMany("Extras")
+                        .HasForeignKey("RentalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Extra");
                 });
 
@@ -1467,6 +1739,40 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ProtectionPackage");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Reservations.Reservation", b =>
+                {
+                    b.HasOne("Domain.Entities.Customers.Customer", "Customer")
+                        .WithMany("Reservations")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Branchs.Branch", "PickupBranch")
+                        .WithMany("PickupReservations")
+                        .HasForeignKey("PickupBranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Branchs.Branch", "ReturnBranch")
+                        .WithMany("ReturnReservations")
+                        .HasForeignKey("ReturnBranchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.Vehicles.Vehicle", "Vehicle")
+                        .WithMany("Reservations")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("PickupBranch");
+
+                    b.Navigation("ReturnBranch");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("Domain.Entities.Roles.PermissionRole", b =>
@@ -1566,9 +1872,21 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Entities.Branchs.Branch", b =>
+                {
+                    b.Navigation("PickupReservations");
+
+                    b.Navigation("ReturnReservations");
+                });
+
             modelBuilder.Entity("Domain.Entities.Categories.Category", b =>
                 {
                     b.Navigation("SubCategories");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Customers.Customer", b =>
+                {
+                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("Domain.Entities.Extras.Extra", b =>
@@ -1584,6 +1902,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Protection.ProtectionPackage", b =>
                 {
                     b.Navigation("Pricing");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Reservations.Reservation", b =>
+                {
+                    b.Navigation("Extras");
                 });
 
             modelBuilder.Entity("Domain.Entities.Roles.Permission", b =>
@@ -1606,6 +1929,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Vehicles.Vehicle", b =>
                 {
                     b.Navigation("Images");
+
+                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("Domain.Entities.Vehicles.VehicleModel", b =>

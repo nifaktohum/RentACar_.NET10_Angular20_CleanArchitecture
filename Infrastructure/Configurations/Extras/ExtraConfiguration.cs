@@ -32,15 +32,13 @@ public sealed class ExtraConfiguration : IEntityTypeConfiguration<Extra>
         .IsRequired()
         .HasPrecision(18, 2);
 
-    // PriceType enum değerini veritabanında int (sayısal) olarak saklıyoruz
+    // PriceType enum değerini veritabanında string olarak saklıyoruz
     _builder.Property(e => e.PriceType)
-        .IsRequired()
-        .HasConversion<int>();
+        .IsRequired();
 
-    // Category enum değerini veritabanında int (sayısal) olarak saklıyoruz
+    // Category enum değerini veritabanında string olarak saklıyoruz
     _builder.Property(e => e.Category)
-        .IsRequired()
-        .HasConversion<int>();
+        .IsRequired();
 
     // DisplayOrder alanı zorunlu olacak ve varsayılan olarak 0 atanacak
     _builder.Property(e => e.DisplayOrder)

@@ -1,4 +1,5 @@
 using Domain.Abstractions;
+using Domain.Entities.Reservations;
 using Domain.Exceptions;
 
 namespace Domain.Entities.Customers;
@@ -237,6 +238,7 @@ public sealed class Customer : BaseEntity
 
   // ==================== İLİŞKİLER ====================
   // public ICollection<Rental> Rentals { get; private set; } = new List<Rental>(); // Navigation Property: Müşterinin tüm kiralama geçmişi (1-N ilişki, Rental entity'si hazır olunca yorum satırı kaldırılacak)
+  public ICollection<Reservation> Reservations { get; private set; } = new List<Reservation>();
   #endregion
 
 

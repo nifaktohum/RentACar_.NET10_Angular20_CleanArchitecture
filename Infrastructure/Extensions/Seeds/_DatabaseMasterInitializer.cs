@@ -15,6 +15,8 @@ public static class DatabaseMasterInitializer
     using var scope = app.ApplicationServices.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+    // Transaction başlat
+    await using var transaction = await context.Database.BeginTransactionAsync();
 
     try
     {
@@ -71,12 +73,18 @@ public static class DatabaseMasterInitializer
       await context.VehicleSeedAsync(configuration);
       Console.WriteLine("--> [Seed Master] Adım 11 VehicleTypes kategorisi tamamlandı.");
 
+      // 12 Rezervasyonlar ==> veriler gercek zamanlı olmadıgı için kaldırdık. tutarsız veri
+      // await context.ReservationSeedAsync(configuration);
+      // Console.WriteLine("--> [Seed Master] Adım 12 Rezervasyonlar tamamlandı.");
+
 
       // =====================================> 
+      await transaction.CommitAsync();
       Console.WriteLine("--> [Seed Master] ✅ Tüm parçalar başarıyla işlendi!");
     }
     catch (Exception ex)
     {
+      await transaction.RollbackAsync();
       Console.WriteLine("❌ KRİTİK HATA: " + ex.Message);
       Console.WriteLine("❌ DETAY: " + ex.ToString());
       throw;

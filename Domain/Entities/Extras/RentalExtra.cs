@@ -1,41 +1,112 @@
 using Domain.Abstractions;
+using Domain.Entities.Extras.Enum;
+using Domain.Exceptions;
 
 namespace Domain.Entities.Extras;
-//  RentalExtra, bir kiralamanın hangi ekstra ürünleri seçtiğini ve 
-//  bu seçime ait detayları (fiyat, adet, toplam tutar) saklamak için kullanılan ara tablo (junction table) entity'sidir.
+/// RentalExtra, bir kiralamanın hangi ekstra ürünleri seçtiğini ve
+/// bu seçime ait detayları (fiyat, adet, toplam tutar) saklamak için
+/// kullanılan ara tablo (junction table) entity'sidir.
 public sealed class RentalExtra : BaseEntity
 {
-  public RentalExtra() : base(Guid.Empty) { }
+  // ==================== PRIVATE CONSTRUCTOR (EF Core için) ====================
+  private RentalExtra() : base(Guid.Empty)
+  {
+    Extra = null!;
+  }
 
+  // ==================== PUBLIC CONSTRUCTOR ====================
   public RentalExtra(
       Guid rentalId,
       Guid extraId,
       decimal unitPrice,
       int quantity,
-      decimal totalPrice,
+      int rentalDayCount,
+      PriceType priceType,
       Guid createdBy
   ) : base(createdBy)
   {
+    if (unitPrice < 0)
+      throw new DomainValidationException("Birim fiyat 0'dan küçük olamaz!", nameof(unitPrice));
+
+    if (quantity <= 0)
+      throw new DomainValidationException("Miktar 0 veya negatif olamaz!", nameof(quantity));
+
+    if (rentalDayCount <= 0)
+      throw new DomainValidationException("Kiralama gün sayısı 0 veya negatif olamaz!", nameof(rentalDayCount));
+
     RentalId = rentalId;
     ExtraId = extraId;
     UnitPrice = unitPrice;
     Quantity = quantity;
-    TotalPrice = totalPrice;
+    RentalDayCount = rentalDayCount;
+    PriceType = priceType;
+
+    TotalPrice = CalculateTotalPrice();
+
+    Extra = null!;
   }
 
   // ==================== PROPERTIES ====================
-
-  public Guid RentalId { get; private set; }          // Sadece ID
-  public Guid ExtraId { get; private set; }    // Sadece ID
-
+  public Guid RentalId { get; private set; }
+  public Guid ExtraId { get; private set; }
   public decimal UnitPrice { get; private set; }
   public int Quantity { get; private set; }
+  public int RentalDayCount { get; private set; }
+  public PriceType PriceType { get; private set; }
   public decimal TotalPrice { get; private set; }
 
-  // ==================== NAVIGATION PROPERTIES ====================
-  // public Rental Rental { get; private set; }  // ŞİMDİLİK YOK!     // ❌ KALDIR
+  // ==================== NAVIGATION ====================
   public Extra Extra { get; private set; } = null!;
+
+  // ==================== DOMAIN METOTLARI ====================
+
+  /// Extra navigation'ını set et (in-memory kullanım için)
+  public void SetExtra(Extra extra)
+  {
+    if (extra == null)
+      throw new ArgumentNullException(nameof(extra));
+
+    Extra = extra;
+  }
+
+  /// Miktarı güncelle
+  public void UpdateQuantity(int newQuantity, Guid updatedBy)
+  {
+    if (newQuantity <= 0)
+      throw new DomainValidationException("Miktar 0 veya negatif olamaz!", nameof(newQuantity));
+
+    Quantity = newQuantity;
+    TotalPrice = CalculateTotalPrice();
+
+    UpdateMetadata(updatedBy);
+  }
+
+  /// Birim fiyatı güncelle (admin düzeltmesi için)
+  public void UpdateUnitPrice(decimal newUnitPrice, Guid updatedBy)
+  {
+    if (newUnitPrice < 0)
+      throw new DomainValidationException("Birim fiyat 0'dan küçük olamaz!", nameof(newUnitPrice));
+
+    UnitPrice = newUnitPrice;
+    TotalPrice = CalculateTotalPrice();
+
+    UpdateMetadata(updatedBy);
+  }
+
+  // ==================== PRIVATE YARDIMCILAR ====================
+
+  /// <summary>Fiyat tipine göre toplam tutarı hesapla</summary>
+  private decimal CalculateTotalPrice()
+  {
+    return PriceType == PriceType.Daily
+        ? UnitPrice * Quantity * RentalDayCount
+        : UnitPrice * Quantity;
+  }
 }
+
+// public Rental Rental { get; private set; }  // ŞİMDİLİK YOK!     // ❌ KALDIR
+
+
 
 /* 1️⃣ Kiralama Sırasında Extra Ekleme
 

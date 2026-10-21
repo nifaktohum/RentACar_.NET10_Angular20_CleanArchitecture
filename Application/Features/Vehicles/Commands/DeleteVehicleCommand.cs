@@ -60,7 +60,6 @@ public sealed class DeleteVehicleCommandHandler(
       _logger.LogError(_ex, "❌ Araç silme hatası. VehicleId: {VehicleId}", _req.Id);
       return Result<Unit>.Failure(500, $"Araç silinirken bir hata oluştu: {_ex.Message}");
     }
-    throw new NotImplementedException();
   }
 }
 

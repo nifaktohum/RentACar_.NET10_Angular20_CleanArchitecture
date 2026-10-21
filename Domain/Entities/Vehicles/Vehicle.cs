@@ -1,4 +1,5 @@
 using Domain.Abstractions;
+using Domain.Entities.Reservations;
 using Domain.Exceptions;
 
 namespace Domain.Entities.Vehicles;
@@ -80,6 +81,9 @@ public sealed class Vehicle : BaseEntity
   public Guid VehicleModelId { get; private set; }  
   public VehicleModel VehicleModel { get; private set; } = null!;  
   public ICollection<VehicleImage> Images { get; private set; }
+
+  
+  public ICollection<Reservation> Reservations { get; private set; } = new List<Reservation>();
   // ==================== DOMAIN METHODS ====================
 
   public void UpdateDetails(

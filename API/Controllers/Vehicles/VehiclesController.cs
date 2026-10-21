@@ -22,15 +22,6 @@ public sealed class VehiclesController : BaseApiController
     return result.IsSuccessful ? Ok(result) : BadRequest(result);
   }
 
-  // GET: ID'ye göre araç getir (DÜZELTİLDİ)
-  // [HttpGet("get-by-id/{id:guid}")]
-  // public async Task<IActionResult> GetById(Guid id, CancellationToken token)
-  // {
-  //   var query = new GetVehicleByIdQuery(id);
-  //   var result = await Mediator.Send(query, token);
-  //   return result.IsSuccessful ? Ok(result) : BadRequest(result);
-  // }
-
   // GET: Araç tipine göre listeleme
   [HttpGet("by-type/{id:guid}")]
   [AllowAnonymous]

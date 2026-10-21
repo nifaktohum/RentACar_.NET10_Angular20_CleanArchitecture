@@ -11,6 +11,7 @@ public class BaseSpecification<T>(Expression<Func<T, bool>>? _criteria) : ISpeci
   // Bu sınıf, bir kriter alıp onu saklayan ve gerektiğinde dışarıya sunan temel bir spesifikasyon sınıfı.
   public Expression<Func<T, bool>>? Criteria => _criteria;
   public List<Expression<Func<T, object>>> Includes { get; } = new();
+  public List<string> IncludeStrings { get; } = new();
 
   public Expression<Func<T, object>>? OrderBy { get; private set; }
   public Expression<Func<T, object>>? OrderByDescending { get; private set; }
@@ -41,6 +42,11 @@ public class BaseSpecification<T>(Expression<Func<T, bool>>? _criteria) : ISpeci
   public void AddInclude(Expression<Func<T, object>> includeExpression)
   {
     Includes.Add(includeExpression);
+  }
+
+  protected void AddInclude(string includeString)
+  {
+    IncludeStrings.Add(includeString);
   }
 
   public void ApplyOrderBy(Expression<Func<T, object>> orderByExpression)
