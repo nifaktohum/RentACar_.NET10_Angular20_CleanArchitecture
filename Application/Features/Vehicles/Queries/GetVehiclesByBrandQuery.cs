@@ -13,9 +13,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetVehiclesByBrandQuery(string? Brand) : VehicleSpecParams, IRequest<Result<PagedResponse<VehicleListDto>>>;
 
 public sealed class GetVehiclesByBrandQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetVehiclesByBrandQueryHandler> _logger
-                    ) : IRequestHandler<GetVehiclesByBrandQuery, Result<PagedResponse<VehicleListDto>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetVehiclesByBrandQueryHandler> _logger
+) : IRequestHandler<GetVehiclesByBrandQuery, Result<PagedResponse<VehicleListDto>>>
 {
   public async Task<Result<PagedResponse<VehicleListDto>>> Handle(GetVehiclesByBrandQuery _req, CancellationToken _token)
   {
@@ -34,17 +34,18 @@ public sealed class GetVehiclesByBrandQueryHandler(
         query = query.Include(include);
       }
 
-      // Eğer marka parametresi verildiyse filtreleme ekleyelim (Case-insensitive arama için uygun yapılabilir)
-      if (!string.IsNullOrWhiteSpace(_req.Brand))
-      {
-        query = query.Where(v => v.Brand.ToLower() == _req.Brand.ToLower());
-      }
+      // 🆕 VehicleModel -> VehicleType ilişkisini dahil et
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
 
+      // ❌ Gereksiz Filtre Silindi: Specification (spec.Criteria) zaten marka filtresini uyguluyor.
+
+      // Sıralama
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
         query = query.OrderByDescending(spec.OrderByDescending);
 
+      // 🚨 Toplam sayıyı Sayfalama'dan ÖNCE alıyoruz
       var totalCount = await query.CountAsync(_token);
 
       if (spec.IsPagingEnabled)
@@ -52,6 +53,7 @@ public sealed class GetVehiclesByBrandQueryHandler(
 
       var vehicles = await query.ToListAsync(_token);
 
+      // 🆕 DTO Map'lemesi Güncellendi
       var vehicleDtos = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -60,14 +62,18 @@ public sealed class GetVehiclesByBrandQueryHandler(
           v.Year,
           v.Plate,
           v.Color,
+          v.VinNumber,
           v.FuelType,
           v.Transmission,
+          v.TractionType,
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
+          v.CurrentKilometer,
+          v.Status.ToString(),
           v.IsAvailable,
           v.VehicleModel?.VehicleType?.Name ?? "Bilinmiyor",
-          v.GetMainImageUrl(),
+          v.GetMainImageUrl() ?? string.Empty,
           v.IsActive,
           v.CreatedAt
       )).ToList();
@@ -75,10 +81,10 @@ public sealed class GetVehiclesByBrandQueryHandler(
       _logger.LogInformation("✅ Marka filtreli {Count} araç getirildi. Brand: {Brand}", vehicleDtos.Count, _req.Brand ?? "Tümü");
 
       var response = new PagedResponse<VehicleListDto>(
-                            vehicleDtos,
-                            totalCount,
-                            _req.PageNumber,
-                            _req.PageSize
+          vehicleDtos,
+          totalCount,
+          _req.PageNumber,
+          _req.PageSize
       );
 
       return Result<PagedResponse<VehicleListDto>>.Succeed(response);

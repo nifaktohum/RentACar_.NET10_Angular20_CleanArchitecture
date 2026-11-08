@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260919031124_06_customer_securityStamp")]
-    partial class _06_customer_securityStamp
+    [Migration("20261108003122_01_AddRefundFieldsToReservation")]
+    partial class _01_AddRefundFieldsToReservation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -350,8 +350,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<int>("Category")
-                        .HasColumnType("integer");
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -401,8 +402,9 @@ namespace Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
-                    b.Property<int>("PriceType")
-                        .HasColumnType("integer");
+                    b.Property<string>("PriceType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int?>("StockLimit")
                         .HasColumnType("integer");
@@ -436,7 +438,9 @@ namespace Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(0);
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -451,7 +455,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ExtraId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("ExtraId")
+                        .HasColumnOrder(2);
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -459,21 +465,44 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("PriceType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Daily")
+                        .HasColumnName("PriceType")
+                        .HasColumnOrder(6);
+
                     b.Property<int>("Quantity")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(1);
+                        .HasDefaultValue(1)
+                        .HasColumnName("Quantity")
+                        .HasColumnOrder(4);
+
+                    b.Property<int>("RentalDayCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("RentalDayCount")
+                        .HasColumnOrder(5);
 
                     b.Property<Guid>("RentalId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("RentalId")
+                        .HasColumnOrder(1);
 
                     b.Property<decimal>("TotalPrice")
                         .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("TotalPrice")
+                        .HasColumnOrder(7);
 
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("UnitPrice")
+                        .HasColumnOrder(3);
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -483,12 +512,15 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExtraId");
+                    b.HasIndex("ExtraId")
+                        .HasDatabaseName("IX_RentalExtras_ExtraId");
 
-                    b.HasIndex("RentalId");
+                    b.HasIndex("RentalId")
+                        .HasDatabaseName("IX_RentalExtras_RentalId");
 
                     b.HasIndex("RentalId", "ExtraId")
                         .IsUnique()
+                        .HasDatabaseName("IX_RentalExtras_Rental_Extra")
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("RentalExtras", (string)null);
@@ -789,6 +821,279 @@ namespace Infrastructure.Migrations
                     b.ToTable("ProtectionPricings", "protection");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Reservations.Reservation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(0);
+
+                    b.Property<DateTimeOffset?>("ActualPickupAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ActualPickupAt")
+                        .HasColumnOrder(9);
+
+                    b.Property<DateTimeOffset?>("ActualReturnAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ActualReturnAt")
+                        .HasColumnOrder(10);
+
+                    b.Property<string>("AdminNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("AdminNotes")
+                        .HasColumnOrder(30);
+
+                    b.Property<decimal?>("BillablePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("BillablePrice")
+                        .HasColumnOrder(13);
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("CancellationReason")
+                        .HasColumnOrder(28);
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CancelledAt")
+                        .HasColumnOrder(27);
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CompletedAt")
+                        .HasColumnOrder(26);
+
+                    b.Property<DateTimeOffset?>("ConfirmedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("ConfirmedAt")
+                        .HasColumnOrder(25);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("CustomerId")
+                        .HasColumnOrder(2);
+
+                    b.Property<decimal>("DailyPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("DailyPrice")
+                        .HasColumnOrder(11);
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("DepositAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("DepositAmount")
+                        .HasColumnOrder(14);
+
+                    b.Property<DateTimeOffset?>("DepositLockDeadline")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("DepositLockDeadline")
+                        .HasColumnOrder(19);
+
+                    b.Property<bool>("DepositPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("DepositPaid")
+                        .HasColumnOrder(16);
+
+                    b.Property<DateTimeOffset?>("DepositPaidAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("DepositPaidAt")
+                        .HasColumnOrder(17);
+
+                    b.Property<decimal?>("ForfeitedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("ForfeitedAmount")
+                        .HasColumnOrder(34);
+
+                    b.Property<string>("FullPaymentId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("FullPaymentId")
+                        .HasColumnOrder(22);
+
+                    b.Property<bool>("FullPaymentPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("FullPaymentPaid")
+                        .HasColumnOrder(20);
+
+                    b.Property<DateTimeOffset?>("FullPaymentPaidAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("FullPaymentPaidAt")
+                        .HasColumnOrder(21);
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsDepositRefunded")
+                        .HasColumnType("boolean")
+                        .HasColumnName("IsDepositRefunded")
+                        .HasColumnOrder(32);
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("Notes")
+                        .HasColumnOrder(29);
+
+                    b.Property<DateTimeOffset>("PaymentDeadline")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("PaymentDeadline")
+                        .HasColumnOrder(24);
+
+                    b.Property<string>("PaymentId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("PaymentId")
+                        .HasColumnOrder(18);
+
+                    b.Property<Guid>("PickupBranchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("PickupBranchId")
+                        .HasColumnOrder(4);
+
+                    b.Property<int>("PlannedDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("PlannedDays")
+                        .HasColumnOrder(8);
+
+                    b.Property<DateTimeOffset>("PlannedEndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("PlannedEndDate")
+                        .HasColumnOrder(7);
+
+                    b.Property<DateTimeOffset>("PlannedStartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("PlannedStartDate")
+                        .HasColumnOrder(6);
+
+                    b.Property<decimal?>("RefundedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("RefundedAmount")
+                        .HasColumnOrder(33);
+
+                    b.Property<decimal>("RemainingAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("RemainingAmount")
+                        .HasColumnOrder(15);
+
+                    b.Property<string>("ReservationNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("ReservationNumber")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid?>("ReturnBranchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ReturnBranchId")
+                        .HasColumnOrder(5);
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("Status")
+                        .HasColumnOrder(23)
+                        .HasComment("PendingPayment, Confirmed, Active, Completed, Expired, Cancelled");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("TotalPrice")
+                        .HasColumnOrder(12);
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("VehicleId")
+                        .HasColumnOrder(3);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_Reservations_CustomerId");
+
+                    b.HasIndex("DepositLockDeadline")
+                        .HasDatabaseName("IX_Reservations_DepositLockDeadline")
+                        .HasFilter("\"IsDeleted\" = false AND \"DepositLockDeadline\" IS NOT NULL");
+
+                    b.HasIndex("PaymentDeadline")
+                        .HasDatabaseName("IX_Reservations_PaymentDeadline")
+                        .HasFilter("\"IsDeleted\" = false AND \"Status\" = 'PendingPayment'");
+
+                    b.HasIndex("PickupBranchId");
+
+                    b.HasIndex("ReservationNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Reservations_ReservationNumber")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("ReturnBranchId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Reservations_Status");
+
+                    b.HasIndex("CustomerId", "Status")
+                        .HasDatabaseName("IX_Reservations_Customer_Status")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("VehicleId", "Status", "PlannedStartDate", "PlannedEndDate")
+                        .HasDatabaseName("IX_Reservations_Vehicle_Status_DateRange")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("Reservations", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Reservations.ReservationSequence", b =>
+                {
+                    b.Property<int>("Year")
+                        .HasColumnType("integer")
+                        .HasColumnName("Year")
+                        .HasColumnOrder(0);
+
+                    b.Property<int>("LastNumber")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("LastNumber")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("Year");
+
+                    b.ToTable("ReservationSequences", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Roles.Permission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -980,12 +1285,20 @@ namespace Infrastructure.Migrations
                         .HasColumnName("Id")
                         .HasColumnOrder(0);
 
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Brand")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("Brand")
                         .HasColumnOrder(1);
+
+                    b.Property<DateTimeOffset>("CascoEndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CascoEndDate")
+                        .HasColumnOrder(27);
 
                     b.Property<string>("Color")
                         .IsRequired()
@@ -995,16 +1308,25 @@ namespace Infrastructure.Migrations
                         .HasColumnOrder(5);
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(34);
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(36);
+
+                    b.Property<int>("CurrentKilometer")
+                        .HasColumnType("integer")
+                        .HasColumnName("CurrentKilometer")
+                        .HasColumnOrder(21);
 
                     b.Property<decimal>("DailyPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("DailyPrice")
-                        .HasColumnOrder(11);
+                        .HasColumnOrder(17);
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1012,41 +1334,99 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("DepositAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("DepositAmount")
+                        .HasColumnOrder(18);
+
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("Description")
-                        .HasColumnOrder(13);
+                        .HasColumnOrder(30);
 
                     b.Property<int>("DoorCount")
                         .HasColumnType("integer")
                         .HasColumnName("DoorCount")
-                        .HasColumnOrder(9);
+                        .HasColumnOrder(15);
+
+                    b.Property<string>("EngineNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("EngineNumber")
+                        .HasColumnOrder(7);
+
+                    b.Property<int>("EnginePower")
+                        .HasColumnType("integer")
+                        .HasColumnName("EnginePower")
+                        .HasColumnOrder(12);
+
+                    b.Property<decimal>("EngineVolume")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("EngineVolume")
+                        .HasColumnOrder(11);
+
+                    b.Property<decimal>("FuelConsumption")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("FuelConsumption")
+                        .HasColumnOrder(13);
 
                     b.Property<string>("FuelType")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasColumnName("FuelType")
-                        .HasColumnOrder(6);
+                        .HasColumnOrder(8);
+
+                    b.Property<string>("GeneralStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("GeneralStatus")
+                        .HasColumnOrder(29);
+
+                    b.Property<DateTimeOffset>("InspectionDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("InspectionDate")
+                        .HasColumnOrder(25);
+
+                    b.Property<DateTimeOffset>("InsuranceEndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("InsuranceEndDate")
+                        .HasColumnOrder(26);
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsAvailable")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true)
-                        .HasColumnName("IsAvailable")
-                        .HasColumnOrder(12);
+                        .HasColumnName("IsActive")
+                        .HasColumnOrder(32);
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted")
+                        .HasColumnOrder(33);
+
+                    b.Property<DateTimeOffset>("LastMaintenanceDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("LastMaintenanceDate")
+                        .HasColumnOrder(24);
+
+                    b.Property<int>("LastMaintenanceKm")
+                        .HasColumnType("integer")
+                        .HasColumnName("LastMaintenanceKm")
+                        .HasColumnOrder(22);
 
                     b.Property<int?>("MinAge")
                         .HasColumnType("integer")
                         .HasColumnName("MinAge")
-                        .HasColumnOrder(10);
+                        .HasColumnOrder(16);
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -1055,33 +1435,83 @@ namespace Infrastructure.Migrations
                         .HasColumnName("Model")
                         .HasColumnOrder(2);
 
+                    b.Property<decimal>("MonthlyDiscountRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("MonthlyDiscountRate")
+                        .HasColumnOrder(20);
+
+                    b.Property<int>("NextMaintenanceKm")
+                        .HasColumnType("integer")
+                        .HasColumnName("NextMaintenanceKm")
+                        .HasColumnOrder(23);
+
                     b.Property<string>("Plate")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
                         .HasColumnName("Plate")
                         .HasColumnOrder(4);
 
                     b.Property<int>("SeatCount")
                         .HasColumnType("integer")
                         .HasColumnName("SeatCount")
-                        .HasColumnOrder(8);
+                        .HasColumnOrder(14);
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("Status")
+                        .HasColumnOrder(31);
+
+                    b.Property<string>("TireStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("TireStatus")
+                        .HasColumnOrder(28);
+
+                    b.Property<string>("TractionType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("TractionType")
+                        .HasColumnOrder(10);
 
                     b.Property<string>("Transmission")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
                         .HasColumnName("Transmission")
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(9);
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("UpdatedAt")
+                        .HasColumnOrder(35);
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("UpdatedBy")
+                        .HasColumnOrder(37);
 
                     b.Property<Guid>("VehicleModelId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("VinNumber")
+                        .IsRequired()
+                        .HasMaxLength(17)
+                        .HasColumnType("character(17)")
+                        .HasColumnName("VinNumber")
+                        .HasColumnOrder(6)
+                        .IsFixedLength();
+
+                    b.Property<decimal>("WeeklyDiscountRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("WeeklyDiscountRate")
+                        .HasColumnOrder(19);
 
                     b.Property<string>("Year")
                         .IsRequired()
@@ -1092,11 +1522,16 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BranchId")
+                        .HasDatabaseName("IX_Vehicles_BranchId");
+
                     b.HasIndex("Brand")
                         .HasDatabaseName("IX_Vehicles_Brand");
 
-                    b.HasIndex("IsAvailable")
-                        .HasDatabaseName("IX_Vehicles_IsAvailable");
+                    b.HasIndex("EngineNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Vehicles_EngineNumber")
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("Model")
                         .HasDatabaseName("IX_Vehicles_Model");
@@ -1106,14 +1541,28 @@ namespace Infrastructure.Migrations
                         .HasDatabaseName("IX_Vehicles_Plate")
                         .HasFilter("\"IsDeleted\" = false");
 
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Vehicles_Status");
+
                     b.HasIndex("VehicleModelId")
                         .HasDatabaseName("IX_Vehicles_VehicleModelId");
+
+                    b.HasIndex("VinNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Vehicles_VinNumber")
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("Year")
                         .HasDatabaseName("IX_Vehicles_Year");
 
+                    b.HasIndex("CurrentKilometer", "NextMaintenanceKm")
+                        .HasDatabaseName("IX_Vehicles_MaintenanceKm");
+
                     b.HasIndex("Brand", "Model", "Year")
                         .HasDatabaseName("IX_Vehicles_Brand_Model_Year");
+
+                    b.HasIndex("Status", "IsActive", "IsDeleted")
+                        .HasDatabaseName("IX_Vehicles_Status_IsActive_IsDeleted");
 
                     b.ToTable("Vehicles", (string)null);
                 });
@@ -1127,10 +1576,14 @@ namespace Infrastructure.Migrations
                         .HasColumnOrder(0);
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(8);
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(10);
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1142,55 +1595,67 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("Description")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(5);
 
                     b.Property<int>("DisplayOrder")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0)
                         .HasColumnName("DisplayOrder")
-                        .HasColumnOrder(2);
+                        .HasColumnOrder(3);
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("ImageUrl")
-                        .HasColumnOrder(1);
+                        .HasColumnOrder(2);
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("IsActive")
+                        .HasColumnOrder(6);
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted")
+                        .HasColumnOrder(7);
 
                     b.Property<bool>("IsMain")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false)
                         .HasColumnName("IsMain")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(4);
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("UpdatedAt")
+                        .HasColumnOrder(9);
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("UpdatedBy")
+                        .HasColumnOrder(11);
 
                     b.Property<Guid>("VehicleId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("VehicleId")
+                        .HasColumnOrder(1);
 
                     b.HasKey("Id");
 
                     b.HasIndex("VehicleId")
-                        .HasDatabaseName("IX_VehicleImages_VehicleId");
+                        .IsUnique()
+                        .HasDatabaseName("UX_VehicleImages_VehicleId_IsMain")
+                        .HasFilter("\"IsMain\" = true AND \"IsDeleted\" = false");
 
                     b.HasIndex("VehicleId", "DisplayOrder")
                         .HasDatabaseName("IX_VehicleImages_VehicleId_DisplayOrder");
-
-                    b.HasIndex("VehicleId", "IsMain")
-                        .HasDatabaseName("IX_VehicleImages_VehicleId_IsMain")
-                        .HasFilter("\"IsMain\" = true");
 
                     b.ToTable("VehicleImages", (string)null);
                 });
@@ -1203,13 +1668,6 @@ namespace Infrastructure.Migrations
                         .HasColumnName("Id")
                         .HasColumnOrder(0);
 
-                    b.Property<int>("AvailableStock")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("AvailableStock")
-                        .HasColumnOrder(5);
-
                     b.Property<string>("Brand")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -1218,10 +1676,14 @@ namespace Infrastructure.Migrations
                         .HasColumnOrder(1);
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(6);
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(8);
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1236,10 +1698,18 @@ namespace Infrastructure.Migrations
                         .HasColumnOrder(3);
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("IsActive")
+                        .HasColumnOrder(4);
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted")
+                        .HasColumnOrder(5);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1248,26 +1718,20 @@ namespace Infrastructure.Migrations
                         .HasColumnName("Name")
                         .HasColumnOrder(2);
 
-                    b.Property<int>("Stock")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0)
-                        .HasColumnName("Stock")
-                        .HasColumnOrder(4);
-
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("UpdatedAt")
+                        .HasColumnOrder(7);
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("UpdatedBy")
+                        .HasColumnOrder(9);
 
                     b.Property<Guid>("VehicleTypeId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AvailableStock")
-                        .HasDatabaseName("IX_VehicleModels_AvailableStock");
 
                     b.HasIndex("Brand")
                         .HasDatabaseName("IX_VehicleModels_Brand");
@@ -1275,15 +1739,12 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Name")
                         .HasDatabaseName("IX_VehicleModels_Name");
 
-                    b.HasIndex("Stock")
-                        .HasDatabaseName("IX_VehicleModels_Stock");
-
                     b.HasIndex("VehicleTypeId")
                         .HasDatabaseName("IX_VehicleModels_VehicleTypeId");
 
                     b.HasIndex("Brand", "Name")
                         .IsUnique()
-                        .HasDatabaseName("IX_VehicleModels_Brand_Name")
+                        .HasDatabaseName("UX_VehicleModels_Brand_Name")
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("VehicleModels", (string)null);
@@ -1298,10 +1759,14 @@ namespace Infrastructure.Migrations
                         .HasColumnOrder(0);
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(7);
 
                     b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(9);
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1329,10 +1794,18 @@ namespace Infrastructure.Migrations
                         .HasColumnOrder(3);
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("IsActive")
+                        .HasColumnOrder(5);
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted")
+                        .HasColumnOrder(6);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1342,10 +1815,14 @@ namespace Infrastructure.Migrations
                         .HasColumnOrder(1);
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("UpdatedAt")
+                        .HasColumnOrder(8);
 
                     b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("UpdatedBy")
+                        .HasColumnOrder(10);
 
                     b.HasKey("Id");
 
@@ -1354,7 +1831,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("Name")
                         .IsUnique()
-                        .HasDatabaseName("IX_VehicleTypes_Name")
+                        .HasDatabaseName("UX_VehicleTypes_Name")
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("VehicleTypes", (string)null);
@@ -1447,6 +1924,12 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.Reservations.Reservation", null)
+                        .WithMany("Extras")
+                        .HasForeignKey("RentalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Extra");
                 });
 
@@ -1470,6 +1953,40 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ProtectionPackage");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Reservations.Reservation", b =>
+                {
+                    b.HasOne("Domain.Entities.Customers.Customer", "Customer")
+                        .WithMany("Reservations")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Branchs.Branch", "PickupBranch")
+                        .WithMany("PickupReservations")
+                        .HasForeignKey("PickupBranchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Branchs.Branch", "ReturnBranch")
+                        .WithMany("ReturnReservations")
+                        .HasForeignKey("ReturnBranchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.Vehicles.Vehicle", "Vehicle")
+                        .WithMany("Reservations")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("PickupBranch");
+
+                    b.Navigation("ReturnBranch");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("Domain.Entities.Roles.PermissionRole", b =>
@@ -1569,9 +2086,21 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Entities.Branchs.Branch", b =>
+                {
+                    b.Navigation("PickupReservations");
+
+                    b.Navigation("ReturnReservations");
+                });
+
             modelBuilder.Entity("Domain.Entities.Categories.Category", b =>
                 {
                     b.Navigation("SubCategories");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Customers.Customer", b =>
+                {
+                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("Domain.Entities.Extras.Extra", b =>
@@ -1587,6 +2116,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Protection.ProtectionPackage", b =>
                 {
                     b.Navigation("Pricing");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Reservations.Reservation", b =>
+                {
+                    b.Navigation("Extras");
                 });
 
             modelBuilder.Entity("Domain.Entities.Roles.Permission", b =>
@@ -1609,6 +2143,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Vehicles.Vehicle", b =>
                 {
                     b.Navigation("Images");
+
+                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("Domain.Entities.Vehicles.VehicleModel", b =>

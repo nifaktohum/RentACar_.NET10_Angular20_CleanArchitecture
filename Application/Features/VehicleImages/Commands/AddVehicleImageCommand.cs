@@ -1,8 +1,7 @@
-using System.Globalization;
+using Application.Behaviors;
 using Application.Features.VehicleImages.Dto;
-using Application.Features.Vehicles.Dto;
 using Application.Services;
-using Domain.Entities.Vehicles;
+using Domain.Entities.Vehicles; // 🆕 VehicleStatus için
 using Domain.Repositories.Vehicles;
 using FluentValidation;
 using GenericRepository;
@@ -12,11 +11,12 @@ using TS.Result;
 
 namespace Application.Features.VehicleImages.Commands;
 
+[Permission("VehicleImages.Create")]
 public sealed record AddVehicleImageCommand(
-                          Guid VehicleId,
-                          List<FileUploadDto> Files,
-                          bool IsMain = false
-                      ) : IRequest<Result<AddVehicleImageResponse>>;
+    Guid VehicleId,
+    List<FileUploadDto> Files,
+    bool IsMain = false
+) : IRequest<Result<AddVehicleImageResponse>>;
 
 public sealed class AddVehicleImageCommandValidator : AbstractValidator<AddVehicleImageCommand>
 {
@@ -35,22 +35,19 @@ public sealed class AddVehicleImageCommandValidator : AbstractValidator<AddVehic
 }
 
 public sealed class AddVehicleImageCommandHandler(
-                        IVehicleRepository _vehicleRepo,
-                        IVehicleImageService _vehicleImageService,
-                        IUnitOfWork _unit,
-                        ILogger<AddVehicleImageCommandHandler> _logger
-                    ) : IRequestHandler<AddVehicleImageCommand, Result<AddVehicleImageResponse>>
+    IVehicleRepository _vehicleRepo,
+    IVehicleImageService _vehicleImageService,
+    IUnitOfWork _unit,
+    ILogger<AddVehicleImageCommandHandler> _logger
+) : IRequestHandler<AddVehicleImageCommand, Result<AddVehicleImageResponse>>
 {
-  private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
-  private const long MaxFileSize = 5 * 1024 * 1024; // 5MB
-  private const int MaxFileCount = 10;
-
   public async Task<Result<AddVehicleImageResponse>> Handle(AddVehicleImageCommand _req, CancellationToken _token)
   {
     try
     {
       _logger.LogInformation("📸 Çoklu resim yükleme başladı. VehicleId: {VehicleId}, Dosya Sayısı: {Count}", _req.VehicleId, _req.Files?.Count ?? 0);
-      // 1. Vehicle var mı kontrol et
+
+      // 1. Vehicle var mı kontrol et (Mevcut görselleriyle birlikte)
       var vehicle = await _vehicleRepo.GetVehicleWithImagesAsync(_req.VehicleId, _token);
 
       if (vehicle is null)
@@ -59,11 +56,18 @@ public sealed class AddVehicleImageCommandHandler(
         return Result<AddVehicleImageResponse>.Failure(404, "Araç bulunamadı!");
       }
 
-      // 2. Dosya kontrolü
+      // 🆕 2. GÜVENLİK KONTROLÜ: Kiradaki veya bakımdaki araca resim eklenemez!
+      if (vehicle.Status != VehicleStatus.Available)
+      {
+        _logger.LogWarning("⚠️ Araca resim eklenemez, operasyonel durumu uygun değil. VehicleId: {VehicleId}, Status: {Status}", _req.VehicleId, vehicle.Status);
+        return Result<AddVehicleImageResponse>.Failure(400, $"Bu araç şu anda '{vehicle.Status}' durumunda olduğu için resim eklenemez!");
+      }
+
+      // 3. Dosya kontrolü (FluentValidation zaten yapıyor ama garantiye alalım)
       if (_req.Files is null || _req.Files.Count == 0)
         return Result<AddVehicleImageResponse>.Failure(400, "En az bir dosya seçilmelidir!");
 
-      // 3. ✅ Servis ile resimleri kaydet
+      // 4. ✅ Servis ile resimleri kaydet
       var uploadedImages = await _vehicleImageService.SaveVehicleImagesAsync(
           vehicle,
           _req.Files,
@@ -71,87 +75,19 @@ public sealed class AddVehicleImageCommandHandler(
           _token
       );
 
-      #region SaveVehicleImagesAsync
-      /*
-    if (_req.Files.Count > MaxFileCount)
-      return Result<AddVehicleImageResponse>.Failure(400, $"En fazla {MaxFileCount} resim yüklenebilir!");
-
-    var brandSlug = _fileSlug.Slugify(vehicle.Brand);
-    var modelSlug = _fileSlug.Slugify(vehicle.Model);
-    var colorSlug = _fileSlug.Slugify(vehicle.Color);
-
-    var uploadedImages = new List<UploadedImageInfo>();
-    var webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-    var uploadPath = Path.Combine(webRootPath, "uploads", "vehicles", "images", $"{brandSlug.ToUpper()}_{modelSlug.ToUpper()}_{vehicle.Id}");
-
-    if (!Directory.Exists(uploadPath))
-      Directory.CreateDirectory(uploadPath);
-
-    for (int i = 0; i < _req.Files.Count; i++)
-    {
-      var file = _req.Files[i];
-
-
-      // 3.1 Dosya kontrolü
-      if (file is null || file.Length == 0)
-        continue;
-
-
-      // 3.2 Dosya uzantısını kontrol et
-      var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-      if (!_allowedExtensions.Contains(extension))
-        continue;
-
-      // 3.3 Dosya boyutunu kontrol et
-      if (file.Length > MaxFileSize)
-        continue;
-
-      // 3.4 Dosya adı oluştur
-      var uniqueSuffix = Guid.NewGuid().ToString("N")[..8];
-      var fileName = $"{brandSlug}_{modelSlug}_{vehicle.Year}_{colorSlug}__{uniqueSuffix}";
-      //         var filePath = Path.Combine(uploadPath, $"{fileName}{extension}");
-      var filePath = Path.Combine(uploadPath, $"{fileName}{extension}");
-
-      // 3.5 Dosyayı kaydet
-      using (var stream = new FileStream(filePath, FileMode.Create))
-      {
-        await file.FileStream.CopyToAsync(stream, _token);
-      }
-
-      // 3.6 URL oluştur
-      var imageUrl = $"/uploads/vehicles/images/{brandSlug.ToUpper()}_{modelSlug.ToUpper()}_{vehicle.Id}/{fileName}{extension}";
-
-      // 3.7 İlk resim main olabilir (eğer IsMain true ise)
-      var isMainForThis = (uploadedImages.Count == 0 && _req.IsMain);
-
-      // 3.8 Eğer ana resimse, diğerlerini non-main yap
-      if (isMainForThis)
-      {
-        await _vehicleImageRepo.SetAllAsNonMainAsync(_req.VehicleId, _token);
-      }
-
-      // 3.9 Database'e kaydet
-      var newImage = vehicle.AddImage(imageUrl, isMainForThis);
-      _vehicleImageRepo.Add(newImage);
-
-      uploadedImages.Add(new UploadedImageInfo(imageUrl, isMainForThis));
-
-    }
-      */
-      #endregion
-
-      // 9. Veritabanına kaydet
+      // 5. Veritabanına kaydet
       await _unit.SaveChangesAsync(_token);
-
 
       _logger.LogInformation("✅ {Count} resim başarıyla yüklendi. VehicleId: {VehicleId}", uploadedImages.Count, _req.VehicleId);
 
-      return Result<AddVehicleImageResponse>.Succeed(new AddVehicleImageResponse(
-              uploadedImages,
-              uploadedImages.Count,
-              _req.Files.Count - uploadedImages.Count
-          ));
+      // 6. Response (Hatalı/atlanan dosya sayısını daha güvenli hesaplıyoruz)
+      int failedCount = _req.Files.Count - uploadedImages.Count;
 
+      return Result<AddVehicleImageResponse>.Succeed(new AddVehicleImageResponse(
+          uploadedImages,
+          uploadedImages.Count,
+          failedCount
+      ));
     }
     catch (Exception _ex)
     {

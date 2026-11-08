@@ -8,14 +8,18 @@ public sealed record VehicleListDto(
     string Year,
     string Plate,
     string Color,
+    string VinNumber,           // 🆕 Eklendi (Admin arama/filtreleme için)
     string FuelType,
     string Transmission,
+    string TractionType,        // 🆕 Eklendi
     int SeatCount,
     int DoorCount,
     decimal DailyPrice,
-    bool IsAvailable,
+    int CurrentKilometer,       // 🆕 Eklendi
+    string Status,              // 🆕 Eklendi (Available, Rented, Maintenance vb.)
+    bool IsAvailable,           // Computed property (Status == Available)
     string? VehicleTypeName,
     string? MainImageUrl,
     bool IsActive,
-    DateTimeOffset CreatedAt
+    DateTimeOffset? CreatedAt   // Nullable yaptık (bazı yerlerde null gelebilir)
 );

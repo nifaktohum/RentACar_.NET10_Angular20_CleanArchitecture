@@ -20,6 +20,10 @@ public static class DependencyInjection
     // isteği handler'a göndermeden önce o bir ön kontrol yapıyor."
     _services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
+    // JOB KAYITLARI (MediatR otomatik bulamaz, elle ekliyoruz)
+    _services.AddScoped<Features.Reservations.Jobs.ExpirePendingPaymentsJob>();
+    _services.AddScoped<Features.Reservations.Jobs.ExpireDepositLocksJob>();
+
     return _services;
   }
 }

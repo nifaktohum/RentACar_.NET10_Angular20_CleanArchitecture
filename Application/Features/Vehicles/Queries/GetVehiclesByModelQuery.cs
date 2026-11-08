@@ -13,9 +13,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetVehiclesByModelQuery(string? Model) : VehicleSpecParams, IRequest<Result<PagedResponse<VehicleListDto>>>;
 
 public sealed class GetVehiclesByModelQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetVehiclesByModelQueryHandler> _logger
-                    ) : IRequestHandler<GetVehiclesByModelQuery, Result<PagedResponse<VehicleListDto>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetVehiclesByModelQueryHandler> _logger
+) : IRequestHandler<GetVehiclesByModelQuery, Result<PagedResponse<VehicleListDto>>>
 {
   public async Task<Result<PagedResponse<VehicleListDto>>> Handle(GetVehiclesByModelQuery _req, CancellationToken _token)
   {
@@ -29,30 +29,32 @@ public sealed class GetVehiclesByModelQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // Include'ları uygula
       foreach (var include in spec.Includes)
       {
         query = query.Include(include);
       }
 
-      // Eğer model parametresi verildiyse filtreleme ekleyelim (Case-insensitive)
-      if (!string.IsNullOrWhiteSpace(_req.Model))
-      {
-        query = query.Where(v => v.Model.ToLower() == _req.Model.ToLower());
-      }
+      // 🆕 VehicleModel -> VehicleType ilişkisini dahil et
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
 
-      // Specification içinde belirlenen sıralama kuralını sorguya uyguluyoruz
+      // ❌ Gereksiz Filtre Silindi: Specification (spec.Criteria) zaten model filtresini uyguluyor.
+
+      // Sıralama
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
         query = query.OrderByDescending(spec.OrderByDescending);
 
-      // Veritabanına sorguyu gönder
+      // 🚨 Toplam sayıyı Sayfalama'dan ÖNCE alıyoruz
       var totalCount = await query.CountAsync(_token);
+
       if (spec.IsPagingEnabled)
         query = query.Skip(spec.Skip).Take(spec.Take);
 
       var vehicles = await query.ToListAsync(_token);
 
+      // 🆕 DTO Map'lemesi Güncellendi
       var result = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -61,14 +63,18 @@ public sealed class GetVehiclesByModelQueryHandler(
           v.Year,
           v.Plate,
           v.Color,
+          v.VinNumber,
           v.FuelType,
           v.Transmission,
+          v.TractionType,
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
+          v.CurrentKilometer,
+          v.Status.ToString(),
           v.IsAvailable,
           v.VehicleModel?.VehicleType?.Name ?? "Bilinmiyor",
-          v.GetMainImageUrl(),
+          v.GetMainImageUrl() ?? string.Empty,
           v.IsActive,
           v.CreatedAt
       )).ToList();
@@ -76,10 +82,12 @@ public sealed class GetVehiclesByModelQueryHandler(
       _logger.LogInformation("✅ Model filtreli {Count} araç getirildi. Model: {Model}", result.Count, _req.Model ?? "Tümü");
 
       var response = new PagedResponse<VehicleListDto>(
-                            result,
-                            totalCount,
-                            _req.PageNumber,
-                            _req.PageSize);
+          result,
+          totalCount,
+          _req.PageNumber,
+          _req.PageSize
+      );
+
       return Result<PagedResponse<VehicleListDto>>.Succeed(response);
     }
     catch (Exception _ex)

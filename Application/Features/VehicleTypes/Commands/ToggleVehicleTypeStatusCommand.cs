@@ -1,3 +1,4 @@
+using Application.Behaviors;
 using Domain.Repositories;
 using Domain.Repositories.Vehicles;
 using GenericRepository;
@@ -8,6 +9,7 @@ using TS.Result;
 
 namespace Application.Features.VehicleTypes.Commands;
 
+[Permission("VehicleTypes.Update")]
 public sealed record ToggleVehicleTypeStatusCommand(Guid Id) : IRequest<Result<bool>>;
 
 public sealed class ToggleVehicleTypeStatusCommandHandler(

@@ -1,0 +1,168 @@
+<!-- reservations.component.html -->
+<div class="reservations-container">
+  <p-card>
+    <!-- Header -->
+    <div class="header-section">
+      <div class="header-left">
+        <h2>Rezervasyon Yönetimi</h2>
+        <p>Tüm rezervasyonları listeleyin, durumlarını kontrol edin ve iptal işlemlerini yönetin.</p>
+      </div>
+      <div class="header-right">
+        <!-- Yeni Rezervasyon butonu ileride eklenecek -->
+        <!-- <p-button label="Yeni Rezervasyon" icon="ri-add-line" [raised]="true" (onClick)="navigateToAdd()"></p-button> -->
+        <p-button severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile" tooltipPosition="top"
+          (onClick)="loadReservations()" [loading]="isLoading()"></p-button>
+      </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Ara</label>
+          <input pInputText [(ngModel)]="filterSearch" (ngModelChange)="onFilterChange()"
+            placeholder="Rezervasyon no, müşteri..." class="filter-input" />
+        </div>
+        <div class="filter-field">
+          <label>Durum</label>
+          <p-select [options]="statusOptions" optionLabel="label" optionValue="value" [(ngModel)]="selectedStatus"
+            (ngModelChange)="onFilterChange()" placeholder="Durum Seç" [showClear]="true" class="filter-select">
+          </p-select>
+        </div>
+        <div class="filter-field filter-reset">
+          <p-button icon="ri-filter-off-line" severity="secondary" [raised]="true" (onClick)="onResetFilters()">
+          </p-button>
+        </div>
+            <div class="filter-field filter-count">
+              <label>Toplam</label>
+              <p-button severity="contrast" [raised]="true" class="count-badge">{{ totalCount() }}</p-button>
+            </div>
+      </div>
+    </div>
+
+    <!-- Tablo -->
+    <div class="table-wrapper">
+      <p-table [value]="reservations()" [lazy]="true" [paginator]="true" [rows]="pageSize()"
+        [totalRecords]="totalCount()" [loading]="isLoading()" [rowsPerPageOptions]="[5, 10, 20, 50]"
+        [tableStyle]="{ width: '100%' }" [sortField]="sortField()" [sortOrder]="sortOrder()" (onSort)="onSort($event)"
+        (onPage)="onPageChange($event)" dataKey="id"
+        currentPageReportTemplate="Toplam {totalRecords} rezervasyondan {first} - {last} arası gösteriliyor"
+        showCurrentPageReport="true">
+
+        <!-- Header -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-reservation-no" pSortableColumn="reservationNumber">
+              Rezervasyon No <p-sortIcon field="reservationNumber"></p-sortIcon>
+            </th>
+            <th class="col-customer" pSortableColumn="customerFullName">
+              Müşteri <p-sortIcon field="customerFullName"></p-sortIcon>
+            </th>
+            <th class="col-vehicle">Araç</th>
+            <th class="col-dates" pSortableColumn="plannedStartDate">
+              Tarih Aralığı <p-sortIcon field="plannedStartDate"></p-sortIcon>
+            </th>
+            <th class="col-days">Gün</th>
+            <th class="col-price" pSortableColumn="totalPrice">
+              Toplam Fiyat <p-sortIcon field="totalPrice"></p-sortIcon>
+            </th>
+            <th class="col-status">Durum</th>
+            <th class="col-payment">Ödeme</th>
+            <th class="col-actions">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <!-- Body -->
+        <ng-template pTemplate="body" let-res>
+          <tr>
+            <!-- Rezervasyon No -->
+            <td class="col-reservation-no">
+              <span class="reservation-no-badge">{{ res.reservationNumber }}</span>
+            </td>
+
+            <!-- Müşteri -->
+            <td class="col-customer">
+              <div class="customer-info">
+                <div class="customer-avatar">
+                  <i class="ri-user-line"></i>
+                </div>
+                <span class="customer-name">{{ res.customerFullName }}</span>
+              </div>
+            </td>
+
+            <!-- Araç -->
+            <td class="col-vehicle">
+              <span class="vehicle-info">{{ res.vehicleInfo }}</span>
+            </td>
+
+            <!-- Tarih Aralığı -->
+            <td class="col-dates">
+              <div class="date-cell">
+                <span class="date-start">{{ res.plannedStartDate | date:'dd MMM yyyy' }}</span>
+                <span class="date-divider">
+                  <i class="ri-arrow-right-line"></i>
+                </span>
+                <span class="date-end">{{ res.plannedEndDate | date:'dd MMM yyyy' }}</span>
+              </div>
+            </td>
+
+            <!-- Gün -->
+            <td class="col-days">
+              <span class="days-badge">{{ res.plannedDays }} gün</span>
+            </td>
+
+            <!-- Toplam Fiyat -->
+            <td class="col-price">
+              <span class="price-value">{{ res.totalPrice | currency:'TRY':'₺':'1.0-2' }}</span>
+            </td>
+
+            <!-- Durum -->
+            <td class="col-status">
+              <p-tag [value]="getStatusLabel(res.status)" [severity]="getStatusSeverity(res.status)"
+                ></p-tag>
+            </td>
+
+            <!-- Ödeme -->
+            <td class="col-payment">
+              <div class="payment-status">
+                @if (res.depositPaid) {
+                <span class="payment-badge payment-paid">
+                  <i class="ri-checkbox-circle-fill"></i>
+                  Ödendi
+                </span>
+                } @else {
+                <span class="payment-badge payment-pending">
+                  <i class="ri-close-circle-fill"></i>
+                  Ödenmedi
+                </span>
+                }
+              </div>
+            </td>
+
+            <!-- İşlemler -->
+            <td class="col-actions">
+              <div class="action-buttons">
+                <button pButton type="button" class="p-button-text p-button-rounded btn-detail"
+                  icon="ri-eye-line" pTooltip="Detay" tooltipPosition="top" (click)="navigateToDetail(res)">
+                </button>
+                <button pButton type="button" class="p-button-text p-button-rounded btn-cancel"
+                  icon="ri-close-line" pTooltip="İptal Et" tooltipPosition="top" (click)="cancelReservation(res)"
+                  [disabled]="res.status === 'Completed' || res.status === 'Cancelled' || res.status === 'Active'">
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty Message -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9" class="empty-table-message">
+              {{ isLoading() ? 'Yükleniyor...' : 'Sistemde kayıtlı rezervasyon bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+</div>

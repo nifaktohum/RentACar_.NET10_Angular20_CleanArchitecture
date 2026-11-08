@@ -1,58 +1,70 @@
 namespace Application.Features.Reservations.Dto.Responses;
 
 public sealed record ReservationDetailDto(
-    Guid Id,                        // Rezervasyonun sistemdeki benzersiz ID'si
-    string ReservationNumber,       // Rezervasyon numarası (Örn: RES-2026-00042)
+    Guid Id,
+    string ReservationNumber,
 
     // Müşteri
-    Guid CustomerId,                // Rezervasyonu yapan müşterinin ID'si
-    string CustomerFullName,        // Müşterinin ad soyad bilgisi
-    string CustomerPhone,           // Müşterinin telefon numarası
-    string CustomerEmail,           // Müşterinin e-posta adresi
+    Guid CustomerId,
+    string CustomerFullName,
+    string CustomerPhone,
+    string CustomerEmail,
 
     // Araç
-    Guid VehicleId,                 // Kiralanan aracın ID'si
-    string VehicleBrand,            // Aracın markası (Örn: Renault, BMW)
-    string VehicleModel,            // Aracın modeli (Örn: Clio, 3.20)
-    string VehiclePlate,            // Aracın plakası
+    Guid VehicleId,
+    string VehicleBrand,
+    string VehicleModel,
+    string VehiclePlate,
 
     // Şubeler
-    string PickupBranchName,        // Aracın teslim alınacağı şubenin adı
-    string? ReturnBranchName,       // Aracın bırakılacağı şubenin adı (Eğer aynıysa null gelebilir)
+    string PickupBranchName,
+    string? ReturnBranchName,
 
     // Tarihler
-    DateTimeOffset PlannedStartDate,  // Planlanan başlangıç tarihi
-    DateTimeOffset PlannedEndDate,    // Planlanan bitiş tarihi
-    int PlannedDays,                  // Toplam planlanan kiralama gün sayısı
-    DateTimeOffset? ActualPickupAt,   // Aracın fiilen teslim alındığı tarih (Süreç başladığında dolar)
-    DateTimeOffset? ActualReturnAt,   // Aracın fiilen teslim edildiği/iade edildiği tarih (Süreç kapandığında dolar)
+    DateTimeOffset PlannedStartDate,
+    DateTimeOffset PlannedEndDate,
+    int PlannedDays,
+    DateTimeOffset? ActualPickupAt,
+    DateTimeOffset? ActualReturnAt,
 
     // Fiyatlandırma
-    decimal DailyPrice,               // Aracın günlük kiralama fiyatı
-    decimal TotalPrice,               // Kiralamanın toplam tutarı (Araç + Ekstralar vb.)
-    decimal? BillablePrice,           // Faturalandırılacak net tutar
-    decimal DepositAmount,            // Alınması gereken kapora / güvence bedeli tutarı
-    decimal RemainingAmount,          // Ödenmesi gereken kalan tutar
-    bool DepositPaid,                 // Kapora ödenip ödenmediğinin boolean bayrağı
-    DateTimeOffset? DepositPaidAt,    // Kaporanın ödendiği zaman damgası
-    string? PaymentId,                // Sanal POS ödeme işlem referans numarası
+    decimal DailyPrice,
+    decimal TotalPrice,
+    decimal? BillablePrice,
+    decimal DepositAmount,
+    decimal RemainingAmount,
+
+    // Ödeme: Depozito
+    bool DepositPaid,
+    DateTimeOffset? DepositPaidAt,
+    string? PaymentId,
+    DateTimeOffset? DepositLockDeadline,
+
+    // Ödeme: Tam Ödeme
+    bool FullPaymentPaid,
+    DateTimeOffset? FullPaymentPaidAt,
+    string? FullPaymentId,
+
+    // iade yöntemi 
+    bool? IsDepositRefunded,       // İade yapıldı mı?
+    decimal? RefundedAmount,       // İade edilen tutar
+    decimal? ForfeitedAmount,      // Yanan tutar
 
     // Durum ve Süreler
-    string Status,                    // Rezervasyonun güncel statüsü (Pending, Confirmed, Active, Completed, Cancelled vb.)
-    DateTimeOffset PaymentDeadline,   // Ödemenin yapılması gereken son süre sınırı
-    DateTimeOffset? PickupDeadline,   // Müşterinin aracı teslim almak için şubeye gelmesi gereken son süre sınırı
-    DateTimeOffset? ConfirmedAt,      // Rezervasyonun onaylandığı zaman
-    DateTimeOffset? CompletedAt,      // Rezervasyonun başarıyla tamamlandığı zaman
-    DateTimeOffset? CancelledAt,      // Rezervasyonun iptal edildiği zaman
-    string? CancellationReason,       // İptal edildiyse girilen sebep açıklaması
+    string Status,
+    DateTimeOffset PaymentDeadline,
+    DateTimeOffset? ConfirmedAt,
+    DateTimeOffset? CompletedAt,
+    DateTimeOffset? CancelledAt,
+    string? CancellationReason,
 
     // Extralar
-    List<RentalExtraDto> Extras,      // Bu rezervasyona eklenen tüm ekstra kalemlerin detay listesi (Bebek koltuğu, GPS vb.)
-    decimal ExtrasTotalPrice,         // Seçilen tüm ekstraların toplam tutarı
+    List<RentalExtraDto> Extras,
+    decimal ExtrasTotalPrice,
 
     // Notlar
-    string? Notes,                    // Müşterinin oluştururken bıraktığı özel notlar
-    string? AdminNotes,               // Sadece personelin/adminin görebildiği dahili notlar
+    string? Notes,
+    string? AdminNotes,
 
-    DateTimeOffset CreatedAt          // Kaydın ilk oluşturulduğu zaman damgası
+    DateTimeOffset CreatedAt
 );

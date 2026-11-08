@@ -13,15 +13,15 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetAvailableVehiclesByPriceRangeQuery : VehicleSpecParams, IRequest<Result<PagedResponse<VehicleListDto>>>;
 
 public sealed class GetAvailableVehiclesByPriceRangeQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetAvailableVehiclesByPriceRangeQueryHandler> _logger
-                    ) : IRequestHandler<GetAvailableVehiclesByPriceRangeQuery, Result<PagedResponse<VehicleListDto>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetAvailableVehiclesByPriceRangeQueryHandler> _logger
+) : IRequestHandler<GetAvailableVehiclesByPriceRangeQuery, Result<PagedResponse<VehicleListDto>>>
 {
   public async Task<Result<PagedResponse<VehicleListDto>>> Handle(GetAvailableVehiclesByPriceRangeQuery _req, CancellationToken _token)
   {
     try
     {
-      _logger.LogInformation("Müsait araçlar fiyat aralığına göre sorgulanıyor. Min: {MinPrice} ₺, Max: {MaxPrice} ₺", _req.MinPrice, _req.MaxPrice);
+      _logger.LogInformation("🔍 Müsait araçlar fiyat aralığına göre sorgulanıyor. Min: {MinPrice} ₺, Max: {MaxPrice} ₺", _req.MinPrice, _req.MaxPrice);
 
       // Kriterimizi query'den gelen fiyat aralığı ile oluşturuyoruz.
       var spec = new AvailableVehiclesByPriceRangeSpecification(_req);
@@ -30,19 +30,20 @@ public sealed class GetAvailableVehiclesByPriceRangeQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
-      // 3. Include'ları EKLE! (ÇOK ÖNEMLİ)
+      // Include'ları EKLE
       query = query
           .Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType)
-          .Include(v => v.Images.Where(i => i.IsActive && !i.IsDeleted))
-          .OrderBy(v => v.DailyPrice); // Fiyata göre sırala (en ucuzdan en pahalıya)
+          .Include(v => v.Images.Where(i => i.IsActive && !i.IsDeleted));
 
-      // Specification içinde belirlenen sıralama kuralını sorguya uyguluyoruz
+      // Sıralama Mantığı Düzeltildi
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
         query = query.OrderByDescending(spec.OrderByDescending);
+      else
+        query = query.OrderBy(v => v.DailyPrice); // Varsayılan: En ucuzdan en pahalıya
 
-      // 4. Veritabanına sorguyu gönder
+      // Toplam sayı ve Sayfalama
       var totalCount = await query.CountAsync(_token);
 
       if (spec.IsPagingEnabled)
@@ -50,10 +51,9 @@ public sealed class GetAvailableVehiclesByPriceRangeQueryHandler(
 
       var vehicles = await query.ToListAsync(_token);
 
-      // 2. Türkçe Bilgi Logu (Başarılı Sonuç)
-      _logger.LogInformation("{Count} adet müsait araç başarıyla getirildi. Fiyat Aralığı: {MinPrice} ₺ - {MaxPrice} ₺", vehicles.Count, _req.MinPrice, _req.MaxPrice);
+      _logger.LogInformation("✅ {Count} adet müsait araç başarıyla getirildi. Fiyat Aralığı: {MinPrice} ₺ - {MaxPrice} ₺", vehicles.Count, _req.MinPrice, _req.MaxPrice);
 
-      // Entity -> DTO Dönüşümü
+      // Entity -> DTO Dönüşümü (Yeni Alanlar Eklendi)
       var vehicleDtos = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -62,11 +62,15 @@ public sealed class GetAvailableVehiclesByPriceRangeQueryHandler(
           v.Year,
           v.Plate,
           v.Color,
+          v.VinNumber,
           v.FuelType,
           v.Transmission,
+          v.TractionType,
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
+          v.CurrentKilometer,
+          v.Status.ToString(),
           v.IsAvailable,
           v.VehicleModel?.VehicleType?.Name ?? "Belirtilmemiş",
           v.GetMainImageUrl() ?? string.Empty,    // Null safety
@@ -75,17 +79,16 @@ public sealed class GetAvailableVehiclesByPriceRangeQueryHandler(
       )).ToList();
 
       var response = new PagedResponse<VehicleListDto>(
-                      vehicleDtos,
-                      totalCount,
-                      _req.PageNumber,
-                      _req.PageSize);
+          vehicleDtos,
+          totalCount,
+          _req.PageNumber,
+          _req.PageSize);
 
       return Result<PagedResponse<VehicleListDto>>.Succeed(response);
     }
     catch (Exception ex)
     {
-      // 3. Türkçe Hata Logu
-      _logger.LogError(ex, "Araçlar fiyat aralığına göre getirilirken sistemde bir hata oluştu! Min: {MinPrice}, Max: {MaxPrice}", _req.MinPrice, _req.MaxPrice);
+      _logger.LogError(ex, "❌ Araçlar fiyat aralığına göre getirilirken sistemde bir hata oluştu! Min: {MinPrice}, Max: {MaxPrice}", _req.MinPrice, _req.MaxPrice);
 
       return Result<PagedResponse<VehicleListDto>>.Failure("Araçlar fiyat aralığına göre getirilirken bir hata oluştu.");
     }

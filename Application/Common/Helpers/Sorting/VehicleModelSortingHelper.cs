@@ -17,23 +17,23 @@ public static class VehicleModelSortingHelper
 
     switch (sort.ToLower())
     {
-      // Stok miktarına göre sıralama
+      // Stok miktarına göre sıralama (Computed Property hatası çözüldü)
       case "stockasc":
-        spec.ApplyOrderBy(vm => vm.Stock);
-        spec.ApplyThenBy(vm => vm.Brand);  // Aynı stokta olanları Marka'ya göre sırala
+        spec.ApplyOrderBy(vm => vm.Vehicles.Count(v => v.IsActive && !v.IsDeleted));
+        spec.ApplyThenBy(vm => vm.Brand);
         break;
       case "stockdesc":
-        spec.ApplyOrderByDescending(vm => vm.Stock);
+        spec.ApplyOrderByDescending(vm => vm.Vehicles.Count(v => v.IsActive && !v.IsDeleted));
         spec.ApplyThenBy(vm => vm.Brand);
         break;
 
-      // Müsait stok miktarına göre sıralama
+      // Müsait stok miktarına göre sıralama (Computed Property hatası çözüldü)
       case "availableasc":
-        spec.ApplyOrderBy(vm => vm.AvailableStock);
+        spec.ApplyOrderBy(vm => vm.Vehicles.Count(v => v.IsAvailable));
         spec.ApplyThenBy(vm => vm.Brand);
         break;
       case "availabledesc":
-        spec.ApplyOrderByDescending(vm => vm.AvailableStock);
+        spec.ApplyOrderByDescending(vm => vm.Vehicles.Count(v => v.IsAvailable));
         spec.ApplyThenBy(vm => vm.Brand);
         break;
 

@@ -1,3 +1,4 @@
+using Application.Behaviors;
 using Application.Services;
 using Domain.Entities.Customers;
 using Domain.Repositories;
@@ -8,6 +9,7 @@ using TS.Result;
 
 namespace Application.Features.Customers.Profile.Commands;
 
+[Permission("Customers.Update")]
 public sealed record UpdateCustomerProfileCommand(
                         // Ortak
                         string PhoneNumber,

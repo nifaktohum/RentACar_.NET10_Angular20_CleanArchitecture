@@ -21,6 +21,12 @@ public sealed class VehicleRepository : Repository<Vehicle, AppDbContext>, IVehi
 
   // ==================== ÖZEL SORGULAR ====================
 
+  public async Task<Vehicle?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+  {
+    return await _context.Vehicles
+        .FirstOrDefaultAsync(v => v.Id == id && !v.IsDeleted, cancellationToken);
+  }
+
   // Belirtilen ID'ye sahip aracı; türü ve görselleri gibi tüm detay ilişkileriyle birlikte getirir.
   public async Task<Vehicle?> GetVehicleWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
   {
@@ -64,38 +70,6 @@ public sealed class VehicleRepository : Repository<Vehicle, AppDbContext>, IVehi
       query = query.Where(v => v.Id != excludeId.Value);
 
     return !await query.AnyAsync(cancellationToken);
-  }
-
-  // ==================== STOK İŞLEMLERİ ====================
-
-  // Araç kiralandığında veya stok düştüğünde, belirtilen miktarda stok miktarını azaltır ve başarılı olup olmadığını döner.
-  public async Task<bool> DecreaseStockAsync(Guid id, int quantity = 1, CancellationToken cancellationToken = default)
-  {
-    var affected = await _context.Vehicles
-        .Where(v => v.Id == id && !v.IsDeleted && v.VehicleModel.AvailableStock >= quantity)
-        .ExecuteUpdateAsync(
-            setter => setter
-                .SetProperty(v => v.VehicleModel.AvailableStock, v => v.VehicleModel.AvailableStock - quantity)
-                .SetProperty(v => v.IsAvailable, v => v.VehicleModel.AvailableStock - quantity > 0),
-            cancellationToken
-        );
-
-    return affected > 0;
-  }
-
-  // İptal veya iade durumlarında, belirtilen miktarda araç stok miktarını artırır.
-  public async Task<bool> IncreaseStockAsync(Guid id, int quantity = 1, CancellationToken cancellationToken = default)
-  {
-    var affected = await _context.Vehicles
-        .Where(v => v.Id == id && !v.IsDeleted)
-        .ExecuteUpdateAsync(
-            setter => setter
-                .SetProperty(v => v.VehicleModel.AvailableStock, v => v.VehicleModel.AvailableStock + quantity)
-                .SetProperty(v => v.IsAvailable, true),
-            cancellationToken
-        );
-
-    return affected > 0;
   }
 
   // ==================== FİLTRELEME ====================

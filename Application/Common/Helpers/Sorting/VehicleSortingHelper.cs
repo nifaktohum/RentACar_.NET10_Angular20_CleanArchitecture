@@ -5,46 +5,46 @@ namespace Application.Common.Helpers.Sorting;
 
 public static class VehicleSortingHelper
 {
-  // BaseSpecification<Vehicle> sınıfına extension (uzantı) yazıyoruz
   public static void ApplyVehicleSorting(this BaseSpecification<Vehicle> spec, string? sort)
   {
+    // 🆕 Gelen sıralama parametresini küçük harfe çeviriyoruz (Null-safe olarak)
+    var normalizedSort = sort?.ToLowerInvariant();
 
-    // Reflection veya dinamik tip casting derdi olmadan, doğrudan Vehicle bildiğimiz için güvenle yazıyoruz:
-    switch (sort)
+    switch (normalizedSort)
     {
       // Price
-      case "dailyPriceAsc":
+      case "dailypriceasc":
         spec.ApplyOrderBy(v => v.DailyPrice);
         break;
-      case "dailyPriceDesc":
+      case "dailypricedesc":
         spec.ApplyOrderByDescending(v => v.DailyPrice);
         break;
       // Year
-      case "yearAsc":
+      case "yearasc":
         spec.ApplyOrderBy(v => v.Year);
         break;
-      case "yearDesc":
+      case "yeardesc":
         spec.ApplyOrderByDescending(v => v.Year);
         break;
       // Brand
-      case "brandAsc":
+      case "brandasc":
         spec.ApplyOrderBy(v => v.Brand);
         break;
-      case "brandDesc":
+      case "branddesc":
         spec.ApplyOrderByDescending(v => v.Brand);
         break;
       // Model
-      case "modelAsc":
+      case "modelasc":
         spec.ApplyOrderBy(v => v.Model);
         break;
-      case "modelDesc":
+      case "modeldesc":
         spec.ApplyOrderByDescending(v => v.Model);
         break;
       // Create
-      case "createdAsc":
+      case "createdasc":
         spec.ApplyOrderBy(v => v.CreatedAt);
         break;
-      case "createdDesc":
+      case "createddesc":
       case "latest":
         spec.ApplyOrderByDescending(v => v.CreatedAt);
         break;
@@ -52,7 +52,6 @@ public static class VehicleSortingHelper
       default:
         // Varsayılan olarak fiyata göre artan sırala
         spec.ApplyOrderBy(v => v.DailyPrice);
-        // spec.ApplyOrderByDescending(v => v.CreatedAt);
         spec.ApplyThenBy(v => v.Brand);
         break;
     }

@@ -1,6 +1,8 @@
+using Application.Behaviors;
 using Application.Features.Reservations.Specifications;
 using Domain.Exceptions;
 using Domain.Repositories;
+using Domain.Repositories.Vehicles;
 using FluentValidation;
 using GenericRepository;
 using MediatR;
@@ -9,6 +11,7 @@ using TS.Result;
 
 namespace Application.Features.Reservations.Commands;
 
+[Permission("Reservations.Update")]
 public sealed record PayDepositCommand(
                           Guid ReservationId,
                           string PaymentId
@@ -18,11 +21,8 @@ public sealed class PayDepositCommandValidator : AbstractValidator<PayDepositCom
 {
   public PayDepositCommandValidator()
   {
-    RuleFor(x => x.ReservationId)
-        .NotEmpty().WithMessage("Rezervasyon ID zorunludur!");
-
-    RuleFor(x => x.PaymentId)
-        .NotEmpty().WithMessage("Ödeme ID zorunludur!");
+    RuleFor(x => x.ReservationId).NotEmpty().WithMessage("Rezervasyon ID zorunludur!");
+    RuleFor(x => x.PaymentId).NotEmpty().WithMessage("Ödeme ID zorunludur!");
   }
 }
 
@@ -40,13 +40,17 @@ public sealed class PayDepositCommandHandler(
       // 1. Rezervasyonu bul
       var spec = new ReservationByIdSpecification(_req.ReservationId);
       var reservation = await _reservationRepo.GetFirstAsync(spec, _token);
-      if (reservation == null) return Result<bool>.Failure("Rezervasyon bulunamadı!");
+
+      if (reservation == null)
+        return Result<bool>.Failure("Rezervasyon bulunamadı!");
 
       // 2. User ID
       var userId = _userRepo.GetCurrentUserId();
-      if (userId == Guid.Empty) userId = Guid.Parse(_config["SeedData:AdminUserId"]!);
+      if (userId == Guid.Empty)
+        userId = Guid.Parse(_config["SeedData:AdminUserId"]!);
 
-      // 3. Domain metodu çağır (Statü, Deadline vs. kontrolleri içeride)
+      // 3. Domain metodunu çağır
+      // Bu metot içeride Status'u Confirmed yapar ve DepositLockDeadline = now + 24h atar.
       reservation.MarkDepositPaid(_req.PaymentId, userId);
 
       // 4. Kaydet
@@ -54,7 +58,6 @@ public sealed class PayDepositCommandHandler(
       await _unit.SaveChangesAsync(_token);
 
       return Result<bool>.Succeed(true);
-
     }
     catch (DomainValidationException _ex)
     {

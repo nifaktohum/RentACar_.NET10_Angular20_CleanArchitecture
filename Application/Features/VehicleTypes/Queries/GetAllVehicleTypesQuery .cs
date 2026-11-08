@@ -13,9 +13,9 @@ namespace Application.Features.VehicleTypes.Queries;
 public sealed record GetAllVehicleTypesQuery : VehicleSpecParams, IRequest<Result<PagedResponse<VehicleTypeDto>>>;
 
 public sealed class GetAllVehicleTypesQueryHandler(
-                          IVehicleTypeRepository _vehicleTypeRepo,
-                          ILogger<GetAllVehicleTypesQuery> _logger
-                    ) : IRequestHandler<GetAllVehicleTypesQuery, Result<PagedResponse<VehicleTypeDto>>>
+    IVehicleTypeRepository _vehicleTypeRepo,
+    ILogger<GetAllVehicleTypesQuery> _logger
+) : IRequestHandler<GetAllVehicleTypesQuery, Result<PagedResponse<VehicleTypeDto>>>
 {
   public async Task<Result<PagedResponse<VehicleTypeDto>>> Handle(GetAllVehicleTypesQuery _req, CancellationToken _token)
   {
@@ -26,50 +26,48 @@ public sealed class GetAllVehicleTypesQueryHandler(
       // 1. Specification oluştur
       var spec = new GetAllVehicleTypesSpecification(_req);
 
-      // ⭐ 2. Query oluştur (Vehicle'deki gibi)
+      // 2. Query oluştur
       var query = spec.Criteria != null
-         ? _vehicleTypeRepo.Where(spec.Criteria)
-         : _vehicleTypeRepo.GetAll();
+          ? _vehicleTypeRepo.Where(spec.Criteria)
+          : _vehicleTypeRepo.GetAll();
 
-      // ⭐ 3. Include'ları uygula
+      // 3. Include'ları uygula (Eğer spec içinde yoksa diye garantiye alıyoruz)
       foreach (var include in spec.Includes)
       {
         query = query.Include(include);
       }
 
-      // ⭐ 4. Sıralama
+      // 4. Sıralama
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
         query = query.OrderByDescending(spec.OrderByDescending);
 
-      // ⭐ 5. Toplam sayı (Count)
+      // 5. Toplam sayı (Sayfalamadan ÖNCE)
       var totalCount = await query.CountAsync(_token);
       _logger.LogInformation("📊 Toplam kayıt: {TotalCount}", totalCount);
 
-      // ⭐ 6. Sayfalama (Paging)
+      // 6. Sayfalama (Paging)
       if (spec.IsPagingEnabled)
         query = query.Skip(spec.Skip).Take(spec.Take);
 
-      // ⭐ 7. Verileri çek
-      var vehicleTypes = await query.ToListAsync(_token);
-
-      // ⭐ 8. DTO'ya dönüştür
-      var result = vehicleTypes.Select(v => new VehicleTypeDto(
+      // 🆕 7. Verileri çek VE DTO'ya dönüştür (Projection)
+      // Not: Count işlemini doğrudan SQL'e çeviriyoruz, böylece Include etmesek bile 
+      // alt modellerin sayısı veritabanında hesaplanıp gelir.
+      var result = await query.Select(v => new VehicleTypeDto(
           v.Id,
           v.Name,
           v.Description,
           v.Icon,
           v.DisplayOrder,
-          v.VehicleModels.Count(vm => !vm.IsDeleted),
+          v.VehicleModels.Count(vm => !vm.IsDeleted), // ✅ Doğru Sayım
           v.IsActive,
           v.CreatedAt
-      )).ToList();
+      )).ToListAsync(_token);
 
-      _logger.LogInformation("✅ {Count} araç tipi getirildi. Toplam: {TotalCount}",
-          result.Count, totalCount);
+      _logger.LogInformation("✅ {Count} araç tipi getirildi. Toplam: {TotalCount}", result.Count, totalCount);
 
-      // ⭐ 9. PagedResponse oluştur
+      // 8. PagedResponse oluştur
       var response = new PagedResponse<VehicleTypeDto>(
           result,
           totalCount,
@@ -87,7 +85,5 @@ public sealed class GetAllVehicleTypesQueryHandler(
           $"Araç tipleri getirilirken hata oluştu: {ex.Message}"
       );
     }
-
-
   }
 }

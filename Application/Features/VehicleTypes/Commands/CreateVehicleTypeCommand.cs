@@ -1,3 +1,4 @@
+using Application.Behaviors;
 using Application.Features.VehicleTypes.Dto;
 using Domain.Entities.Vehicles;
 using Domain.Repositories.Vehicles;
@@ -8,6 +9,7 @@ using TS.Result;
 
 namespace Application.Features.VehicleTypes.Commands;
 
+[Permission("VehicleTypes.Create")]
 public sealed record CreateVehicleTypeCommand(
                         string Name,
                         string? Description,

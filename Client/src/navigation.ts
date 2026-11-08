@@ -25,10 +25,6 @@ export const navigations: NavigationModel[] =
       role: 'Dashboard.Read'
     },
     // Vehicles
-    // src/app/core/navigation/navigation.ts
-
-    // src/app/core/navigation/navigation.ts
-
     {
       title: 'Araç Yönetimi',
       key: 'vehicles',
@@ -191,9 +187,24 @@ export const navigations: NavigationModel[] =
       role: 'Reservations.Read',
       haveSubMenu: true,
       subMenus: [
-        { title: 'Tüm Rezervasyonlar', url: '/admin/reservations', role: 'Reservations.Read' },
-        { title: 'Yeni Rezervasyon', url: '/admin/reservations/add', role: 'Reservations.Read' },
-        { title: 'Aktif Rezervasyonlar', url: '/admin/reservations/active', role: 'Reservations.Read' }
+        {
+          title: 'Tüm Rezervasyonlar',
+          url: '/admin/reservations',
+          role: 'Reservations.Read',
+          haveSubMenu: false
+        },
+        {
+          title: 'Yeni Rezervasyon',
+          url: '/admin/reservations/add',
+          role: 'Reservations.Create',
+          haveSubMenu: false
+        },
+        {
+          title: 'Aktif Rezervasyonlar',
+          url: '/admin/reservations/active',
+          role: 'Reservations.Read',
+          haveSubMenu: false
+        }
       ],
     },
     // Customers
@@ -213,7 +224,7 @@ export const navigations: NavigationModel[] =
         },
         {
           title: 'Kara Liste',
-          url: '/admin/customers/blacklist',  
+          url: '/admin/customers/blacklist',
           icon: 'ri-forbid-2-line',
           role: 'Customers.Read',
           haveSubMenu: false

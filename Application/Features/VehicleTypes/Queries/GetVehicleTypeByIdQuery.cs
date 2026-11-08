@@ -23,16 +23,10 @@ public sealed class GetVehicleTypeByIdQueryHandler(
     {
       _logger.LogInformation("🔍 Araç tipi detayı getiriliyor: {Id}", _req.Id);
 
-      var vehicleType = await _vehicleTypeRepo.GetByExpressionAsync(v => v.Id == _req.Id && !v.IsDeleted, _token);
-      if (vehicleType is null) return Result<VehicleTypeDetailDto>.Failure("Araç Tipi bulunamadı!");
+      // ❌ Bu satırı sildik, aşağıdaki rawData sorgusu zaten bu işi yapıyor.
+      // var vehicleType = await _vehicleTypeRepo.GetByExpressionAsync(v => v.Id == _req.Id && !v.IsDeleted, _token);
+      // if (vehicleType is null) return Result<VehicleTypeDetailDto>.Failure("Araç Tipi bulunamadı!");
 
-
-      var userId = new Guid(vehicleType.CreatedBy.ToString());
-      var userName = await _userRepo.GetUserNamesByIdsAsync([userId], _token);
-
-      string GetUserName(Guid userId) => userName.GetValueOrDefault(userId, "Bilinmiyor");
-
-      // SQL tarafında AsNoTracking ve Projeksiyon kullanımı
       // 1. Veritabanından ham verileri SQL seviyesinde çekiyoruz
       var rawData = await _vehicleTypeRepo
           .GetAll()
@@ -59,7 +53,14 @@ public sealed class GetVehicleTypeByIdQueryHandler(
         return Result<VehicleTypeDetailDto>.Failure(404, "Araç tipi bulunamadı.");
       }
 
-      // 2. C# Belleğinde (In-Memory) C# metodlarını çağırarak DTO'yu oluşturuyoruz
+      // 2. Kullanıcı isimlerini al (Sadece gerekli olanları)
+      var userIds = new List<Guid> { rawData.CreatedBy };
+      if (rawData.UpdatedBy.HasValue) userIds.Add(rawData.UpdatedBy.Value);
+
+      var userNames = await _userRepo.GetUserNamesByIdsAsync(userIds, _token);
+      string GetUserName(Guid id) => userNames.GetValueOrDefault(id, "Bilinmiyor");
+
+      // 3. DTO'yu oluştur
       var response = new VehicleTypeDetailDto(
           rawData.Id,
           rawData.Name,
@@ -76,10 +77,8 @@ public sealed class GetVehicleTypeByIdQueryHandler(
           rawData.UpdatedBy.HasValue ? GetUserName(rawData.UpdatedBy.Value) : null
       );
 
-
       _logger.LogInformation("✅ ID: {Id} olan araç tipi getirildi.", _req.Id);
       return Result<VehicleTypeDetailDto>.Succeed(response);
-
     }
     catch (Exception _ex)
     {

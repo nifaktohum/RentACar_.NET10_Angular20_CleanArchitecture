@@ -1,3 +1,4 @@
+using Application.Behaviors;
 using Application.Common.Models;
 using Application.Features.Reservations.Dto.Responses;
 using Application.Features.Reservations.Specifications;
@@ -10,7 +11,8 @@ using TS.Result;
 
 namespace Application.Features.Reservations.Queries;
 
-public sealed record GetReservationListQuery: ReservationSpecParams, IRequest<Result<PagedResponse<ReservationDto>>>;
+[Permission("Reservations.Read")]
+public sealed record GetReservationListQuery : ReservationSpecParams, IRequest<Result<PagedResponse<ReservationDto>>>;
 
 public sealed class GetReservationListQueryHandler(
                         IReservationRepository _reservationRepo
@@ -21,13 +23,13 @@ public sealed class GetReservationListQueryHandler(
     // 1. Specification oluştur
     var spec = new GetAllReservationsSpecification(_req);
 
-    // 2. Repository'den getir
+    // 2. Repository'den getir (Filtrelenmiş, sıralanmış ve sayfalanmış liste)
     var reservations = await _reservationRepo.GetAsync(spec, _token);
 
-    // Toplam sayı
+    // 3. Toplam sayıyı al (Sayfalama yapmadan, sadece filtreye uyanları sayar)
     var totalCount = await _reservationRepo.CountAsync(spec, _token);
 
-    // 3. DTO'ya map et
+    // 4. DTO'ya map et
     var result = reservations.Select(r => new ReservationDto(
         Id: r.Id,
         ReservationNumber: r.ReservationNumber,
@@ -44,25 +46,29 @@ public sealed class GetReservationListQueryHandler(
     )).ToList();
 
     var response = new PagedResponse<ReservationDto>(
-    result,
-    totalCount,
-    _req.PageNumber,
-    _req.PageSize
-);
-
+        result,
+        totalCount,
+        _req.PageNumber,
+        _req.PageSize
+    );
 
     return Result<PagedResponse<ReservationDto>>.Succeed(response);
   }
 
-  private static string GetCustomerFullName(Customer customer)
+  // 🚨 Null Korumalı Metotlar
+  private static string GetCustomerFullName(Customer? customer)
   {
+    if (customer == null) return "Bilinmeyen Müşteri";
+
     return customer.Type == CustomerType.Individual
         ? $"{customer.FirstName} {customer.LastName}"
         : customer.CompanyName ?? "Kurumsal Müşteri";
   }
 
-  private static string GetVehicleInfo(Vehicle vehicle)
+  private static string GetVehicleInfo(Vehicle? vehicle)
   {
+    if (vehicle == null) return "Araç Bilgisi Yok";
+
     return $"{vehicle.Brand} {vehicle.Model} - {vehicle.Plate}";
   }
 }

@@ -10,9 +10,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetDistinctFuelTypesQuery : IRequest<Result<List<string>>>;
 
 public sealed class GetDistinctFuelTypesQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetDistinctFuelTypesQueryHandler> _logger
-                    ) : IRequestHandler<GetDistinctFuelTypesQuery, Result<List<string>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetDistinctFuelTypesQueryHandler> _logger
+) : IRequestHandler<GetDistinctFuelTypesQuery, Result<List<string>>>
 {
   public async Task<Result<List<string>>> Handle(GetDistinctFuelTypesQuery _req, CancellationToken _token)
   {
@@ -23,19 +23,17 @@ public sealed class GetDistinctFuelTypesQueryHandler(
       var spec = new DistinctVehicleSpecifications.FuelTypes();
 
       var query = spec.Criteria != null
-       ? _vehicleRepo.Where(spec.Criteria)
-       : _vehicleRepo.GetAll();
+          ? _vehicleRepo.Where(spec.Criteria)
+          : _vehicleRepo.GetAll();
 
+      // Yakıt tiplerini veritabanından çek, tekilleştir ve sırala
       var fuelTypes = await query
-         .Select(v => v.FuelType)
-         .Distinct()
-         .OrderBy(f => f)
-         .ToListAsync(_token);
+          .Select(v => v.FuelType)
+          .Distinct()
+          .OrderBy(f => f)
+          .ToListAsync(_token);
 
-      if (spec.OrderBy != null)
-        query = query.OrderBy(spec.OrderBy);
-      else if (spec.OrderByDescending != null)
-        query = query.OrderByDescending(spec.OrderByDescending);
+      // ❌ Gereksiz OrderBy bloğu silindi. Zaten yukarıda SQL seviyesinde sıralama yapıldı.
 
       _logger.LogInformation("✅ {Count} benzersiz yakıt tipi getirildi", fuelTypes.Count);
 

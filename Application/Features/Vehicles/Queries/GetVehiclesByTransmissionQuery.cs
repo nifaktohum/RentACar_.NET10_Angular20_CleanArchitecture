@@ -13,9 +13,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetVehiclesByTransmissionQuery(string? Transmission, VehicleSpecParams? SpecParams) : IRequest<Result<PagedResponse<VehicleListDto>>>;
 
 public sealed class GetVehiclesByTransmissionQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetVehiclesByTransmissionQueryHandler> _logger
-                    ) : IRequestHandler<GetVehiclesByTransmissionQuery, Result<PagedResponse<VehicleListDto>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetVehiclesByTransmissionQueryHandler> _logger
+) : IRequestHandler<GetVehiclesByTransmissionQuery, Result<PagedResponse<VehicleListDto>>>
 {
   public async Task<Result<PagedResponse<VehicleListDto>>> Handle(GetVehiclesByTransmissionQuery _req, CancellationToken _token)
   {
@@ -30,24 +30,30 @@ public sealed class GetVehiclesByTransmissionQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // Include'ları uygula
       foreach (var include in spec.Includes)
       {
         query = query.Include(include);
       }
 
+      // 🆕 VehicleModel -> VehicleType ilişkisini dahil et (DTO'da tip adı dönebilmesi için)
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
+
+      // Sıralama
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
         query = query.OrderByDescending(spec.OrderByDescending);
 
+      // 🚨 Toplam sayıyı Sayfalama'dan ÖNCE alıyoruz
       var totalCount = await query.CountAsync(_token);
 
       if (spec.IsPagingEnabled)
         query = query.Skip(spec.Skip).Take(spec.Take);
 
-
       var vehicles = await query.ToListAsync(_token);
 
+      // 🆕 DTO Map'lemesi Güncellendi
       var result = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -56,14 +62,18 @@ public sealed class GetVehiclesByTransmissionQueryHandler(
           v.Year,
           v.Plate,
           v.Color,
+          v.VinNumber,
           v.FuelType,
           v.Transmission,
+          v.TractionType,
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
+          v.CurrentKilometer,
+          v.Status.ToString(),
           v.IsAvailable,
           v.VehicleModel?.VehicleType?.Name ?? "Bilinmiyor",
-          v.GetMainImageUrl(),
+          v.GetMainImageUrl() ?? string.Empty,
           v.IsActive,
           v.CreatedAt
       )).ToList();
@@ -71,11 +81,11 @@ public sealed class GetVehiclesByTransmissionQueryHandler(
       _logger.LogInformation("✅ Vites tipi filtreli {Count} araç getirildi. Transmission: {Transmission}", result.Count, _req.Transmission ?? "Tümü");
 
       var response = new PagedResponse<VehicleListDto>(
-                               result,
-                               totalCount,
-                               specParams.PageNumber,
-                               specParams.PageSize);
-
+          result,
+          totalCount,
+          specParams.PageNumber,
+          specParams.PageSize
+      );
 
       return Result<PagedResponse<VehicleListDto>>.Succeed(response);
     }

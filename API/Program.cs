@@ -88,6 +88,9 @@ _builder.Services.AddResponseCompression(opt =>
   opt.EnableForHttps = true;
 });
 
+// API Katmanındaki Zamanlayıcıyı Kaydet
+_builder.Services.AddHostedService<API.BackgroundJobs.BackgroundJobScheduler>();
+
 _builder.Services.AddTransient<SecurityStampMiddleware>();
 //==========================================================================================>
 // --- 2. MIDDLEWARE BORU HATTI (PIPELINE) SIRALAMASI ---

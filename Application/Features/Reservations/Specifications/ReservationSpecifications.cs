@@ -70,10 +70,22 @@ public sealed class ReservationsByCustomerSpecification : BaseSpecification<Rese
 
 public sealed class ConflictingReservationsSpecification : BaseSpecification<Reservation>
 {
-  public ConflictingReservationsSpecification(Guid vehicleId, DateTimeOffset startDate, DateTimeOffset endDate)
+  public ConflictingReservationsSpecification(
+      Guid vehicleId,
+      DateTimeOffset startDate,
+      DateTimeOffset endDate)
       : base(r => r.VehicleId == vehicleId
           && !r.IsDeleted
-          && (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.Active)
+          && (
+                (r.Status == ReservationStatus.Confirmed && r.FullPaymentPaid)
+             || r.Status == ReservationStatus.Active
+             || (r.Status == ReservationStatus.Confirmed
+                 && !r.FullPaymentPaid
+                 && r.DepositLockDeadline != null
+                 && r.DepositLockDeadline > DateTimeOffset.UtcNow)
+             || (r.Status == ReservationStatus.PendingPayment
+                 && r.PaymentDeadline > DateTimeOffset.UtcNow)
+             )
           && r.PlannedStartDate < endDate
           && startDate < r.PlannedEndDate)
   {
@@ -82,6 +94,7 @@ public sealed class ConflictingReservationsSpecification : BaseSpecification<Res
 
 // ==================== JOB ====================
 
+// 15 Dakikalık Ödeme Süresi Dolanlar (PendingPayment)
 public sealed class ExpiredPendingPaymentsSpecification : BaseSpecification<Reservation>
 {
   public ExpiredPendingPaymentsSpecification()
@@ -93,12 +106,14 @@ public sealed class ExpiredPendingPaymentsSpecification : BaseSpecification<Rese
   }
 }
 
-public sealed class ExpiredConfirmedPickupsSpecification : BaseSpecification<Reservation>
+// 24 Saatlik Depozito Sonrası Tam Ödeme Süresi Dolanlar (Confirmed)
+public sealed class ExpiredDepositLocksSpecification : BaseSpecification<Reservation>
 {
-  public ExpiredConfirmedPickupsSpecification()
+  public ExpiredDepositLocksSpecification()
       : base(r => r.Status == ReservationStatus.Confirmed
-          && r.PickupDeadline.HasValue
-          && r.PickupDeadline.Value < DateTimeOffset.UtcNow
+          && !r.FullPaymentPaid
+          && r.DepositLockDeadline.HasValue
+          && r.DepositLockDeadline.Value < DateTimeOffset.UtcNow
           && !r.IsDeleted)
   {
     AddInclude(r => r.Vehicle);

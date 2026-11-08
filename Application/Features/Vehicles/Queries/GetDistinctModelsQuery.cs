@@ -10,9 +10,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetDistinctModelsQuery : IRequest<Result<List<string>>>;
 
 public sealed class GetDistinctModelsQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetDistinctModelsQueryHandler> _logger
-                    ) : IRequestHandler<GetDistinctModelsQuery, Result<List<string>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetDistinctModelsQueryHandler> _logger
+) : IRequestHandler<GetDistinctModelsQuery, Result<List<string>>>
 {
   public async Task<Result<List<string>>> Handle(GetDistinctModelsQuery _req, CancellationToken _token)
   {
@@ -26,16 +26,14 @@ public sealed class GetDistinctModelsQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // Modelleri veritabanından çek, tekilleştir ve sırala
       var models = await query
           .Select(v => v.VehicleModel.Name)
           .Distinct()
           .OrderBy(m => m)
           .ToListAsync(_token);
 
-      if (spec.OrderBy != null)
-        query = query.OrderBy(spec.OrderBy);
-      else if (spec.OrderByDescending != null)
-        query = query.OrderByDescending(spec.OrderByDescending);
+      // ❌ Gereksiz OrderBy bloğu silindi. SQL seviyesinde OrderBy(m => m) zaten yapıldı.
 
       _logger.LogInformation("✅ {Count} benzersiz model getirildi", models.Count);
 
@@ -48,13 +46,3 @@ public sealed class GetDistinctModelsQueryHandler(
     }
   }
 }
-
-/*
-                        KULLANIM ALANLARI
-      ---------------------------------------------------------------------
-      1️⃣	Filtreleme Dropdown'u	      Kullanıcı modele göre filtreleyebilsin
-      2️⃣	Arama Sayfası	              Gelişmiş arama filtresi
-      3️⃣	Raporlama	                  Modele göre rapor filtreleme
-      4️⃣	Admin Paneli	              Araç yönetiminde filtreleme
-      5️⃣	Ana Sayfa	                  Popüler modelleri gösterme
-*/

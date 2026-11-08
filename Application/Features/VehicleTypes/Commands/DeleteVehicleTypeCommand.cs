@@ -1,3 +1,4 @@
+using Application.Behaviors;
 using Domain.Repositories;
 using Domain.Repositories.Vehicles;
 using GenericRepository;
@@ -9,6 +10,7 @@ using TS.Result;
 
 namespace Application.Features.VehicleTypes.Commands;
 
+[Permission("VehicleTypes.Delete")]
 public sealed record DeleteVehicleTypeCommand(Guid Id) : IRequest<Result<Unit>>;
 
 public sealed class DeleteVehicleTypeCommandHandler(

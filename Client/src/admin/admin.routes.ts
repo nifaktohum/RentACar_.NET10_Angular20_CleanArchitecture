@@ -77,7 +77,14 @@ export const ADMIN_ROUTES: Routes = [
         loadChildren: () => import('./features/customers/customers.routes').then(m => m.CUSTOMER_ROUTES),
         canActivate: [permissionAuthGuard],
         data: { requiredPermission: 'Customers.Read' }
-      }
+      },
+        // --- RESERVATIONS --- 
+      {
+        path: 'reservations',
+        loadChildren: () => import('./features/reservations/reservation.routes').then(m => m.RESERVATION_ROUTES),
+        canActivate: [permissionAuthGuard],
+        data: { requiredPermission: 'Reservations.Read' }
+      },
     ]
   },
 ];

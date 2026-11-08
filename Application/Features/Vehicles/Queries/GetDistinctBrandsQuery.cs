@@ -9,11 +9,10 @@ namespace Application.Features.Vehicles.Queries;
 
 public sealed class GetDistinctBrandsQuery : IRequest<Result<List<string>>>;
 
-
 public sealed class GetDistinctBrandsQueryHandler(
-                      IVehicleRepository _vehicleRepo,
-                      ILogger<GetDistinctBrandsQueryHandler> _logger
-                    ) : IRequestHandler<GetDistinctBrandsQuery, Result<List<string>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetDistinctBrandsQueryHandler> _logger
+) : IRequestHandler<GetDistinctBrandsQuery, Result<List<string>>>
 {
   public async Task<Result<List<string>>> Handle(GetDistinctBrandsQuery _req, CancellationToken _token)
   {
@@ -22,21 +21,17 @@ public sealed class GetDistinctBrandsQueryHandler(
       _logger.LogInformation("🔍 Benzersiz markalar getiriliyor...");
 
       var spec = new DistinctVehicleSpecifications.Brands();
+
       var query = spec.Criteria != null
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // 🆕 Markaları veritabanı seviyesinde çek, alfabetik sırala ve listele
       var brands = await query
-             .Select(v => v.VehicleModel.Brand)
-             .Distinct()
-             .OrderBy(b => b)
-             .ToListAsync(_token);
-
-      if (spec.OrderBy != null)
-        query = query.OrderBy(spec.OrderBy);
-      else if (spec.OrderByDescending != null)
-        query = query.OrderByDescending(spec.OrderByDescending);
-      
+          .Select(v => v.VehicleModel.Brand)
+          .Distinct()
+          .OrderBy(b => b) // Veritabanı seviyesinde sıralama (SQL ORDER BY)
+          .ToListAsync(_token);
 
       _logger.LogInformation("✅ {Count} benzersiz marka getirildi", brands.Count);
 
@@ -49,4 +44,3 @@ public sealed class GetDistinctBrandsQueryHandler(
     }
   }
 }
-

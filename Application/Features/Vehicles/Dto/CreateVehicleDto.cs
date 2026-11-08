@@ -1,27 +1,58 @@
-using Application.Features.VehicleImages.Dto;
-
 namespace Application.Features.Vehicles.Dto;
 
 public sealed record CreateVehicleDto(
+    // --- Kimlik ---
     Guid Id,
+
+    // --- Temel Bilgiler ---
     string Brand,
     string Model,
     string Year,
     string Plate,
     string Color,
-    string FuelType,
-    string Transmission,
-    int SeatCount,
-    int DoorCount,
-    int? MinAge,
-    decimal DailyPrice,
-    bool IsAvailable,
-    string? Description,
     Guid VehicleModelId,
     string? VehicleModelName,
     string? VehicleTypeName,
-List<VehicleImageDto> Images,
-    DateTimeOffset? CreatedAt,        // Oluşturulma tarihi
-    Guid? CreatedBy,                  // Oluşturanın ID'si
+    Guid BranchId,                         // 🆕 Şube ID'si
+
+    // --- Teknik & Tanımlayıcı Bilgiler ---
+    string VinNumber,                      // 🆕 Şasi Numarası
+    string EngineNumber,                   // 🆕 Motor Numarası
+    string FuelType,
+    string Transmission,
+    string TractionType,                   // 🆕 Çekiş Tipi
+    decimal EngineVolume,                  // 🆕 Motor Hacmi
+    int EnginePower,                       // 🆕 Motor Gücü
+    decimal FuelConsumption,               // 🆕 Yakıt Tüketimi
+    int SeatCount,
+    int DoorCount,
+
+    // --- Ticari & Yasal Bilgiler ---
+    int? MinAge,
+    decimal DailyPrice,
+    decimal DepositAmount,                 // 🆕 Depozito
+    decimal WeeklyDiscountRate,            // 🆕 Haftalık İndirim
+    decimal MonthlyDiscountRate,           // 🆕 Aylık İndirim
+
+    // --- Bakım & Durum Bilgileri ---
+    int CurrentKilometer,                  // 🆕 Güncel KM
+    int LastMaintenanceKm,                 // 🆕 Son Bakım KM
+    int NextMaintenanceKm,                 // 🆕 Sonraki Bakım KM
+    DateTimeOffset LastMaintenanceDate,    // 🆕 Son Bakım Tarihi
+    DateTimeOffset InspectionDate,         // 🆕 Muayene Tarihi
+    DateTimeOffset InsuranceEndDate,       // 🆕 Sigorta Bitiş
+    DateTimeOffset CascoEndDate,           // 🆕 Kasko Bitiş
+    string TireStatus,                     // 🆕 Lastik Durumu
+    string GeneralStatus,                  // 🆕 Genel Durum
+
+    // --- Sistem & Durum ---
+    bool IsAvailable,
+    string Status,                         // 🆕 Enum yerine string gönderiyoruz (UI için daha kolay)
+    string? Description,
+    List<VehicleImageDto> Images,
+
+    // --- Audit Bilgileri ---
+    DateTimeOffset? CreatedAt,
+    Guid? CreatedBy,
     string? CreatedByName
 );

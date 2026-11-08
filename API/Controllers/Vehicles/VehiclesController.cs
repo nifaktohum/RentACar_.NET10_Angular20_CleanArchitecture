@@ -84,14 +84,6 @@ public sealed class VehiclesController : BaseApiController
     return result.IsSuccessful ? Ok(result) : BadRequest(result);
   }
 
-  // PATCH: Stok güncelleme
-  [HttpPatch("update-stock")]
-  public async Task<IActionResult> UpdateStock([FromBody] UpdateVehicleStockCommand command, CancellationToken cancellationToken)
-  {
-    var result = await Mediator.Send(command, cancellationToken);
-    return result.IsSuccessful ? Ok(result) : BadRequest(result);
-  }
-
   // PATCH: Durum değiştirme (Aktif/Pasif)
   [HttpPatch("toggle-status/{id:guid}")]
   public async Task<IActionResult> ToggleStatus(Guid id, CancellationToken cancellationToken)

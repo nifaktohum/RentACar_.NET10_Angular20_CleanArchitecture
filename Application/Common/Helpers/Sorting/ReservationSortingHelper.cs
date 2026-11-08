@@ -9,28 +9,40 @@ public static class ReservationSortingHelper
   {
     switch (sort)
     {
-      case "startDateAsc":
+      case "reservationnumberasc":
+        spec.ApplyOrderBy(r => r.ReservationNumber);
+        break;
+      case "reservationnumberdesc":
+        spec.ApplyOrderByDescending(r => r.ReservationNumber);
+        break;
+      case "customerfullnameasc":
+        spec.ApplyOrderBy(r => r.Customer);
+        break;
+      case "customerfullnamedesc":
+        spec.ApplyOrderByDescending(r => r.Customer);
+        break;
+      case "plannedstartdateasc":
         spec.ApplyOrderBy(r => r.PlannedStartDate);
         break;
-      case "startDateDesc":
+      case "plannedstartdatedesc":
         spec.ApplyOrderByDescending(r => r.PlannedStartDate);
         break;
-      case "endDateAsc":
+      case "enddateasc":
         spec.ApplyOrderBy(r => r.PlannedEndDate);
         break;
-      case "endDateDesc":
+      case "enddatedesc":
         spec.ApplyOrderByDescending(r => r.PlannedEndDate);
         break;
-      case "priceAsc":
+      case "totalpriceasc":
         spec.ApplyOrderBy(r => r.TotalPrice);
         break;
-      case "priceDesc":
+      case "totalpricedesc":
         spec.ApplyOrderByDescending(r => r.TotalPrice);
         break;
-      case "createdAsc":
+      case "createdasc":
         spec.ApplyOrderBy(r => r.CreatedAt);
         break;
-      case "createdDesc":
+      case "createddesc":
       case "latest":
         spec.ApplyOrderByDescending(r => r.CreatedAt);
         break;

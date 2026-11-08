@@ -9,108 +9,129 @@ public static class VehicleFilterExtensions
 {
   public static Expression<Func<Vehicle, bool>> BuildFilter(VehicleSpecParams? specParams, bool includeAll = false)
   {
-    // Başlangıç koşulu: Tüm aktif ve müsait araçlar
-    // Expression<Func<Vehicle, bool>> filter = v => v.IsAvailable && v.IsActive && !v.IsDeleted;
-    // ⭐ includeAll true ise IsAvailable filtreleme, false ise sadece müsait araçlar
+    // 1. Başlangıç Koşulu
+    // Admin için: Silinmemiş her şey
+    // Müşteri için: Silinmemiş, Aktif ve Müsait olanlar
     Expression<Func<Vehicle, bool>> filter = includeAll
-                                      ? v => !v.IsDeleted                                    // Admin: Sadece silinmemişler (Aktif/Pasif fark etmez)
-                                      : v => v.IsAvailable && v.IsActive && !v.IsDeleted;    // Müşteri: Müsait, aktif ve silinmemişler
+        ? v => !v.IsDeleted
+        : v => v.Status == VehicleStatus.Available && v.IsActive && !v.IsDeleted;
+
     if (specParams == null) return filter;
 
-    // Marka filtresi varsa ekle
+    // 2. Marka Filtresi
     if (specParams.Brands != null && specParams.Brands.Any())
     {
+      // Not: PostgreSQL kullanıyorsan Npgsql ILike kullanabilirsin, SQL Server'da ToLower yerine Collation kullanmak daha performanslıdır.
       var brands = specParams.Brands.Select(b => b.ToLower()).ToList();
       filter = filter.And(v => brands.Contains(v.Brand.ToLower()));
-      //.And ==>  İki Expression<Func<T, bool>> ifadesini güvenli bir şekilde && ile birleştirmek için ya LinqKit kütüphanesini kullanman gerekir
     }
 
-    // Renk filtresi varsa ekle
+    // 3. Renk Filtresi
     if (specParams.Colors != null && specParams.Colors.Any())
     {
       var colors = specParams.Colors.Select(c => c.ToLower()).ToList();
       filter = filter.And(v => colors.Contains(v.Color.ToLower()));
     }
 
-    // Model filtresi
+    // 4. Model Filtresi
     if (specParams.Models != null && specParams.Models.Any())
     {
       var models = specParams.Models.Select(m => m.ToLower()).ToList();
-      filter = filter.And(v => models.Contains(v.VehicleModel.Name.ToLower()));
+      filter = filter.And(v => v.VehicleModel != null && models.Contains(v.VehicleModel.Name.ToLower()));
     }
 
-    // Yakıt filtresi
+    // 5. Yakıt Filtresi
     if (specParams.FuelTypes != null && specParams.FuelTypes.Any())
     {
       var fuelTypes = specParams.FuelTypes.Select(f => f.ToLower()).ToList();
       filter = filter.And(v => fuelTypes.Contains(v.FuelType.ToLower()));
     }
 
-    // Vites filtresi
+    // 6. Vites Filtresi
     if (specParams.Transmissions != null && specParams.Transmissions.Any())
     {
       var transmissions = specParams.Transmissions.Select(t => t.ToLower()).ToList();
       filter = filter.And(v => transmissions.Contains(v.Transmission.ToLower()));
     }
 
-    // Yıl filtresi
+    // 7. Yıl Filtresi
     if (specParams.Years != null && specParams.Years.Any())
     {
       var years = specParams.Years.ToList();
       filter = filter.And(v => years.Contains(v.Year));
     }
 
-    // TARİH FİLTRELERİ
+    // 8. Araç Tipi Filtresi (VehicleTypeId)
+    if (specParams.VehicleTypeIds != null && specParams.VehicleTypeIds.Any())
+    {
+      var typeIds = specParams.VehicleTypeIds;
+      filter = filter.And(v => typeIds.Contains(v.VehicleModel.VehicleTypeId));
+    }
+
+    // 9. Araç Tipi İsim Filtresi (Types)
+    if (specParams.Types != null && specParams.Types.Any())
+    {
+      var vehicleTypeNames = specParams.Types.Select(t => t.ToLower()).ToList();
+      filter = filter.And(v => v.VehicleModel != null && v.VehicleModel.VehicleType != null && vehicleTypeNames.Contains(v.VehicleModel.VehicleType.Name.ToLower()));
+    }
+
+    // 10. TARİH FİLTRELERİ (Kiralama Takvimi İçin)
+    // ⚠️ DİKKAT: Eğer araç kiralama takvimini kontrol ediyorsak, ilgili tarihlerde çakışan rezervasyon olmamalı.
+    // Bu kısım Rezervasyon tablosuna bakmalıdır. Şimdilik aracın eklendiği tarihe göre filtreliyoruz.
     if (specParams.StartDate.HasValue)
       filter = filter.And(v => v.CreatedAt >= specParams.StartDate.Value);
 
     if (specParams.EndDate.HasValue)
       filter = filter.And(v => v.CreatedAt <= specParams.EndDate.Value);
 
-    // Fiyat aralığı
+    // 11. Fiyat Aralığı
     if (specParams.MinPrice.HasValue)
       filter = filter.And(v => v.DailyPrice >= specParams.MinPrice.Value);
 
     if (specParams.MaxPrice.HasValue)
       filter = filter.And(v => v.DailyPrice <= specParams.MaxPrice.Value);
 
-    // Koltuk
+    // 12. Koltuk & Kapı
     if (specParams.SeatCounts.HasValue)
       filter = filter.And(v => v.SeatCount == specParams.SeatCounts.Value);
 
-    // Kapı
     if (specParams.DoorCounts.HasValue)
       filter = filter.And(v => v.DoorCount == specParams.DoorCounts.Value);
 
-    // IsAvailable (Müsaitlik) filtresi varsa ekle
+    // 13. Müsaitlik Filtresi
     if (specParams.IsAvailable.HasValue)
-    {
       filter = filter.And(v => v.IsAvailable == specParams.IsAvailable.Value);
-    }
 
-    if (specParams.Types != null && specParams.Types.Any() )
+    // 14. Aktiflik Filtresi
+    if (specParams.IsActive.HasValue)
+      filter = filter.And(v => v.IsActive == specParams.IsActive.Value);
+
+    // 15. Stok Filtreleri (VehicleModel üzerinden)
+    if (specParams.IsInStock.HasValue)
     {
-      var vehicleTypeName = specParams.Types.ToList();
-      filter = filter.And(v => vehicleTypeName.Contains(v.VehicleModel.VehicleType.Name));
+      // 🚨 DİKKAT: Stock bir Computed Property'dir. LINQ to Entities bunu SQL'e çeviremez!
+      // Bunu veritabanında hesaplatmak için alt sorgu (Subquery) kullanmalıyız.
+      bool inStock = specParams.IsInStock.Value;
+      filter = filter.And(v => v.VehicleModel.Vehicles.Any(veh => veh.IsAvailable) == inStock);
     }
 
-    // tekli Arama Filtresi 
+    // 16. Genel Arama (SearchTerm)
     if (!string.IsNullOrWhiteSpace(specParams.SearchTerm))
     {
       var search = specParams.SearchTerm.ToLower();
 
       filter = filter.And(v =>
-              v.VehicleModel.Brand.ToLower().Contains(search) ||          // Marka
-              v.VehicleModel.Name.ToLower().Contains(search) ||          // Model
-              v.VehicleModel.VehicleType.Name.ToLower().Contains(search) ||           // Araç Tipi
-              v.Plate.ToLower().Contains(search) ||                      // Plaka
-              v.Color.ToLower().Contains(search) ||                      // Renk
-              v.FuelType.ToLower().Contains(search) ||                   // Yakıt
-              v.Transmission.ToLower().Contains(search) ||               // Vites
-              v.Year.Contains(search) ||                                 // Yıl
-              (v.Description != null && v.Description.ToLower().Contains(search)) // Açıklama
-          );
-      
+          (v.VehicleModel != null && v.VehicleModel.Brand.ToLower().Contains(search)) ||
+          (v.VehicleModel != null && v.VehicleModel.Name.ToLower().Contains(search)) ||
+          (v.VehicleModel != null && v.VehicleModel.VehicleType != null && v.VehicleModel.VehicleType.Name.ToLower().Contains(search)) ||
+          v.Plate.ToLower().Contains(search) ||
+          v.Color.ToLower().Contains(search) ||
+          v.FuelType.ToLower().Contains(search) ||
+          v.Transmission.ToLower().Contains(search) ||
+          v.Year.Contains(search) ||
+          (v.Description != null && v.Description.ToLower().Contains(search)) ||
+          (v.VinNumber != null && v.VinNumber.ToLower().Contains(search)) // 🆕 VIN ile arama eklendi
+      );
     }
 
     return filter;

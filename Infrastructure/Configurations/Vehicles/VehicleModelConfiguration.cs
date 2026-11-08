@@ -17,8 +17,8 @@ public class VehicleModelConfiguration : IEntityTypeConfiguration<VehicleModel>
     // ==================== PROPERTIES ====================
 
     builder.Property(vm => vm.Id)
-    .HasColumnName("Id")
-    .HasColumnOrder(0);
+        .HasColumnName("Id")
+        .HasColumnOrder(0);
 
     builder.Property(vm => vm.Brand)
         .IsRequired()
@@ -32,44 +32,70 @@ public class VehicleModelConfiguration : IEntityTypeConfiguration<VehicleModel>
         .HasColumnName("Name")
         .HasColumnOrder(2);
 
-
     builder.Property(vm => vm.Description)
         .HasMaxLength(500)
         .HasColumnName("Description")
         .HasColumnOrder(3);
 
-    builder.Property(vm => vm.Stock)
+    // ❌ Stock ve AvailableStock DB'de YOK — computed property
+    // builder.Property(vm => vm.Stock)...
+    // builder.Property(vm => vm.AvailableStock)...
+
+    // ==================== AUDIT / SOFT DELETE ====================
+    // (BaseEntityConfiguration varsa SİL)
+    builder.Property(vm => vm.IsActive)
         .IsRequired()
-        .HasDefaultValue(0)
-        .HasColumnName("Stock")
+        .HasDefaultValue(true)
+        .HasColumnName("IsActive")
         .HasColumnOrder(4);
 
-    builder.Property(vm => vm.AvailableStock)
+    builder.Property(vm => vm.IsDeleted)
         .IsRequired()
-        .HasDefaultValue(0)
-        .HasColumnName("AvailableStock")
+        .HasDefaultValue(false)
+        .HasColumnName("IsDeleted")
         .HasColumnOrder(5);
 
+    builder.Property(vm => vm.CreatedAt)
+        .IsRequired()
+        .HasColumnName("CreatedAt")
+        .HasColumnOrder(6);
+
+    builder.Property(vm => vm.UpdatedAt)
+        .HasColumnName("UpdatedAt")
+        .HasColumnOrder(7);
+
+    builder.Property(vm => vm.CreatedBy)
+        .IsRequired()
+        .HasColumnName("CreatedBy")
+        .HasColumnOrder(8);
+
+    builder.Property(vm => vm.UpdatedBy)
+        .HasColumnName("UpdatedBy")
+        .HasColumnOrder(9);
+
     // ==================== RELATIONSHIPS ====================
+
     // VehicleType ile ilişki
     builder.HasOne(vm => vm.VehicleType)
-          .WithMany(vt => vt.VehicleModels)
-          .HasForeignKey(vm => vm.VehicleTypeId)
-          .OnDelete(DeleteBehavior.Restrict)
-          .IsRequired();
+        .WithMany(vt => vt.VehicleModels)
+        .HasForeignKey(vm => vm.VehicleTypeId)
+        .OnDelete(DeleteBehavior.Restrict)
+        .IsRequired();
 
     // Vehicle ile ilişki (one-to-many)
     builder.HasMany(vm => vm.Vehicles)
         .WithOne(v => v.VehicleModel)
         .HasForeignKey(v => v.VehicleModelId)
-        .OnDelete(DeleteBehavior.Restrict);
+        .OnDelete(DeleteBehavior.Restrict)
+        .IsRequired();          // 🆕
 
     // ==================== INDEXES ====================
-    // Arama performansı için
+
+    // Unique: Brand + Name (soft delete hariç)
     builder.HasIndex(vm => new { vm.Brand, vm.Name })
         .IsUnique()
-        .HasDatabaseName("IX_VehicleModels_Brand_Name")
-        .HasFilter("\"IsDeleted\" = false"); ;
+        .HasDatabaseName("UX_VehicleModels_Brand_Name")
+        .HasFilter("\"IsDeleted\" = false");
 
     builder.HasIndex(vm => vm.Brand)
         .HasDatabaseName("IX_VehicleModels_Brand");
@@ -80,17 +106,16 @@ public class VehicleModelConfiguration : IEntityTypeConfiguration<VehicleModel>
     builder.HasIndex(vm => vm.VehicleTypeId)
         .HasDatabaseName("IX_VehicleModels_VehicleTypeId");
 
-    builder.HasIndex(vm => vm.Stock)
-        .HasDatabaseName("IX_VehicleModels_Stock");
-
-    builder.HasIndex(vm => vm.AvailableStock)
-        .HasDatabaseName("IX_VehicleModels_AvailableStock");
+    // ❌ Stock / AvailableStock index'leri SİL (computed, kolon yok)
+    // builder.HasIndex(vm => vm.Stock)...
+    // builder.HasIndex(vm => vm.AvailableStock)...
 
     // ==================== QUERY FILTERS ====================
-    // Soft delete filter
     builder.HasQueryFilter(vm => !vm.IsDeleted);
 
     // ==================== IGNORED PROPERTIES ====================
-    builder.Ignore(vm => vm.IsInStock);
+    builder.Ignore(vm => vm.Stock);            // 🆕 computed
+    builder.Ignore(vm => vm.AvailableStock);   // 🆕 computed
+    builder.Ignore(vm => vm.IsInStock);        // computed
   }
 }

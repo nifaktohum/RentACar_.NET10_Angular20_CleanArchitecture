@@ -11,9 +11,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetVehiclesByColorQuery(string? Color) : IRequest<Result<List<VehicleListDto>>>;
 
 public sealed class GetVehiclesByColorQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetVehiclesByColorQueryHandler> _logger
-                    ) : IRequestHandler<GetVehiclesByColorQuery, Result<List<VehicleListDto>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetVehiclesByColorQueryHandler> _logger
+) : IRequestHandler<GetVehiclesByColorQuery, Result<List<VehicleListDto>>>
 {
   public async Task<Result<List<VehicleListDto>>> Handle(GetVehiclesByColorQuery _req, CancellationToken _token)
   {
@@ -32,9 +32,12 @@ public sealed class GetVehiclesByColorQueryHandler(
         query = query.Include(include);
       }
 
+      // 🆕 VehicleModel -> VehicleType ilişkisini dahil et
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
 
       var vehicles = await query.ToListAsync(_token);
 
+      // 🆕 DTO Map'lemesi Güncellendi
       var result = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -43,14 +46,18 @@ public sealed class GetVehiclesByColorQueryHandler(
           v.Year,
           v.Plate,
           v.Color,
+          v.VinNumber,
           v.FuelType,
           v.Transmission,
+          v.TractionType,
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
+          v.CurrentKilometer,
+          v.Status.ToString(),
           v.IsAvailable,
           v.VehicleModel?.VehicleType?.Name ?? "Bilinmiyor",
-          v.GetMainImageUrl(),
+          v.GetMainImageUrl() ?? string.Empty,
           v.IsActive,
           v.CreatedAt
       )).ToList();

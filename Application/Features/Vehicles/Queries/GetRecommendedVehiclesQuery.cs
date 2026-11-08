@@ -12,7 +12,6 @@ namespace Application.Features.Vehicles.Queries;
 
 public sealed record GetRecommendedVehiclesQuery : VehicleSpecParams, IRequest<Result<PagedResponse<VehicleListDto>>>;
 
-
 public sealed class GetRecommendedVehiclesQueryHandler(
     IVehicleRepository _vehicleRepo,
     ILogger<GetRecommendedVehiclesQueryHandler> _logger
@@ -35,7 +34,10 @@ public sealed class GetRecommendedVehiclesQueryHandler(
         query = query.Include(include);
       }
 
-      // Specification içinde belirlenen sıralama kuralını sorguya uyguluyoruz
+      // 🆕 VehicleModel -> VehicleType ilişkisini dahil et
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
+
+      // Sıralama
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
@@ -44,11 +46,13 @@ public sealed class GetRecommendedVehiclesQueryHandler(
       // Toplam sayı
       var totalCount = await query.CountAsync(_token);
 
+      // Sayfalama
       if (spec.IsPagingEnabled)
         query = query.Skip(spec.Skip).Take(spec.Take);
 
       var vehicles = await query.ToListAsync(_token);
 
+      // 🆕 DTO Map'lemesi Güncellendi
       var result = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -57,11 +61,15 @@ public sealed class GetRecommendedVehiclesQueryHandler(
           v.Year,
           v.Plate,
           v.Color,
+          v.VinNumber,
           v.FuelType,
           v.Transmission,
+          v.TractionType,
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
+          v.CurrentKilometer,
+          v.Status.ToString(),
           v.IsAvailable,
           v.VehicleModel?.VehicleType?.Name ?? "Bilinmiyor",
           v.GetMainImageUrl(),
@@ -71,7 +79,6 @@ public sealed class GetRecommendedVehiclesQueryHandler(
 
       _logger.LogInformation("✅ Tavsiye edilen {Count} araç başarıyla getirildi.", result.Count);
 
-      // 9️⃣ PagedResponse oluştur
       var response = new PagedResponse<VehicleListDto>(
           result,
           totalCount,

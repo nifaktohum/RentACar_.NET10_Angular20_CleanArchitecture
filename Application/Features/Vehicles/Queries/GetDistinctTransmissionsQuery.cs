@@ -10,9 +10,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetDistinctTransmissionsQuery : IRequest<Result<List<string>>>;
 
 public sealed class GetDistinctTransmissionsQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetDistinctTransmissionsQueryHandler> _logger
-                    ) : IRequestHandler<GetDistinctTransmissionsQuery, Result<List<string>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetDistinctTransmissionsQueryHandler> _logger
+) : IRequestHandler<GetDistinctTransmissionsQuery, Result<List<string>>>
 {
   public async Task<Result<List<string>>> Handle(GetDistinctTransmissionsQuery _req, CancellationToken _token)
   {
@@ -26,16 +26,14 @@ public sealed class GetDistinctTransmissionsQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // Vites tiplerini veritabanından çek, tekilleştir ve sırala
       var transmissions = await query
           .Select(v => v.Transmission)
           .Distinct()
           .OrderBy(t => t)
           .ToListAsync(_token);
 
-      if (spec.OrderBy != null)
-        query = query.OrderBy(spec.OrderBy);
-      else if (spec.OrderByDescending != null)
-        query = query.OrderByDescending(spec.OrderByDescending);
+      // ❌ Gereksiz OrderBy bloğu silindi. SQL seviyesinde OrderBy(t => t) zaten yapıldı.
 
       _logger.LogInformation("✅ {Count} benzersiz vites tipi getirildi", transmissions.Count);
 

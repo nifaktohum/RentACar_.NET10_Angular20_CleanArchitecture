@@ -11,9 +11,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetVehiclesByYearQuery(int? Year) : IRequest<Result<List<VehicleListDto>>>;
 
 public sealed class GetVehiclesByYearQueryHandler(
-                          IVehicleRepository _vehicleRepo,
-                          ILogger<GetVehiclesByYearQueryHandler> _logger
-                      ) : IRequestHandler<GetVehiclesByYearQuery, Result<List<VehicleListDto>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetVehiclesByYearQueryHandler> _logger
+) : IRequestHandler<GetVehiclesByYearQuery, Result<List<VehicleListDto>>>
 {
   public async Task<Result<List<VehicleListDto>>> Handle(GetVehiclesByYearQuery _req, CancellationToken _token)
   {
@@ -27,13 +27,18 @@ public sealed class GetVehiclesByYearQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // Include'ları uygula
       foreach (var include in spec.Includes)
       {
         query = query.Include(include);
       }
 
+      // 🆕 VehicleModel -> VehicleType ilişkisini dahil et (DTO'da tip adı dönebilmesi için)
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
+
       var vehicles = await query.ToListAsync(_token);
 
+      // 🆕 DTO Map'lemesi Güncellendi
       var result = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -42,14 +47,18 @@ public sealed class GetVehiclesByYearQueryHandler(
           v.Year,
           v.Plate,
           v.Color,
+          v.VinNumber,
           v.FuelType,
           v.Transmission,
+          v.TractionType,
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
+          v.CurrentKilometer,
+          v.Status.ToString(),
           v.IsAvailable,
           v.VehicleModel?.VehicleType?.Name ?? "Bilinmiyor",
-          v.GetMainImageUrl(),
+          v.GetMainImageUrl() ?? string.Empty,
           v.IsActive,
           v.CreatedAt
       )).ToList();

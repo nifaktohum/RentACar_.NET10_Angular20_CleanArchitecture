@@ -10,9 +10,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetDistinctColorsQuery : IRequest<Result<List<string>>>;
 
 public sealed class GetDistinctColorsQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetDistinctColorsQueryHandler> _logger
-                    ) : IRequestHandler<GetDistinctColorsQuery, Result<List<string>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetDistinctColorsQueryHandler> _logger
+) : IRequestHandler<GetDistinctColorsQuery, Result<List<string>>>
 {
   public async Task<Result<List<string>>> Handle(GetDistinctColorsQuery _req, CancellationToken _token)
   {
@@ -26,17 +26,14 @@ public sealed class GetDistinctColorsQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // Renkleri veritabanından çek, tekilleştir ve sırala
       var colors = await query
           .Select(v => v.Color)
           .Distinct()
           .OrderBy(c => c)
           .ToListAsync(_token);
 
-      if (spec.OrderBy != null)
-        query = query.OrderBy(spec.OrderBy);
-      else if (spec.OrderByDescending != null)
-        query = query.OrderByDescending(spec.OrderByDescending);
-
+      // ❌ Gereksiz OrderBy bloğu silindi. Zaten yukarıda SQL seviyesinde sıralama yapıldı.
 
       _logger.LogInformation("✅ {Count} benzersiz renk getirildi", colors.Count);
 

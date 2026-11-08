@@ -19,37 +19,38 @@ public sealed class GetVehicleTypeWithModelsQueryHandler(
   {
     try
     {
-      _logger.LogInformation("Tüm araç tipleri ve bağlı modelleri getiriliyor...");
-
+      _logger.LogInformation("🔍 Tüm araç tipleri ve bağlı modelleri getiriliyor...");
 
       var spec = new VehicleTypesWithModelsSpecification();
 
       var query = spec.Criteria != null
-       ? _vehicleTypeRepo.Where(spec.Criteria)
-       : _vehicleTypeRepo.GetAll();
+          ? _vehicleTypeRepo.Where(spec.Criteria)
+          : _vehicleTypeRepo.GetAll();
 
       foreach (var include in spec.Includes)
       {
         query = query.Include(include);
       }
 
-      var result = query.Select(vt => new VehicleTypeWithModelsDto(
+      // 🚨 Projection (Select) kullanırken Stock ve AvailableStock'u SQL'de hesaplatıyoruz.
+      // Aksi takdirde EF Core alt araçları yüklemediği için Stock her zaman 0 döner.
+      var result = await query.Select(vt => new VehicleTypeWithModelsDto(
           vt.Id,
           vt.Name,
           vt.Description,
           vt.Icon,
           vt.DisplayOrder,
           vt.VehicleModels.Count(vm => vm.IsActive && !vm.IsDeleted),
-          vt.VehicleModels.Select(vm => new VehicleModelSummaryDto(
+          vt.VehicleModels.Where(vm => vm.IsActive && !vm.IsDeleted).Select(vm => new VehicleModelSummaryDto(
               vm.Id,
               vm.Brand,
               vm.Name,
-              vm.Stock,
-              vm.AvailableStock
+              vm.Vehicles.Count(v => v.IsActive && !v.IsDeleted), // 🆕 Doğru Stock Hesabı
+              vm.Vehicles.Count(v => v.IsAvailable)              // 🆕 Doğru AvailableStock Hesabı
           )).ToList(),
           vt.IsActive,
           vt.CreatedAt
-      )).ToList();
+      )).ToListAsync(_token); // 🆕 Asenkron hale getirildi
 
       _logger.LogInformation("✅ {Count} adet araç tipi ve modelleri başarıyla getirildi", result.Count);
 

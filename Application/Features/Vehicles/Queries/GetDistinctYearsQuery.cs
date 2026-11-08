@@ -10,9 +10,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetDistinctYearsQuery : IRequest<Result<List<int>>>;
 
 public sealed class GetDistinctYearsQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetDistinctYearsQueryHandler> _logger
-                    ) : IRequestHandler<GetDistinctYearsQuery, Result<List<int>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetDistinctYearsQueryHandler> _logger
+) : IRequestHandler<GetDistinctYearsQuery, Result<List<int>>>
 {
   public async Task<Result<List<int>>> Handle(GetDistinctYearsQuery _req, CancellationToken _token)
   {
@@ -26,12 +26,18 @@ public sealed class GetDistinctYearsQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
-      var years = await query
+      // 1. Önce veritabanından sadece benzersiz string yılları çekiyoruz (SQL'e çevrilebilir)
+      var distinctYearsAsString = await query
           .Select(v => v.Year)
           .Distinct()
-          .OrderByDescending(y => y)  // En yeni yıl önce  // String sıralama
-          .Select(y => int.Parse(y))  // string -> int dönüşümü
           .ToListAsync(_token);
+
+      // 2. C# tarafında int'e çevir, int olarak sırala ve listele (En yeni yıl en üstte)
+      var years = distinctYearsAsString
+          .Where(y => int.TryParse(y, out _)) // 🆕 Güvenlik: Sadece geçerli sayıları al
+          .Select(y => int.Parse(y))
+          .OrderByDescending(y => y)
+          .ToList();
 
       _logger.LogInformation("✅ {Count} benzersiz yıl getirildi", years.Count);
 
@@ -44,14 +50,3 @@ public sealed class GetDistinctYearsQueryHandler(
     }
   }
 }
-
-/*
-                  NEREDE KULLANILIR?
-    ----------------------------------------------------
-    Alan	              Açıklama
-    Araç Arama Sayfası	Yıl filtresi olarak
-    Admin Paneli	      Araç listesini yıla göre filtreleme
-    Raporlama	          Yıla göre rapor filtreleme
-    Ana Sayfa	          "2024 Modelleri" gibi öne çıkarma
-    Mobil Uygulama	    Arama filtreleri
-*/

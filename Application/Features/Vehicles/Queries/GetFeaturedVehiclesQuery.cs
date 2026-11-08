@@ -9,14 +9,13 @@ using Microsoft.Extensions.Logging;
 using TS.Result;
 
 namespace Application.Features.Vehicles.Queries;
-// specParams.Sort alanı "latest" değerini alacak, extension metod bunu yakalayacak ve 
-// CreatedAt alanına göre azalan (en yeniler en başta olacak şekilde) sıralama yapıp latest sorgusunu kusursuzca çalıştır
+
 public sealed record GetFeaturedVehiclesQuery : VehicleSpecParams, IRequest<Result<PagedResponse<VehicleListDto>>>;
 
 public sealed class GetFeaturedVehiclesQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetFeaturedVehiclesQueryHandler> _logger
-                    ) : IRequestHandler<GetFeaturedVehiclesQuery, Result<PagedResponse<VehicleListDto>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetFeaturedVehiclesQueryHandler> _logger
+) : IRequestHandler<GetFeaturedVehiclesQuery, Result<PagedResponse<VehicleListDto>>>
 {
   public async Task<Result<PagedResponse<VehicleListDto>>> Handle(GetFeaturedVehiclesQuery _req, CancellationToken _token)
   {
@@ -30,12 +29,16 @@ public sealed class GetFeaturedVehiclesQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // Include işlemleri
       foreach (var include in spec.Includes)
       {
         query = query.Include(include);
       }
 
-      // Specification içinde belirlenen sıralama kuralını sorguya uyguluyoruz
+      // 🆕 VehicleModel -> VehicleType ilişkisini dahil et (DTO'da tip adı döneceğimiz için)
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
+
+      // Sıralama
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
@@ -43,11 +46,13 @@ public sealed class GetFeaturedVehiclesQueryHandler(
 
       var totalCount = await query.CountAsync(_token);
 
+      // Sayfalama
       if (spec.IsPagingEnabled)
         query = query.Skip(spec.Skip).Take(spec.Take);
 
       var vehicles = await query.ToListAsync(_token);
 
+      // 🆕 DTO Map'lemesi Güncellendi
       var result = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -56,11 +61,15 @@ public sealed class GetFeaturedVehiclesQueryHandler(
           v.Year,
           v.Plate,
           v.Color,
+          v.VinNumber,
           v.FuelType,
           v.Transmission,
+          v.TractionType,
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
+          v.CurrentKilometer,
+          v.Status.ToString(),
           v.IsAvailable,
           v.VehicleModel?.VehicleType?.Name ?? "Bilinmiyor",
           v.GetMainImageUrl(),
@@ -71,10 +80,10 @@ public sealed class GetFeaturedVehiclesQueryHandler(
       _logger.LogInformation("✅ Öne çıkan {Count} araç başarıyla getirildi.", result.Count);
 
       var response = new PagedResponse<VehicleListDto>(
-                         result,
-                         totalCount,
-                         _req.PageNumber,
-                         _req.PageSize);
+          result,
+          totalCount,
+          _req.PageNumber,
+          _req.PageSize);
 
       return Result<PagedResponse<VehicleListDto>>.Succeed(response);
     }

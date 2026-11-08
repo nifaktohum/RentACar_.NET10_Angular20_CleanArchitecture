@@ -11,14 +11,12 @@ using TS.Result;
 
 namespace Application.Features.Vehicles.Queries;
 
-public sealed record GetVehiclesForReportQuery: VehicleSpecParams, IRequest<Result<PagedResponse<VehicleReportDto>>>;
-
-
+public sealed record GetVehiclesForReportQuery : VehicleSpecParams, IRequest<Result<PagedResponse<VehicleReportDto>>>;
 
 public sealed class GetVehiclesForReportQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetVehiclesForReportQueryHandler> _logger
-                    ) : IRequestHandler<GetVehiclesForReportQuery, Result<PagedResponse<VehicleReportDto>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetVehiclesForReportQueryHandler> _logger
+) : IRequestHandler<GetVehiclesForReportQuery, Result<PagedResponse<VehicleReportDto>>>
 {
   public async Task<Result<PagedResponse<VehicleReportDto>>> Handle(GetVehiclesForReportQuery _req, CancellationToken _token)
   {
@@ -26,18 +24,25 @@ public sealed class GetVehiclesForReportQueryHandler(
     {
       _logger.LogInformation("📊 Rapor için araçlar getiriliyor...");
 
-      // 1️⃣ Specification oluştur (tek satır!)
       var spec = new VehiclesForReportSpecification(_req);
 
       var query = spec.Criteria != null
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // Include'ları uygula
       foreach (var include in spec.Includes)
       {
         query = query.Include(include);
       }
 
+      // 🆕 VehicleModel -> VehicleType ilişkisini dahil et
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
+
+      // 🚨 KRİTİK: VehicleModel.Stock hesaplanabilmesi için modelin altındaki araçları da çekmeliyiz!
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.Vehicles);
+
+      // Sıralama
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
@@ -48,39 +53,40 @@ public sealed class GetVehiclesForReportQueryHandler(
 
       if (spec.IsPagingEnabled)
         query = query.Skip(spec.Skip).Take(spec.Take);
-      // 2️⃣ Sorgula
-      // Sorgula
+
       var vehicles = await query.ToListAsync(_token);
 
-      // 7️⃣ Map et
+      // Map et (Yeni alanlar eklendi)
       var items = vehicles.Select(v => new VehicleReportDto(
           v.Id,
           v.Brand,
           v.Model,
           v.Year,
           v.Plate,
+          v.VinNumber,                   // ✅
           v.Color,
           v.FuelType,
           v.Transmission,
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
+          v.CurrentKilometer,            // ✅
           v.VehicleModel.Stock,
           v.IsAvailable,
           v.VehicleModel.VehicleType?.Name ?? "Bilinmiyor",
-          v.GetMainImageUrl(),
+          v.GetMainImageUrl() ?? string.Empty,
           v.IsActive,
           v.CreatedAt,
           v.UpdatedAt,
-          GetStatus(v) // Durum hesapla // Durum hesapla
+          GetStatus(v)
       )).ToList();
 
       var response = new PagedResponse<VehicleReportDto>(
-                items,
-                totalCount,
-                _req.PageNumber,
-                _req.PageSize
-            );
+          items,
+          totalCount,
+          _req.PageNumber,
+          _req.PageSize
+      );
 
       _logger.LogInformation("✅ Rapor için {Count} araç getirildi. Toplam: {TotalCount}", items.Count, totalCount);
 
@@ -97,8 +103,15 @@ public sealed class GetVehiclesForReportQueryHandler(
   {
     if (!vehicle.IsActive)
       return "Pasif";
-    if (!vehicle.IsAvailable)
-      return "Dolu";
-    return "Müsait";
+
+    // 🆕 Enum kullanarak daha detaylı statü
+    return vehicle.Status switch
+    {
+      VehicleStatus.Available => "Müsait",
+      VehicleStatus.Rented => "Kirada",
+      VehicleStatus.Maintenance => "Bakımda",
+      VehicleStatus.OutOfService => "Serviste / Arızalı",
+      _ => "Bilinmiyor"
+    };
   }
 }

@@ -1,3 +1,4 @@
+using Application.Behaviors;
 using Application.Features.VehicleTypes.Dto;
 using Domain.Repositories;
 using Domain.Repositories.Vehicles;
@@ -9,6 +10,7 @@ using TS.Result;
 
 namespace Application.Features.VehicleTypes.Commands;
 
+[Permission("VehicleTypes.Update")]
 public sealed record UpdateVehicleTypeCommand(
                         Guid Id,
                         string Name,

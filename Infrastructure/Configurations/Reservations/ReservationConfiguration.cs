@@ -104,7 +104,7 @@ public sealed class ReservationConfiguration : IEntityTypeConfiguration<Reservat
         .HasColumnName("RemainingAmount")
         .HasColumnOrder(15);
 
-    // ==================== ÖDEME ====================
+    // ==================== ÖDEME: DEPOZİTO (Katman 2) ====================
     builder.Property(r => r.DepositPaid)
         .IsRequired()
         .HasDefaultValue(false)
@@ -121,87 +121,117 @@ public sealed class ReservationConfiguration : IEntityTypeConfiguration<Reservat
         .HasColumnName("PaymentId")
         .HasColumnOrder(18);
 
+    // Depozito sonrası 24 saatlik kilit
+    builder.Property(r => r.DepositLockDeadline)
+        .HasColumnType("timestamp with time zone")
+        .HasColumnName("DepositLockDeadline")
+        .HasColumnOrder(19);
+
+    // ==================== ÖDEME: TAM ÖDEME (Katman 3) ====================
+    builder.Property(r => r.FullPaymentPaid)
+        .IsRequired()
+        .HasDefaultValue(false)
+        .HasColumnName("FullPaymentPaid")
+        .HasColumnOrder(20);
+
+    builder.Property(r => r.FullPaymentPaidAt)
+        .HasColumnType("timestamp with time zone")
+        .HasColumnName("FullPaymentPaidAt")
+        .HasColumnOrder(21);
+
+    builder.Property(r => r.FullPaymentId)
+        .HasMaxLength(100)
+        .HasColumnName("FullPaymentId")
+        .HasColumnOrder(22);
+
+    // ==================== İADE YÖNETİMİ ====================
+    builder.Property(r => r.IsDepositRefunded)
+        .HasColumnName("IsDepositRefunded")
+        .HasColumnOrder(32);
+
+    builder.Property(r => r.RefundedAmount)
+        .HasPrecision(18, 2)
+        .HasColumnName("RefundedAmount")
+        .HasColumnOrder(33);
+
+    builder.Property(r => r.ForfeitedAmount)
+        .HasPrecision(18, 2)
+        .HasColumnName("ForfeitedAmount")
+        .HasColumnOrder(34);
+
     // ==================== DURUM ====================
     builder.Property(r => r.Status)
         .IsRequired()
         .HasConversion<string>()
-        .HasComment("PendingPayment, Confirmed, Active, Completed, Expired, NoShow, Cancelled")
+        .HasComment("PendingPayment, Confirmed, Active, Completed, Expired, Cancelled")
         .HasColumnName("Status")
-        .HasColumnOrder(19);
+        .HasColumnOrder(23);
 
     builder.Property(r => r.PaymentDeadline)
         .IsRequired()
         .HasColumnType("timestamp with time zone")
         .HasColumnName("PaymentDeadline")
-        .HasColumnOrder(20);
+        .HasColumnOrder(24);
 
-    builder.Property(r => r.PickupDeadline)
-        .HasColumnType("timestamp with time zone")
-        .HasColumnName("PickupDeadline")
-        .HasColumnOrder(21);
+    // ❌ PickupDeadline kaldırıldı (entity'den silindi)
 
     builder.Property(r => r.ConfirmedAt)
         .HasColumnType("timestamp with time zone")
         .HasColumnName("ConfirmedAt")
-        .HasColumnOrder(22);
+        .HasColumnOrder(25);
 
     builder.Property(r => r.CompletedAt)
         .HasColumnType("timestamp with time zone")
         .HasColumnName("CompletedAt")
-        .HasColumnOrder(23);
+        .HasColumnOrder(26);
 
     builder.Property(r => r.CancelledAt)
         .HasColumnType("timestamp with time zone")
         .HasColumnName("CancelledAt")
-        .HasColumnOrder(24);
+        .HasColumnOrder(27);
 
     builder.Property(r => r.CancellationReason)
         .HasMaxLength(500)
         .HasColumnName("CancellationReason")
-        .HasColumnOrder(25);
+        .HasColumnOrder(28);
 
     // ==================== NOTLAR ====================
     builder.Property(r => r.Notes)
-        .HasMaxLength(500)
+        .HasMaxLength(1000)
         .HasColumnName("Notes")
-        .HasColumnOrder(26);
+        .HasColumnOrder(29);
 
     builder.Property(r => r.AdminNotes)
-        .HasMaxLength(500)
+        .HasMaxLength(1000)
         .HasColumnName("AdminNotes")
-        .HasColumnOrder(27);
+        .HasColumnOrder(30);
 
     // ==================== RELATIONSHIPS ====================
 
-    // Reservation → Customer (Many-to-One)
     builder.HasOne(r => r.Customer)
         .WithMany(c => c.Reservations)
         .HasForeignKey(r => r.CustomerId)
         .OnDelete(DeleteBehavior.Restrict)
         .IsRequired();
 
-    // Reservation → Vehicle (Many-to-One)
     builder.HasOne(r => r.Vehicle)
         .WithMany(v => v.Reservations)
         .HasForeignKey(r => r.VehicleId)
         .OnDelete(DeleteBehavior.Restrict)
         .IsRequired();
 
-    // Reservation → PickupBranch (Many-to-One)
     builder.HasOne(r => r.PickupBranch)
         .WithMany(b => b.PickupReservations)
         .HasForeignKey(r => r.PickupBranchId)
         .OnDelete(DeleteBehavior.Restrict)
         .IsRequired();
 
-    // Reservation → ReturnBranch (Many-to-One, nullable)
     builder.HasOne(r => r.ReturnBranch)
         .WithMany(b => b.ReturnReservations)
         .HasForeignKey(r => r.ReturnBranchId)
         .OnDelete(DeleteBehavior.Restrict)
         .IsRequired(false);
 
-    // Reservation → RentalExtras (One-to-Many)
     builder.HasMany(r => r.Extras)
         .WithOne()
         .HasForeignKey(re => re.RentalId)
@@ -209,35 +239,40 @@ public sealed class ReservationConfiguration : IEntityTypeConfiguration<Reservat
 
     // ==================== INDEXES ====================
 
-    // Rezervasyon numarası unique
     builder.HasIndex(r => r.ReservationNumber)
         .IsUnique()
         .HasDatabaseName("IX_Reservations_ReservationNumber")
         .HasFilter("\"IsDeleted\" = false");
 
-    // Filtreleme/sorgu için
     builder.HasIndex(r => r.CustomerId)
         .HasDatabaseName("IX_Reservations_CustomerId");
 
     builder.HasIndex(r => r.Status)
         .HasDatabaseName("IX_Reservations_Status");
 
+    // Katman 1 job: PendingPayment süresi dolanlar
     builder.HasIndex(r => r.PaymentDeadline)
-        .HasDatabaseName("IX_Reservations_PaymentDeadline");
+        .HasDatabaseName("IX_Reservations_PaymentDeadline")
+        .HasFilter("\"IsDeleted\" = false AND \"Status\" = 'PendingPayment'");
 
-    builder.HasIndex(r => r.PickupDeadline)
-        .HasDatabaseName("IX_Reservations_PickupDeadline");
+    // Katman 2 job: Depozito sonrası 24 saat dolanlar
+    builder.HasIndex(r => r.DepositLockDeadline)
+        .HasDatabaseName("IX_Reservations_DepositLockDeadline")
+        .HasFilter("\"IsDeleted\" = false AND \"DepositLockDeadline\" IS NOT NULL");
 
-    // ⭐ Araç müsaitlik kontrolü için composite index
+    // ⭐ PickupDeadline index KALDIRILDI
+
+    // Araç müsaitlik kontrolü (ConflictingReservationsSpecification)
     builder.HasIndex(r => new { r.VehicleId, r.Status, r.PlannedStartDate, r.PlannedEndDate })
-        .HasDatabaseName("IX_Reservations_Vehicle_Status_DateRange");
+        .HasDatabaseName("IX_Reservations_Vehicle_Status_DateRange")
+        .HasFilter("\"IsDeleted\" = false");
 
     // Müşteri rezervasyonları
     builder.HasIndex(r => new { r.CustomerId, r.Status })
-        .HasDatabaseName("IX_Reservations_Customer_Status");
+        .HasDatabaseName("IX_Reservations_Customer_Status")
+        .HasFilter("\"IsDeleted\" = false");
 
     // ==================== IGNORED PROPERTIES ====================
     builder.Ignore(r => r.ExtrasTotalPrice);
-
   }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Extensions.Seeds;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Seeders;
 
 namespace Infrastructure.Extensions;
 
@@ -73,9 +74,9 @@ public static class DatabaseMasterInitializer
       await context.VehicleSeedAsync(configuration);
       Console.WriteLine("--> [Seed Master] Adım 11 VehicleTypes kategorisi tamamlandı.");
 
-      // 12 Rezervasyonlar ==> veriler gercek zamanlı olmadıgı için kaldırdık. tutarsız veri
-      // await context.ReservationSeedAsync(configuration);
-      // Console.WriteLine("--> [Seed Master] Adım 12 Rezervasyonlar tamamlandı.");
+      // 12 Müşteriler (Customers)
+      await context.SeedCustomersAsync(configuration);
+      Console.WriteLine("--> [Seed Master] Adım 12 Müşteriler tamamlandı.");
 
 
       // =====================================> 

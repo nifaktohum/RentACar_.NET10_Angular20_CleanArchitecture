@@ -6,6 +6,7 @@ namespace Domain.Repositories.Vehicles;
 
 public interface IVehicleRepository : IRepository<Vehicle>
 {
+  Task<Vehicle?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
   // Belirtilen ID'ye sahip aracı, ilişkili görselleriyle (Images) birlikte veritabanından getirir.
   Task<Vehicle?> GetVehicleWithImagesAsync(Guid id, CancellationToken cancellationToken = default);
 
@@ -17,14 +18,6 @@ public interface IVehicleRepository : IRepository<Vehicle>
 
   // Belirli bir ID'ye sahip araçtan istenen miktarda (quantity) stokta bulunup bulunmadığını kontrol eder.
   Task<bool> HasStockAsync(Guid id, int quantity = 1, CancellationToken cancellationToken = default);
-
-
-  // Araç kiralandığında veya stok düştüğünde, belirtilen miktarda stok miktarını azaltır ve başarılı olup olmadığını döner.
-  Task<bool> DecreaseStockAsync(Guid id, int quantity = 1, CancellationToken cancellationToken = default);
-
-  // İptal veya iade durumlarında, belirtilen miktarda araç stok miktarını artırır.
-  Task<bool> IncreaseStockAsync(Guid id, int quantity = 1, CancellationToken cancellationToken = default);
-
 
   // Dinamik filtreleme, sıralama (sorting) ve sayfalama (pagination - skip/take) kriterlerine göre araç listesini getirir.
   Task<List<Vehicle>> GetFilteredAsync(

@@ -7,15 +7,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TS.Result;
 using Application.Common.Models;
+using Application.Behaviors;
 
 namespace Application.Features.Vehicles.Queries;
 
+[Permission("Vehicles.Read")]
 public sealed record GetAdminVehicleListQuery : VehicleSpecParams, IRequest<Result<PagedResponse<VehicleListDto>>>;
 
 public sealed class GetAdminVehicleListQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetAdminVehicleListQueryHandler> _logger
-                    ) : IRequestHandler<GetAdminVehicleListQuery, Result<PagedResponse<VehicleListDto>>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetAdminVehicleListQueryHandler> _logger
+) : IRequestHandler<GetAdminVehicleListQuery, Result<PagedResponse<VehicleListDto>>>
 {
   public async Task<Result<PagedResponse<VehicleListDto>>> Handle(GetAdminVehicleListQuery _req, CancellationToken _token)
   {
@@ -29,12 +31,17 @@ public sealed class GetAdminVehicleListQueryHandler(
           ? _vehicleRepo.Where(spec.Criteria)
           : _vehicleRepo.GetAll();
 
+      // Include işlemleri (VehicleModel ve VehicleType'ı çekmek zorundayız ki DTO'da dolabilsin)
       foreach (var include in spec.Includes)
       {
         query = query.Include(include);
       }
 
-      // Specification içinde belirlenen sıralama kuralını sorguya uyguluyoruz
+      // 🆕 VehicleModel -> VehicleType ilişkisini de dahil et
+      // (Eğer Specification içinde zaten yapılmadıysa)
+      query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
+
+      // Sıralama
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
@@ -43,11 +50,13 @@ public sealed class GetAdminVehicleListQueryHandler(
       // Toplam sayı
       var totalCount = await query.CountAsync(_token);
 
+      // Sayfalama
       if (spec.IsPagingEnabled)
         query = query.Skip(spec.Skip).Take(spec.Take);
 
       var vehicles = await query.ToListAsync(_token);
 
+      // 🆕 YENİ ALANLAR EKLENDİ (Dto'yu da buna göre güncellemelisin)
       var result = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -56,12 +65,16 @@ public sealed class GetAdminVehicleListQueryHandler(
           v.Year,
           v.Plate,
           v.Color,
+          v.VinNumber,               // ✅
           v.FuelType,
           v.Transmission,
+          v.TractionType,            // ✅
           v.SeatCount,
           v.DoorCount,
           v.DailyPrice,
-          v.IsAvailable,
+          v.CurrentKilometer,        // ✅
+          v.Status.ToString(),       // ✅
+          v.IsAvailable,             // ✅ (Status == Available && IsActive && !IsDeleted)
           v.VehicleModel?.VehicleType?.Name ?? "Bilinmiyor",
           v.GetMainImageUrl(),
           v.IsActive,
@@ -70,13 +83,12 @@ public sealed class GetAdminVehicleListQueryHandler(
 
       _logger.LogInformation("✅ Admin paneli için {Count} araç başarıyla getirildi.", result.Count);
 
-      // 9️⃣ PagedResponse oluştur
       var response = new PagedResponse<VehicleListDto>(
-                                result,
-                                totalCount,
-                                _req.PageNumber,
-                                _req.PageSize
-                            );
+          result,
+          totalCount,
+          _req.PageNumber,
+          _req.PageSize
+      );
 
       return Result<PagedResponse<VehicleListDto>>.Succeed(response);
     }

@@ -1,5 +1,6 @@
 using Application.Features.Vehicles.Dto;
 using Application.Features.Vehicles.Specifications;
+using Domain.Entities.Vehicles; 
 using Domain.Repositories.Vehicles;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,9 @@ namespace Application.Features.Vehicles.Queries;
 public sealed record GetVehicleStatisticsQuery : IRequest<Result<VehicleStatisticsDto>>;
 
 public sealed class GetVehicleStatisticsQueryHandler(
-                        IVehicleRepository _vehicleRepo,
-                        ILogger<GetVehicleStatisticsQueryHandler> _logger
-                    ) : IRequestHandler<GetVehicleStatisticsQuery, Result<VehicleStatisticsDto>>
+    IVehicleRepository _vehicleRepo,
+    ILogger<GetVehicleStatisticsQueryHandler> _logger
+) : IRequestHandler<GetVehicleStatisticsQuery, Result<VehicleStatisticsDto>>
 {
   public async Task<Result<VehicleStatisticsDto>> Handle(GetVehicleStatisticsQuery _req, CancellationToken _token)
   {
@@ -28,18 +29,28 @@ public sealed class GetVehicleStatisticsQueryHandler(
           : _vehicleRepo.GetAll();
 
       var totalCount = await query.CountAsync(_token);
-      var availableCount = await query.CountAsync(v => v.IsActive && v.IsAvailable, _token);
-      var rentedCount = await query.CountAsync(v => v.IsActive && !v.IsAvailable, _token);
+
+      // 🆕 Status Enum'una Göre Doğru Sayımlar
+      var availableCount = await query.CountAsync(v => v.IsActive && v.Status == VehicleStatus.Available, _token);
+      var rentedCount = await query.CountAsync(v => v.IsActive && v.Status == VehicleStatus.Rented, _token);
+      var maintenanceCount = await query.CountAsync(v => v.IsActive && v.Status == VehicleStatus.Maintenance, _token);
+      var outOfServiceCount = await query.CountAsync(v => v.IsActive && v.Status == VehicleStatus.OutOfService, _token);
+
+      // Pasif olanlar
       var passiveCount = await query.CountAsync(v => !v.IsActive, _token);
+
       // Ortalama fiyat
       var avgPrice = totalCount > 0
           ? await query.AverageAsync(v => v.DailyPrice, _token)
           : 0;
 
+      // 🆕 DTO'yu Yeni İstatistiklerle Doldur
       var statistics = new VehicleStatisticsDto(
           TotalVehicleCount: totalCount,
           AvailableVehicleCount: availableCount,
           RentedVehicleCount: rentedCount,
+          MaintenanceVehicleCount: maintenanceCount,      // 🆕
+          OutOfServiceVehicleCount: outOfServiceCount,    // 🆕
           PassiveVehicleCount: passiveCount,
           AverageDailyPrice: Math.Round(avgPrice, 2)
       );

@@ -1,160 +1,148 @@
 using Application.Features.Vehicles.Dto;
+using Application.Features.VehicleImages.Dto;
+using Application.Services;
 using Domain.Entities.Vehicles;
 using Domain.Repositories;
 using Domain.Repositories.Vehicles;
 using FluentValidation;
 using GenericRepository;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using TS.Result;
-using Application.Features.VehicleImages.Dto;
-using Application.Services;
-using Microsoft.AspNetCore.Http;
+using Application.Behaviors;
 
 namespace Application.Features.Vehicles.Commands;
 
+[Permission("Vehicles.Create")]
 public sealed record CreateVehicleCommand(
-                        string Brand,
-                        string Model,
-                        string Year,
-                        string Plate,
-                        string Color,
-                        Guid VehicleModelId,
-                        string FuelType,
-                        string Transmission,
-                        int SeatCount,
-                        int DoorCount,
-                        int? MinAge,
-                        decimal DailyPrice,
-                        string? Description,
-                        IFormFile? ImageFile
-                    ) : IRequest<Result<CreateVehicleDto>>;
+    // --- Temel Bilgiler ---
+    string Brand,
+    string Model,
+    string Year,
+    string Plate,
+    string Color,
+    Guid VehicleModelId,
+    Guid BranchId,                         
+    string VinNumber,                     
+    string EngineNumber,                   
+
+    // --- Teknik Özellikler ---
+    string FuelType,
+    string Transmission,
+    string TractionType,                   
+    decimal EngineVolume,                  
+    int EnginePower,                       
+    decimal FuelConsumption,              
+    int SeatCount,
+    int DoorCount,
+
+    // --- Ticari & Yasal Bilgiler ---
+    int? MinAge,
+    decimal DailyPrice,
+    decimal DepositAmount,                 
+    decimal WeeklyDiscountRate,            
+    decimal MonthlyDiscountRate,           
+
+    // --- Bakım & Durum ---
+    int CurrentKilometer,                  
+    int LastMaintenanceKm,                 
+    int NextMaintenanceKm,                 
+    DateTimeOffset LastMaintenanceDate,    
+    DateTimeOffset InspectionDate,         
+    DateTimeOffset InsuranceEndDate,       
+    DateTimeOffset CascoEndDate,           
+    string TireStatus,                     
+    string GeneralStatus,                  
+
+    string? Description,
+    IFormFile? ImageFile
+) : IRequest<Result<CreateVehicleDto>>;
 
 
 public sealed class CreateVehicleCommandValidator : AbstractValidator<CreateVehicleCommand>
 {
   public CreateVehicleCommandValidator()
   {
-    // Brand
-    RuleFor(x => x.Brand)
-        .NotEmpty().WithMessage("Marka boş olamaz!")
-        .MaximumLength(50).WithMessage("Marka en fazla 50 karakter olabilir!");
+    // --- Temel Bilgiler ---
+    RuleFor(x => x.Brand).NotEmpty().MaximumLength(50);
+    RuleFor(x => x.Model).NotEmpty().MaximumLength(50);
+    RuleFor(x => x.Year).NotEmpty().Length(4).Must(BeAValidYear).WithMessage("Yıl 1900-2100 arası olmalı!");
+    RuleFor(x => x.Plate).NotEmpty().MaximumLength(20).Matches(@"^[A-Z0-9\s-]+$");
+    RuleFor(x => x.Color).NotEmpty().MaximumLength(30);
+    RuleFor(x => x.VehicleModelId).NotEmpty();
+    RuleFor(x => x.BranchId).NotEmpty().WithMessage("Şube seçilmelidir!"); // 🆕
+    RuleFor(x => x.VinNumber).NotEmpty().Length(17).WithMessage("Şasi numarası 17 karakter olmalıdır!"); // 🆕
+    RuleFor(x => x.EngineNumber).NotEmpty().MaximumLength(30); // 🆕
 
-    // Model
-    RuleFor(x => x.Model)
-        .NotEmpty().WithMessage("Model boş olamaz!")
-        .MaximumLength(50).WithMessage("Model en fazla 50 karakter olabilir!");
+    // --- Teknik Özellikler ---
+    RuleFor(x => x.FuelType).NotEmpty().MaximumLength(20);
+    RuleFor(x => x.Transmission).NotEmpty().MaximumLength(20);
+    RuleFor(x => x.TractionType).NotEmpty().MaximumLength(20);
+    RuleFor(x => x.EngineVolume).GreaterThan(0);
+    RuleFor(x => x.EnginePower).GreaterThan(0);
+    RuleFor(x => x.FuelConsumption).GreaterThan(0);
+    RuleFor(x => x.SeatCount).InclusiveBetween(1, 60);
+    RuleFor(x => x.DoorCount).InclusiveBetween(1, 10);
 
-    // Year
-    RuleFor(x => x.Year)
-        .NotEmpty().WithMessage("Yıl boş olamaz!")
-        .Length(4).WithMessage("Yıl 4 haneli olmalı!")
-        .Must(BeAValidYear).WithMessage("Yıl 1900 ile 2100 arasında olmalı!");
+    // --- Ticari & Yasal ---
+    RuleFor(x => x.MinAge).InclusiveBetween(18, 80).When(x => x.MinAge.HasValue);
+    RuleFor(x => x.DailyPrice).GreaterThan(0).LessThanOrEqualTo(999999.99m);
+    RuleFor(x => x.DepositAmount).GreaterThanOrEqualTo(0);
+    RuleFor(x => x.WeeklyDiscountRate).InclusiveBetween(0, 100);
+    RuleFor(x => x.MonthlyDiscountRate).InclusiveBetween(0, 100);
 
-    // Plate
-    RuleFor(x => x.Plate)
-        .NotEmpty().WithMessage("Plaka boş olamaz!")
-        .MaximumLength(20).WithMessage("Plaka en fazla 20 karakter olabilir!")
-        .Matches(@"^[A-Z0-9\s-]+$").WithMessage("Plaka geçersiz format! (Sadece büyük harf, rakam, boşluk ve tire kullanabilirsiniz)");
+    // --- Bakım & Durum ---
+    RuleFor(x => x.CurrentKilometer).GreaterThanOrEqualTo(0);
+    RuleFor(x => x.LastMaintenanceKm).GreaterThanOrEqualTo(0).LessThanOrEqualTo(x => x.CurrentKilometer).WithMessage("Son bakım km'si güncel km'den büyük olamaz!");
+    RuleFor(x => x.NextMaintenanceKm).GreaterThan(x => x.LastMaintenanceKm).WithMessage("Sonraki bakım km'si son bakımdan büyük olmalı!");
+    RuleFor(x => x.TireStatus).NotEmpty();
+    RuleFor(x => x.GeneralStatus).NotEmpty();
 
-    // Color
-    RuleFor(x => x.Color)
-        .NotEmpty().WithMessage("Renk boş olamaz!")
-        .MaximumLength(30).WithMessage("Renk en fazla 30 karakter olabilir!");
+    RuleFor(x => x.Description).MaximumLength(1000);
 
-    // VehicleTypeId
-    RuleFor(x => x.VehicleModelId)
-        .NotEmpty().WithMessage("Araç Modeli boş olamaz!");
-
-    // FuelType
-    RuleFor(x => x.FuelType)
-        .NotEmpty().WithMessage("Yakıt tipi boş olamaz!")
-        .MaximumLength(30).WithMessage("Yakıt tipi en fazla 30 karakter olabilir!");
-
-    // Transmission
-    RuleFor(x => x.Transmission)
-        .NotEmpty().WithMessage("Vites tipi boş olamaz!")
-        .MaximumLength(20).WithMessage("Vites tipi en fazla 20 karakter olabilir!");
-
-    // SeatCount
-    RuleFor(x => x.SeatCount)
-        .GreaterThan(0).WithMessage("Koltuk sayısı 0'dan büyük olmalı!")
-        .LessThanOrEqualTo(20).WithMessage("Koltuk sayısı en fazla 20 olabilir!");
-
-    // DoorCount
-    RuleFor(x => x.DoorCount)
-        .GreaterThan(0).WithMessage("Kapı sayısı 0'dan büyük olmalı!")
-        .LessThanOrEqualTo(10).WithMessage("Kapı sayısı en fazla 10 olabilir!");
-
-    // MinAge
-    RuleFor(x => x.MinAge)
-        .GreaterThanOrEqualTo(18).When(x => x.MinAge.HasValue)
-        .WithMessage("Minimum yaş 18'den küçük olamaz!")
-        .LessThanOrEqualTo(99).When(x => x.MinAge.HasValue)
-        .WithMessage("Minimum yaş 99'dan büyük olamaz!");
-
-    // DailyPrice
-    RuleFor(x => x.DailyPrice)
-        .GreaterThan(0).WithMessage("Günlük fiyat 0'dan büyük olmalı!")
-        .LessThanOrEqualTo(999999.99m).WithMessage("Günlük fiyat çok yüksek!");
-
-    // Description
-    RuleFor(x => x.Description)
-        .MaximumLength(500).WithMessage("Açıklama en fazla 500 karakter olabilir!");
-
-    // ✅ ImageFile kontrolü (Opsiyonel)
-    // Dosya varsa, boyut ve tip kontrolü yapılabilir
-    // ✅ ImageFile kontrolü
+    // Resim kontrolü
     RuleFor(x => x.ImageFile)
         .Must(BeAValidImageFile).When(x => x.ImageFile is not null)
-        .WithMessage("Geçersiz resim dosyası! (jpg, jpeg, png, webp, gif - max 5MB)");
+        .WithMessage("Geçersiz resim dosyası! (max 5MB, jpg/png/webp)");
   }
 
-  private bool BeAValidYear(string year)
-  {
-    if (!int.TryParse(year, out int yearInt))
-      return false;
-
-    return yearInt >= 1900 && yearInt <= 2100;
-  }
+  private bool BeAValidYear(string year) =>
+      int.TryParse(year, out int y) && y >= 1900 && y <= 2100;
 
   private bool BeAValidImageFile(IFormFile? file)
   {
-    if (file is null)
-      return true;
-
-    if (file.Length > 5 * 1024 * 1024)
-      return false;
-
-    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
-    var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-    return allowedExtensions.Contains(extension);
+    if (file is null) return true;
+    if (file.Length > 5 * 1024 * 1024) return false;
+    var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+    return allowed.Contains(Path.GetExtension(file.FileName).ToLowerInvariant());
   }
 }
 
 
 public sealed class CreateVehicleCommandHandler(
-                          IVehicleRepository _vehicleRepo,
-                          IVehicleModelRepository _vehicleModelRepo,
-                          IVehicleImageService _imageService,
-                          IUserRepository _userRepo,
-                          IConfiguration _config,
-                          IUnitOfWork _unit
-                    ) : IRequestHandler<CreateVehicleCommand, Result<CreateVehicleDto>>
+    IVehicleRepository _vehicleRepo,
+    IVehicleModelRepository _vehicleModelRepo,
+    IVehicleImageService _imageService,
+    IUserRepository _userRepo,
+    IConfiguration _config,
+    IUnitOfWork _unit
+) : IRequestHandler<CreateVehicleCommand, Result<CreateVehicleDto>>
 {
   public async Task<Result<CreateVehicleDto>> Handle(CreateVehicleCommand _req, CancellationToken _token)
   {
-    // 1. Plate kontrolü
+    // 1. Benzersizlik Kontrolleri (Plaka & VIN)
     var isPlateUnique = await _vehicleRepo.IsPlateUniqueAsync(_req.Plate, cancellationToken: _token);
     if (!isPlateUnique)
       return Result<CreateVehicleDto>.Failure($"'{_req.Plate}' plakalı araç zaten mevcut!");
 
+    // 🆕 VIN kontrolü (Repository'de bu metodun olduğundan emin ol)
+    // var isVinUnique = await _vehicleRepo.IsVinUniqueAsync(_req.VinNumber, cancellationToken: _token);
+    // if (!isVinUnique) return Result<CreateVehicleDto>.Failure($"'{_req.VinNumber}' şasi numaralı araç zaten mevcut!");
+
     // 2. VehicleModel kontrolü
     var vehicleModel = await _vehicleModelRepo.GetByExpressionAsync(
-        x => x.Id == _req.VehicleModelId && !x.IsDeleted,
-        _token
-    );
+        x => x.Id == _req.VehicleModelId && !x.IsDeleted, _token);
     if (vehicleModel is null)
       return Result<CreateVehicleDto>.Failure("Araç modeli bulunamadı!");
 
@@ -163,38 +151,57 @@ public sealed class CreateVehicleCommandHandler(
     if (userId == Guid.Empty)
       userId = Guid.Parse(_config["SeedData:AdminUserId"]!);
 
-    // 4. Vehicle oluştur
+    // 4. Vehicle oluştur (TÜM YENİ PARAMETRELER EKLENDİ)
     var vehicle = new Vehicle(
-        _req.Brand,
-        _req.Model,
-        _req.Year,
-        _req.Plate,
-        _req.Color,
-        _req.VehicleModelId,
-        _req.FuelType,
-        _req.Transmission,
-        _req.SeatCount,
-        _req.DoorCount,
-        _req.MinAge,
-        _req.DailyPrice,
-        _req.Description,
-        userId,
-        true
+        brand: _req.Brand,
+        model: _req.Model,
+        year: _req.Year,
+        plate: _req.Plate,
+        color: _req.Color,
+        vehicleModelId: _req.VehicleModelId,
+        branchId: _req.BranchId,
+        vinNumber: _req.VinNumber,
+        engineNumber: _req.EngineNumber,
+        fuelType: _req.FuelType,
+        transmission: _req.Transmission,
+        tractionType: _req.TractionType,
+        engineVolume: _req.EngineVolume,
+        enginePower: _req.EnginePower,
+        fuelConsumption: _req.FuelConsumption,
+        seatCount: _req.SeatCount,
+        doorCount: _req.DoorCount,
+        minAge: _req.MinAge,
+        dailyPrice: _req.DailyPrice,
+        depositAmount: _req.DepositAmount,
+        weeklyDiscountRate: _req.WeeklyDiscountRate,
+        monthlyDiscountRate: _req.MonthlyDiscountRate,
+        currentKilometer: _req.CurrentKilometer,
+        lastMaintenanceKm: _req.LastMaintenanceKm,
+        nextMaintenanceKm: _req.NextMaintenanceKm,
+        lastMaintenanceDate: _req.LastMaintenanceDate,
+        inspectionDate: _req.InspectionDate,
+        insuranceEndDate: _req.InsuranceEndDate,
+        cascoEndDate: _req.CascoEndDate,
+        tireStatus: _req.TireStatus,
+        generalStatus: _req.GeneralStatus,
+        description: _req.Description,
+        createdBy: userId,
+        isActive: true
     );
 
-    // 5. ✅ ÖNCE VEHICLE'I KAYDET
+    // 5. ÖNCE VEHICLE'I KAYDET
     await _vehicleRepo.AddAsync(vehicle, _token);
     await _unit.SaveChangesAsync(_token);
 
-    // 6. ✅ Resim varsa kaydet (IFormFile → FileUploadDto)
+    // 6. Resim varsa kaydet
     if (_req.ImageFile is not null)
     {
       using var stream = _req.ImageFile.OpenReadStream();
       var fileUploadDto = new FileUploadDto(
-          _req.ImageFile.FileName,      // FileName
-          stream,                        // FileStream
-          _req.ImageFile.ContentType,    // ContentType ✅
-          _req.ImageFile.Length          // Length
+          _req.ImageFile.FileName,
+          stream,
+          _req.ImageFile.ContentType,
+          _req.ImageFile.Length
       );
 
       await _imageService.SaveVehicleImagesAsync(
@@ -203,6 +210,9 @@ public sealed class CreateVehicleCommandHandler(
           isMain: true,
           _token
       );
+
+      // Resim kaydedildikten sonra unit of work'ü tekrar kaydetmek gerekebilir
+      await _unit.SaveChangesAsync(_token);
     }
 
     // 7. User name
@@ -210,47 +220,76 @@ public sealed class CreateVehicleCommandHandler(
     string GetUserName(Guid id) => userName.GetValueOrDefault(id, "Bilinmiyor");
 
     // 8. Response
-    // 8. Response (Images listesini de ekleyelim)
     var response = new CreateVehicleDto(
-        vehicle.Id,
-        vehicle.Brand,
-        vehicle.Model,
-        vehicle.Year,
-        vehicle.Plate,
-        vehicle.Color,
-        vehicle.FuelType,
-        vehicle.Transmission,
-        vehicle.SeatCount,
-        vehicle.DoorCount,
-        vehicle.MinAge,
-        vehicle.DailyPrice,
-        vehicle.IsAvailable,
-        vehicle.Description,
-        vehicle.VehicleModelId,
-        vehicle.VehicleModel?.Name ?? "Belirtilmemiş",
-        vehicle.VehicleModel?.VehicleType?.Name ?? "Belirtilmemiş",
-        // ✅ Resimleri buraya map etmelisin (Örnek DTO yapına göre uyarlayabilirsin)
-        vehicle.Images.Select(i => new VehicleImageDto(
-                 i.Id,
-                 i.ImageUrl,
-                 i.DisplayOrder,
-                 i.IsMain,
-                 i.Description,
-                 i.IsActive,
-                 i.CreatedAt,
-                 i.CreatedBy,
-                 GetUserName(i.CreatedBy),
-                 i.UpdatedAt,
-                 i.UpdatedBy,
-                 i.UpdatedBy.HasValue ? GetUserName(i.UpdatedBy.Value) : null
+        Id: vehicle.Id,
 
-          )).ToList(),
+        // Temel
+        Brand: vehicle.Brand,
+        Model: vehicle.Model,
+        Year: vehicle.Year,
+        Plate: vehicle.Plate,
+        Color: vehicle.Color,
+        VehicleModelId: vehicle.VehicleModelId,
+        VehicleModelName: vehicle.VehicleModel?.Name ?? "Belirtilmemiş",
+        VehicleTypeName: vehicle.VehicleModel?.VehicleType?.Name ?? "Belirtilmemiş",
+        BranchId: vehicle.BranchId,
 
-        vehicle.CreatedAt,
-        vehicle.CreatedBy,
-        GetUserName(vehicle.CreatedBy)
+        // Teknik
+        VinNumber: vehicle.VinNumber,
+        EngineNumber: vehicle.EngineNumber,
+        FuelType: vehicle.FuelType,
+        Transmission: vehicle.Transmission,
+        TractionType: vehicle.TractionType,
+        EngineVolume: vehicle.EngineVolume,
+        EnginePower: vehicle.EnginePower,
+        FuelConsumption: vehicle.FuelConsumption,
+        SeatCount: vehicle.SeatCount,
+        DoorCount: vehicle.DoorCount,
+
+        // Ticari
+        MinAge: vehicle.MinAge,
+        DailyPrice: vehicle.DailyPrice,
+        DepositAmount: vehicle.DepositAmount,
+        WeeklyDiscountRate: vehicle.WeeklyDiscountRate,
+        MonthlyDiscountRate: vehicle.MonthlyDiscountRate,
+
+        // Bakım & Durum
+        CurrentKilometer: vehicle.CurrentKilometer,
+        LastMaintenanceKm: vehicle.LastMaintenanceKm,
+        NextMaintenanceKm: vehicle.NextMaintenanceKm,
+        LastMaintenanceDate: vehicle.LastMaintenanceDate,
+        InspectionDate: vehicle.InspectionDate,
+        InsuranceEndDate: vehicle.InsuranceEndDate,
+        CascoEndDate: vehicle.CascoEndDate,
+        TireStatus: vehicle.TireStatus,
+        GeneralStatus: vehicle.GeneralStatus,
+
+        // Sistem
+        IsAvailable: vehicle.IsAvailable,
+        Status: vehicle.Status.ToString(), // Enum'ı string'e çevirdik
+        Description: vehicle.Description,
+
+        // Resimler
+        Images: vehicle.Images.Select(i => new VehicleImageDto(
+             i.Id,
+             i.ImageUrl,
+             i.DisplayOrder,
+             i.IsMain,
+             i.Description,
+             i.IsActive,
+             i.CreatedAt,
+             i.CreatedBy,
+             GetUserName(i.CreatedBy),
+             i.UpdatedAt,
+             i.UpdatedBy,
+             i.UpdatedBy.HasValue ? GetUserName(i.UpdatedBy.Value) : null
+        )).ToList(),
+
+        // Audit
+        CreatedAt: vehicle.CreatedAt,
+        CreatedBy: vehicle.CreatedBy,
+        CreatedByName: GetUserName(vehicle.CreatedBy)
     );
-
     return Result<CreateVehicleDto>.Succeed(response);
   }
 }
