@@ -51,6 +51,47 @@ public static class ReservationFilterExtensions
       var number = specParams.ReservationNumber.ToLower();
       filter = filter.And(r => r.ReservationNumber.ToLower() == number);
     }
+    // Durum filtresi (tekil — geriye dönük uyumluluk)
+    if (specParams.Status.HasValue)
+      filter = filter.And(r => r.Status == specParams.Status.Value);
+
+    // ⭐ ÇOKLU DURUM FİLTRESİ (YENİ)
+    if (specParams.Statuses != null && specParams.Statuses.Count > 0)
+    {
+      var statuses = specParams.Statuses;
+      filter = filter.And(r => statuses.Contains(r.Status));
+    }
+
+    // ⭐ AKTİF REZERVASYON FİLTRESİ — SADECE 3 GRUP
+    if (specParams.ActiveOnly == true)
+    {
+      filter = filter.And(r =>
+          // 1) Kaporası alınmış (tam ödeme beklemede)
+          (r.Status == ReservationStatus.Confirmed && r.DepositPaid && !r.FullPaymentPaid)
+          // 2) Tam ödemesi alınmış (teslim bekliyor)
+          || (r.Status == ReservationStatus.Confirmed && r.FullPaymentPaid)
+          // 3) Kirada
+          || r.Status == ReservationStatus.Active
+      );
+    }
+
+    // ⭐ ALT FİLTRE (Kaporası / Tam Ödeme / Kirada)
+    if (specParams.ActiveOnly == true && !string.IsNullOrWhiteSpace(specParams.PaymentFilter))
+    {
+      var pf = specParams.PaymentFilter;
+
+      if (pf == "deposit")
+        filter = filter.And(r => r.Status == ReservationStatus.Confirmed
+                              && r.DepositPaid
+                              && !r.FullPaymentPaid);
+
+      else if (pf == "full")
+        filter = filter.And(r => r.Status == ReservationStatus.Confirmed
+                              && r.FullPaymentPaid);
+
+      else if (pf == "active")
+        filter = filter.And(r => r.Status == ReservationStatus.Active);
+    }
 
     // Genel arama
     if (!string.IsNullOrWhiteSpace(specParams.SearchTerm))

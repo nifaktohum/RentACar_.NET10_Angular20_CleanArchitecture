@@ -3,6 +3,7 @@ using Application.Common.Models;
 using Application.Features.VehicleModels.Dto;
 using Application.Features.Vehicles.Specifications;
 using Application.Specifications;
+using Domain.Entities.Vehicles;
 using Domain.Repositories.Vehicles;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -26,8 +27,6 @@ public sealed class GetAllVehicleModelsQueryHandler(
         ? _vehicleModelRepo.Where(spec.Criteria)
         : _vehicleModelRepo.GetAll();
 
-    // 3. Include'leri uygula (Extension metot)
-    query = query.ApplyIncludes(spec);
 
     // Toplam sayı
     var totalCount = await query.CountAsync(_token);
@@ -47,14 +46,16 @@ public sealed class GetAllVehicleModelsQueryHandler(
         x.Brand,
         x.Name,
         x.Description,
-        x.Vehicles.Count(v => v.IsActive && !v.IsDeleted), // ✅ Doğru Stock Hesabı
-        x.Vehicles.Count(v => v.IsAvailable),              // ✅ Doğru AvailableStock Hesabı
-        x.Vehicles.Any(v => v.IsAvailable),                // ✅ IsInStock (En az 1 tane müsait var mı?)
+        x.Vehicles.Count(v => v.IsActive && !v.IsDeleted),
+        x.Vehicles.Count(v =>
+            v.Status == VehicleStatus.Available && v.IsActive && !v.IsDeleted),
+        x.Vehicles.Any(v =>
+            v.Status == VehicleStatus.Available && v.IsActive && !v.IsDeleted),
         x.IsActive,
         x.VehicleTypeId,
-        x.VehicleType != null ? x.VehicleType.Name : "Belirtilmemiş", // Null safety
+        x.VehicleType != null ? x.VehicleType.Name : "Belirtilmemiş",
         x.CreatedAt
-    )).ToListAsync(_token); // Asenkron çekiyoruz
+    )).ToListAsync(_token);
 
     // 7. PagedResponse oluştur
     var response = new PagedResponse<VehicleModelListDto>(

@@ -31,6 +31,8 @@ export class LoginComponent implements OnInit {
   private router = inject(Router)
   private route = inject(ActivatedRoute)
   private messageServiceToast = inject(MessageService);
+
+  private toastShown = false;
   //=======================================>
 
   loginEmail: string = '';
@@ -70,12 +72,10 @@ export class LoginComponent implements OnInit {
       if (firstInvalidInput) {
         // Sayfayı o hatalı inputun olduğu yere yumuşacık kaydırıyoruz
         firstInvalidInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
         // İmleci doğrudan o inputun içine odaklıyoruz ki kullanıcı hatasını anında görebilsin
         firstInvalidInput.focus();
       }
-
-      return; // 👈 Burası kritik! Alttaki kodların çalışmasını ve backend'e istek gitmesini engeller.
+      return; 
     }
     // 🚀 Form geçerli! Spinner'ı ateşliyoruz
     this.loading.set(true);
@@ -90,13 +90,24 @@ export class LoginComponent implements OnInit {
     this.authService.login(credentials, this.isRememberMeChecked).pipe(finalize(() => this.loading.set(false))).subscribe({
       next: (res: Result<LoginResponse>) => {
         if (res.isSuccessful && res.data) {
-          // Servis metodu çağrıldı, komponent rahatladı
-          this.authService.saveUserSession(res.data, this.isRememberMeChecked);
+          // this.authService.saveUserSession(res.data, this.isRememberMeChecked); // toast'ın iki kez tetiklenmesini engelledik kontrol et
           this.messageServiceToast.add({
             severity: 'success',
             summary: 'Giriş Başarılı :)',
             detail: `Hoş geldiniz - ${res.data.fullName}!`
           });
+          /*
+          if (!this.toastShown) {
+            this.toastShown = true;
+            this.messageServiceToast.add({
+              severity: 'success',
+              summary: 'Giriş Başarılı :)',
+              detail: `Hoş geldiniz - ${res.data.fullName}!`
+            });
+            // 👇 Toast gösterildikten sonra flag'i sıfırla (bir sonraki giriş için)
+            setTimeout(() => { this.toastShown = false; }, 1000);
+          }
+          */
           this.router.navigateByUrl(this.returnUrl || '/admin/dashboard');
           return;
         }

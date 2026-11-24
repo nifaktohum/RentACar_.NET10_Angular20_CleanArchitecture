@@ -228,7 +228,7 @@ export class VehiclesComponent implements OnInit {
                 detail: `"${vehicle.brand} ${vehicle.model}" aracı silindi.`,
                 life: 3000
               });
-              // // this.loadVehicles();
+              this.loadVehicles();
             }
           },
           error: (err) => {
@@ -243,6 +243,7 @@ export class VehiclesComponent implements OnInit {
         });
       }
     );
+
   }
 
 

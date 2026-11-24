@@ -46,3 +46,13 @@ public sealed class BackgroundJobScheduler(
       En uzun süren hangisiyse (diyelim ki 2 saniye süren) sistem o kadar sürer.
 
 */
+
+/* ExecuteAsync => 
+      veritabanına bağlanıp "durumu Pending olan ve üzerinden 15 dakika geçen ödemeleri bul, iptal et"
+
+    stoppingToken => 
+      Ana BackgroundService'ten gelen iptal sinyali token'ıdır.
+      .NET sisteme "Kapatılıyoruz, çalışmayı durdur" sinyali gönderir.
+      Bu token o sinyali job'ın içine taşır ki veritabanı sorgusu yarım kalmasın, güvenli bir şekilde kesilebilsin.
+      
+*/

@@ -14,8 +14,7 @@
         </p>
       </div>
       <div class="header-right">
-        <p-button type="button" label="Geri Dön" icon="ri-arrow-left-line" severity="success"
-          (click)="goBack()">
+        <p-button type="button" label="Geri Dön" icon="ri-arrow-left-line" severity="success" (click)="goBack()">
         </p-button>
       </div>
     </div>
@@ -120,6 +119,52 @@
             }
           </div>
 
+          <!-- Şube (YENİ) -->
+          <div class="form-field">
+            <label for="branchId">
+              Şube <span class="required-star">*</span>
+            </label>
+            <input id="branchId" pInputText formControlName="branchId" placeholder="Şube ID"
+              [class.ng-invalid]="isFieldInvalid('branchId')" />
+            @if (isFieldInvalid('branchId')) {
+            <small class="error-text">{{ getFieldError('branchId') }}</small>
+            }
+          </div>
+
+          <!-- Şasi No (YENİ) -->
+          <div class="form-field">
+            <label for="vinNumber">
+              Şasi No (VIN) <span class="required-star">*</span>
+            </label>
+            <input id="vinNumber" pInputText formControlName="vinNumber" placeholder="17 haneli şasi no" maxlength="17"
+              [class.ng-invalid]="isFieldInvalid('vinNumber')" />
+            @if (isFieldInvalid('vinNumber')) {
+            <small class="error-text">{{ getFieldError('vinNumber') }}</small>
+            }
+          </div>
+
+          <!-- Motor No (YENİ) -->
+          <div class="form-field">
+            <label for="engineNumber">
+              Motor No <span class="required-star">*</span>
+            </label>
+            <input id="engineNumber" pInputText formControlName="engineNumber" placeholder="Motor seri no"
+              [class.ng-invalid]="isFieldInvalid('engineNumber')" />
+            @if (isFieldInvalid('engineNumber')) {
+            <small class="error-text">{{ getFieldError('engineNumber') }}</small>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TEKNİK DETAYLAR ==================== -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="ri-settings-3-line"></i>
+          Teknik Detaylar
+        </h3>
+
+        <div class="form-grid">
           <!-- Yakıt Tipi -->
           <div class="form-field">
             <label for="fuelType">
@@ -146,17 +191,63 @@
             <small class="error-text">{{ getFieldError('transmission') }}</small>
             }
           </div>
-        </div>
-      </div>
 
-      <!-- ==================== TEKNİK DETAYLAR ==================== -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="ri-settings-3-line"></i>
-          Teknik Detaylar
-        </h3>
+          <!-- Çekiş Tipi (YENİ) -->
+          <div class="form-field">
+            <label for="tractionType">
+              Çekiş Tipi <span class="required-star">*</span>
+            </label>
+            <input id="tractionType" pInputText formControlName="tractionType" placeholder="Örn: Önden Çeker, 4x4"
+              [class.ng-invalid]="isFieldInvalid('tractionType')" />
+            @if (isFieldInvalid('tractionType')) {
+            <small class="error-text">{{ getFieldError('tractionType') }}</small>
+            }
+          </div>
 
-        <div class="form-grid">
+          <!-- Motor Hacmi (YENİ) -->
+          <div class="form-field">
+            <label for="engineVolume">
+              Motor Hacmi (L) <span class="required-star">*</span>
+            </label>
+            <p-inputNumber id="engineVolume" formControlName="engineVolume" [min]="0.1" [max]="10" [step]="0.1"
+              [minFractionDigits]="1" [maxFractionDigits]="2" [showButtons]="true" buttonLayout="horizontal"
+              incrementButtonIcon="ri-add-line" decrementButtonIcon="ri-subtract-line"
+              [class.ng-invalid]="isFieldInvalid('engineVolume')" styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('engineVolume')) {
+            <small class="error-text">{{ getFieldError('engineVolume') }}</small>
+            }
+          </div>
+
+          <!-- Motor Gücü (YENİ) -->
+          <div class="form-field">
+            <label for="enginePower">
+              Motor Gücü (HP) <span class="required-star">*</span>
+            </label>
+            <p-inputNumber id="enginePower" formControlName="enginePower" [min]="1" [max]="2000" [showButtons]="true"
+              buttonLayout="horizontal" incrementButtonIcon="ri-add-line" decrementButtonIcon="ri-subtract-line"
+              [class.ng-invalid]="isFieldInvalid('enginePower')" styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('enginePower')) {
+            <small class="error-text">{{ getFieldError('enginePower') }}</small>
+            }
+          </div>
+
+          <!-- Yakıt Tüketimi (YENİ) -->
+          <div class="form-field">
+            <label for="fuelConsumption">
+              Yakıt Tüketimi (L/100km) <span class="required-star">*</span>
+            </label>
+            <p-inputNumber id="fuelConsumption" formControlName="fuelConsumption" [min]="0.1" [max]="50" [step]="0.1"
+              [minFractionDigits]="1" [maxFractionDigits]="2" [showButtons]="true" buttonLayout="horizontal"
+              incrementButtonIcon="ri-add-line" decrementButtonIcon="ri-subtract-line"
+              [class.ng-invalid]="isFieldInvalid('fuelConsumption')" styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('fuelConsumption')) {
+            <small class="error-text">{{ getFieldError('fuelConsumption') }}</small>
+            }
+          </div>
+
           <!-- Koltuk Sayısı -->
           <div class="form-field">
             <label for="seatCount">
@@ -214,6 +305,149 @@
         </div>
       </div>
 
+      <!-- ==================== TİCARİ BİLGİLER (YENİ BÖLÜM) ==================== -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="ri-money-dollar-circle-line"></i>
+          Ticari Bilgiler
+        </h3>
+
+        <div class="form-grid">
+          <!-- Depozito -->
+          <div class="form-field">
+            <label for="depositAmount">Depozito (₺)</label>
+            <p-inputNumber id="depositAmount" formControlName="depositAmount" [min]="0" mode="currency" currency="TRY"
+              locale="tr-TR" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="ri-add-line"
+              decrementButtonIcon="ri-subtract-line" [class.ng-invalid]="isFieldInvalid('depositAmount')"
+              styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('depositAmount')) {
+            <small class="error-text">{{ getFieldError('depositAmount') }}</small>
+            }
+          </div>
+
+          <!-- Haftalık İndirim -->
+          <div class="form-field">
+            <label for="weeklyDiscountRate">Haftalık İndirim (%)</label>
+            <p-inputNumber id="weeklyDiscountRate" formControlName="weeklyDiscountRate" [min]="0" [max]="100"
+              [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="ri-add-line"
+              decrementButtonIcon="ri-subtract-line" [class.ng-invalid]="isFieldInvalid('weeklyDiscountRate')"
+              styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('weeklyDiscountRate')) {
+            <small class="error-text">{{ getFieldError('weeklyDiscountRate') }}</small>
+            }
+          </div>
+
+          <!-- Aylık İndirim -->
+          <div class="form-field">
+            <label for="monthlyDiscountRate">Aylık İndirim (%)</label>
+            <p-inputNumber id="monthlyDiscountRate" formControlName="monthlyDiscountRate" [min]="0" [max]="100"
+              [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="ri-add-line"
+              decrementButtonIcon="ri-subtract-line" [class.ng-invalid]="isFieldInvalid('monthlyDiscountRate')"
+              styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('monthlyDiscountRate')) {
+            <small class="error-text">{{ getFieldError('monthlyDiscountRate') }}</small>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== BAKIM & YASAL (YENİ BÖLÜM) ==================== -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="ri-tools-line"></i>
+          Bakım & Yasal Bilgiler
+        </h3>
+
+        <div class="form-grid">
+          <!-- Son Bakım KM -->
+          <div class="form-field">
+            <label for="lastMaintenanceKm">Son Bakım KM</label>
+            <p-inputNumber id="lastMaintenanceKm" formControlName="lastMaintenanceKm" [min]="0" [showButtons]="true"
+              buttonLayout="horizontal" incrementButtonIcon="ri-add-line" decrementButtonIcon="ri-subtract-line"
+              [class.ng-invalid]="isFieldInvalid('lastMaintenanceKm')" styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('lastMaintenanceKm')) {
+            <small class="error-text">{{ getFieldError('lastMaintenanceKm') }}</small>
+            }
+          </div>
+
+          <!-- Sonraki Bakım KM -->
+          <div class="form-field">
+            <label for="nextMaintenanceKm">Sonraki Bakım KM</label>
+            <p-inputNumber id="nextMaintenanceKm" formControlName="nextMaintenanceKm" [min]="0" [showButtons]="true"
+              buttonLayout="horizontal" incrementButtonIcon="ri-add-line" decrementButtonIcon="ri-subtract-line"
+              [class.ng-invalid]="isFieldInvalid('nextMaintenanceKm')" styleClass="w-full">
+            </p-inputNumber>
+            @if (isFieldInvalid('nextMaintenanceKm')) {
+            <small class="error-text">{{ getFieldError('nextMaintenanceKm') }}</small>
+            }
+          </div>
+
+          <!-- Son Bakım Tarihi -->
+          <div class="form-field">
+            <label for="lastMaintenanceDate">Son Bakım Tarihi</label>
+            <input id="lastMaintenanceDate" pInputText type="date" formControlName="lastMaintenanceDate"
+              [class.ng-invalid]="isFieldInvalid('lastMaintenanceDate')" />
+            @if (isFieldInvalid('lastMaintenanceDate')) {
+            <small class="error-text">{{ getFieldError('lastMaintenanceDate') }}</small>
+            }
+          </div>
+
+          <!-- Muayene Bitiş Tarihi -->
+          <div class="form-field">
+            <label for="inspectionDate">Muayene Bitiş Tarihi</label>
+            <input id="inspectionDate" pInputText type="date" formControlName="inspectionDate"
+              [class.ng-invalid]="isFieldInvalid('inspectionDate')" />
+            @if (isFieldInvalid('inspectionDate')) {
+            <small class="error-text">{{ getFieldError('inspectionDate') }}</small>
+            }
+          </div>
+
+          <!-- Trafik Sigortası Bitiş -->
+          <div class="form-field">
+            <label for="insuranceEndDate">Trafik Sigortası Bitiş</label>
+            <input id="insuranceEndDate" pInputText type="date" formControlName="insuranceEndDate"
+              [class.ng-invalid]="isFieldInvalid('insuranceEndDate')" />
+            @if (isFieldInvalid('insuranceEndDate')) {
+            <small class="error-text">{{ getFieldError('insuranceEndDate') }}</small>
+            }
+          </div>
+
+          <!-- Kasko Bitiş -->
+          <div class="form-field">
+            <label for="cascoEndDate">Kasko Bitiş</label>
+            <input id="cascoEndDate" pInputText type="date" formControlName="cascoEndDate"
+              [class.ng-invalid]="isFieldInvalid('cascoEndDate')" />
+            @if (isFieldInvalid('cascoEndDate')) {
+            <small class="error-text">{{ getFieldError('cascoEndDate') }}</small>
+            }
+          </div>
+
+          <!-- Lastik Durumu -->
+          <div class="form-field">
+            <label for="tireStatus">Lastik Durumu</label>
+            <input id="tireStatus" pInputText formControlName="tireStatus" placeholder="Örn: İyi, Orta, Değişmeli"
+              [class.ng-invalid]="isFieldInvalid('tireStatus')" />
+            @if (isFieldInvalid('tireStatus')) {
+            <small class="error-text">{{ getFieldError('tireStatus') }}</small>
+            }
+          </div>
+
+          <!-- Genel Durum -->
+          <div class="form-field">
+            <label for="generalStatus">Genel Durum</label>
+            <input id="generalStatus" pInputText formControlName="generalStatus" placeholder="Örn: Çok iyi, Hasarlı"
+              [class.ng-invalid]="isFieldInvalid('generalStatus')" />
+            @if (isFieldInvalid('generalStatus')) {
+            <small class="error-text">{{ getFieldError('generalStatus') }}</small>
+            }
+          </div>
+        </div>
+      </div>
+
       <!-- ==================== AÇIKLAMA ==================== -->
       <div class="form-section">
         <h3 class="section-title">
@@ -224,7 +458,7 @@
         <div class="form-field full-width">
           <textarea id="description" pTextarea formControlName="description"
             placeholder="Araç hakkında detaylı bilgi..." [rows]="4" [autoResize]="true" styleClass="w-full">
-                    </textarea>
+          </textarea>
         </div>
       </div>
 

@@ -51,21 +51,25 @@ public sealed class GetAllVehicleModelSpecifications : BaseSpecification<Vehicle
     if (specParams.IsInStock.HasValue)
     {
       if (specParams.IsInStock.Value)
-        filter = filter.And(vm => vm.AvailableStock > 0);
+        filter = filter.And(vm => vm.Vehicles.Any(v =>
+            v.Status == VehicleStatus.Available && v.IsActive && !v.IsDeleted));
       else
-        filter = filter.And(vm => vm.AvailableStock == 0);
+        filter = filter.And(vm => !vm.Vehicles.Any(v =>
+            v.Status == VehicleStatus.Available && v.IsActive && !v.IsDeleted));
     }
 
     // Minimum stok filtresi
     if (specParams.MinStock.HasValue)
     {
-      filter = filter.And(vm => vm.Stock >= specParams.MinStock.Value);
+      var min = specParams.MinStock.Value;
+      filter = filter.And(vm => vm.Vehicles.Count(v => v.IsActive && !v.IsDeleted) >= min);
     }
 
     // Maksimum stok filtresi
     if (specParams.MaxStock.HasValue)
     {
-      filter = filter.And(vm => vm.Stock <= specParams.MaxStock.Value);
+      var max = specParams.MaxStock.Value;
+      filter = filter.And(vm => vm.Vehicles.Count(v => v.IsActive && !v.IsDeleted) <= max);
     }
 
     // Genel arama (SearchTerm)

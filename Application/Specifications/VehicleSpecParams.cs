@@ -78,13 +78,18 @@ public record VehicleSpecParams : BasePagedRequest
   }
 
   // ============ ⭐ TARİH FİLTRELERİ ============
-  private DateTime? _startDate;
-  public DateTime? StartDate
+  private DateTimeOffset? _startDate;
+  public DateTimeOffset? StartDate
   {
     get => _startDate;
-    set => _startDate = value != null && DateTime.TryParse(value.ToString(), out var result)
-        ? DateTime.SpecifyKind(result, DateTimeKind.Utc)  // ⬅️ UTC'ye çevir!
-        : null;
+    set => _startDate = value?.ToUniversalTime();
+  }
+
+  private DateTimeOffset? _endDate;
+  public DateTimeOffset? EndDate
+  {
+    get => _endDate;
+    set => _endDate = value?.ToUniversalTime();
   }
 
   // Stok filtresi (VehicleModel için)
@@ -93,15 +98,6 @@ public record VehicleSpecParams : BasePagedRequest
   {
     get => _isInStock;
     set => _isInStock = value;
-  }
-
-  private DateTime? _endDate;
-  public DateTime? EndDate
-  {
-    get => _endDate;
-    set => _endDate = value != null && DateTime.TryParse(value.ToString(), out var result)
-        ? DateTime.SpecifyKind(result, DateTimeKind.Utc)  // ⬅️ UTC'ye çevir!
-        : null;
   }
 
   //  Mİnimun Fiyat filtresi için

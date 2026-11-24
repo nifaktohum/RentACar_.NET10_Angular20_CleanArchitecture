@@ -1,11 +1,13 @@
 using System.Linq.Expressions;
 using Domain.Entities.Vehicles;
+using Domain.Specifications;
 using GenericRepository;
 
 namespace Domain.Repositories.Vehicles;
 
 public interface IVehicleRepository : IRepository<Vehicle>
 {
+  Task<List<Vehicle>> GetAsync(BaseSpecification<Vehicle> spec, CancellationToken cancellationToken = default);
   Task<Vehicle?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
   // Belirtilen ID'ye sahip aracı, ilişkili görselleriyle (Images) birlikte veritabanından getirir.
   Task<Vehicle?> GetVehicleWithImagesAsync(Guid id, CancellationToken cancellationToken = default);

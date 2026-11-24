@@ -37,6 +37,7 @@ public sealed class VehicleImagesController(
   }
 
   [HttpGet("get-vehicle-images/{vehicleId}")]
+  [AllowAnonymous]
   public async Task<IActionResult> GetVehicleImages(Guid vehicleId, CancellationToken token)
   {
     var query = new GetVehicleImagesQuery(vehicleId);

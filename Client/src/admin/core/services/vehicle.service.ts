@@ -101,6 +101,25 @@ export class VehicleService {
     return this.http.patch<Result<void>>(`${this.baseUrl}/toggle-status/${id}`, {});
   }
 
+  // ==================== GET AVAILABLE ====================
+  getAvailable(params?: VehicleFilterParams): Observable<Result<PagedResult<Vehicle>>> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+      if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+      if (params.searchTerm) httpParams = httpParams.set('searchTerm', params.searchTerm);
+      if (params.sort) httpParams = httpParams.set('sort', params.sort);
+      if (params.startDate) httpParams = httpParams.set('startDate', params.startDate);
+      if (params.endDate) httpParams = httpParams.set('endDate', params.endDate);
+    }
+
+    return this.http.get<Result<PagedResult<Vehicle>>>(`${this.baseUrl}/available`, {
+      params: httpParams,
+      context: new HttpContext().set(BYPASS_INTERCEPTOR, true)
+    });
+  }
+
   // ==================== DISTINCT ====================
   getBrandsDistinct(): Observable<Result<string[]>> {
     return this.http.get<Result<string[]>>(`${this.baseUrl}/brand-distinct`);

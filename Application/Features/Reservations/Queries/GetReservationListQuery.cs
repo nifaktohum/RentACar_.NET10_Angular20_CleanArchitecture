@@ -20,16 +20,16 @@ public sealed class GetReservationListQueryHandler(
 {
   public async Task<Result<PagedResponse<ReservationDto>>> Handle(GetReservationListQuery _req, CancellationToken _token)
   {
-    // 1. Specification oluştur
+    // 1. Specification oluştur (İçerisinde Include, Sorting ve Paging tanımlı)
     var spec = new GetAllReservationsSpecification(_req);
 
-    // 2. Repository'den getir (Filtrelenmiş, sıralanmış ve sayfalanmış liste)
+    // 2. Repository'den filtrelenmiş, sıralanmış ve sayfalanmış listeyi getir
     var reservations = await _reservationRepo.GetAsync(spec, _token);
 
-    // 3. Toplam sayıyı al (Sayfalama yapmadan, sadece filtreye uyanları sayar)
+    // 3. Toplam sayıyı al (Generic repository alt yapında Count işlemi Paging'i yok sayacak şekilde tasarlanmıştır)
     var totalCount = await _reservationRepo.CountAsync(spec, _token);
 
-    // 4. DTO'ya map et
+    // 4. DTO'ya güvenli bir şekilde map et
     var result = reservations.Select(r => new ReservationDto(
         Id: r.Id,
         ReservationNumber: r.ReservationNumber,
@@ -42,6 +42,7 @@ public sealed class GetReservationListQueryHandler(
         TotalPrice: r.TotalPrice,
         DepositAmount: r.DepositAmount,
         DepositPaid: r.DepositPaid,
+        FullPaymentPaid: r.FullPaymentPaid,
         CreatedAt: r.CreatedAt
     )).ToList();
 
@@ -55,20 +56,17 @@ public sealed class GetReservationListQueryHandler(
     return Result<PagedResponse<ReservationDto>>.Succeed(response);
   }
 
-  // 🚨 Null Korumalı Metotlar
-  private static string GetCustomerFullName(Customer? customer)
-  {
-    if (customer == null) return "Bilinmeyen Müşteri";
+  // 🚨 Null Korumalı ve Modern Switch Expression Destekli Metotlar
+  private static string GetCustomerFullName(Customer? customer) =>
+      customer switch
+      {
+        null => "Bilinmeyen Müşteri",
+        { Type: CustomerType.Individual } => $"{customer.FirstName} {customer.LastName}",
+        _ => customer.CompanyName ?? "Kurumsal Müşteri"
+      };
 
-    return customer.Type == CustomerType.Individual
-        ? $"{customer.FirstName} {customer.LastName}"
-        : customer.CompanyName ?? "Kurumsal Müşteri";
-  }
-
-  private static string GetVehicleInfo(Vehicle? vehicle)
-  {
-    if (vehicle == null) return "Araç Bilgisi Yok";
-
-    return $"{vehicle.Brand} {vehicle.Model} - {vehicle.Plate}";
-  }
+  private static string GetVehicleInfo(Vehicle? vehicle) =>
+      vehicle is null
+          ? "Araç Bilgisi Yok"
+          : $"{vehicle.Brand} {vehicle.VehicleModel?.Name ?? vehicle.Model} - {vehicle.Plate}";
 }

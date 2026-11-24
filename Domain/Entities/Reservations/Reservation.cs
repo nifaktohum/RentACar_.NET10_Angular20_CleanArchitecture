@@ -509,4 +509,32 @@ public sealed class Reservation : BaseEntity
     if (BillablePrice is null) return 0;
     return BillablePrice.Value - TotalPrice;
   }
+
+  // Domain/Entities/Reservations/Reservation.cs içine ekle
+  public bool IsBlocking(DateTimeOffset now)
+  {
+    if (!IsActive || IsDeleted)
+      return false;
+
+    // Katman 3: Tam ödeme yapıldı veya araç teslim edildi → her zaman bloklar
+    if (Status == ReservationStatus.Active)
+      return true;
+
+    if (Status == ReservationStatus.Confirmed && FullPaymentPaid)
+      return true;
+
+    // Katman 2: Depozito ödendi, tam ödeme yok → 24 saat dolmadıysa bloklar
+    if (Status == ReservationStatus.Confirmed
+        && !FullPaymentPaid
+        && DepositLockDeadline.HasValue
+        && DepositLockDeadline.Value > now)
+      return true;
+
+    // Katman 1: PendingPayment → 15 dk checkout hold dolmadıysa bloklar
+    if (Status == ReservationStatus.PendingPayment
+        && PaymentDeadline > now)
+      return true;
+
+    return false;
+  }
 }

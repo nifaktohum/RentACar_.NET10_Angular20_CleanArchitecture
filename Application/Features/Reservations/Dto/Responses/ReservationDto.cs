@@ -13,5 +13,6 @@ public sealed record ReservationDto(
     decimal TotalPrice,                       // Kiralamanın toplam tutarı
     decimal DepositAmount,                    // Alınması gereken kapora / güvence bedeli tutarı
     bool DepositPaid,                         // Kaporanın ödenip ödenmediğini belirten boolean bayrak (True/False)
+    bool FullPaymentPaid,
     DateTimeOffset CreatedAt                  // Rezervasyon kaydının ilk oluşturulduğu zaman damgası
 );

@@ -17,6 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
+import { ReservationStats } from '../../core/models/reservations/reservation-stats.model';
 
 @Component({
   selector: 'app-reservations',
@@ -58,6 +59,9 @@ export class ReservationsComponent implements OnInit {
   readonly sortField = this.stateService.sortField;
   readonly sortOrder = this.stateService.sortOrder;
 
+  readonly stats = signal<ReservationStats | null>(null);
+  readonly isLoadingStats = signal<boolean>(false);
+
   // ✅ Tip belirtildi
   readonly statusOptions: { label: string; value: string | null }[] = [
     { label: 'Tümü', value: null },
@@ -76,6 +80,7 @@ export class ReservationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.breadcrumbService.reset(this.breadcrumbs());
+    this.loadStats();
     this.loadReservations();
   }
 
@@ -148,6 +153,43 @@ export class ReservationsComponent implements OnInit {
   getStatusLabel(status: string): string {
     const opt = this.statusOptions.find(o => o.value === status);
     return opt ? opt.label : status;
+  }
+
+  /**
+ * İstatistik kartları için durum sayısını hesaplar.
+ * NOT: Şu an sadece o anki sayfadaki (reservations()) verileri sayar.
+ * Tüm sayfalar için backend'de bir "stats" endpoint'i gerekir.
+ */
+  getStatusCount(status: string): number {
+    const s = this.stats();
+    if (!s) return 0;
+
+    switch (status) {
+      case 'PendingPayment': return s.pendingPaymentCount;
+      case 'Confirmed': return s.confirmedCount;
+      case 'Active': return s.activeCount;
+      case 'Completed': return s.completedCount;
+      case 'Expired': return s.expiredCount;
+      case 'NoShow': return s.noShowCount;
+      case 'Cancelled': return s.cancelledCount;
+      default: return 0;
+    }
+  }
+
+
+  loadStats(): void {
+    this.isLoadingStats.set(true);
+    this.reservationService.getStats().subscribe({
+      next: (res) => {
+        if (res.isSuccessful && res.data) {
+          this.stats.set(res.data);
+        }
+      },
+      error: (err) => {
+        console.error('Stats yüklenemedi:', err);
+      },
+      complete: () => this.isLoadingStats.set(false)
+    });
   }
 
   navigateToDetail(reservation: Reservation): void {

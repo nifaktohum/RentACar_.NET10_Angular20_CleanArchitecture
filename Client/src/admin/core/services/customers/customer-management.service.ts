@@ -1,10 +1,12 @@
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { Result } from '../../../../core/models/result.model';
+import { PagedResult, Result } from '../../../../core/models/result.model';
 import { BYPASS_INTERCEPTOR } from '../../../../core/interceptors/error.interceptor';
 import { CustomerStateService } from './customer-state.service';
 import { CustomerSpecParams } from '../../models/customers/customer-spec-params';
+import { Observable } from 'rxjs';
+import { CustomerListDto } from '../../models/customers/customer.model';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +36,25 @@ export class CustomerManagementService {
   // Findeks
   updateFindeksScore(data: { customerId: string; score: number }) {
     return this.http.put<Result<string>>(this.apiUrl + '/findeks-added', data );
+  }
+
+  /**
+ * Rezervasyon formu gibi yerlerde kullanmak için hafif arama.
+ * StateService'e DOKUNMAZ — sadece verilen parametrelerle istek atar.
+ */
+  searchCustomers(searchTerm: string, pageSize: number = 10): Observable<Result<PagedResult<CustomerListDto>>> {
+    let params = new HttpParams()
+      .set('pageNumber', '1')
+      .set('pageSize', pageSize.toString());
+
+    if (searchTerm?.trim()) {
+      params = params.set('searchTerm', searchTerm.trim());
+    }
+
+    return this.http.get<Result<PagedResult<CustomerListDto>>>(
+      `${this.apiUrl}/get-all`,
+      { params }
+    );
   }
 
 

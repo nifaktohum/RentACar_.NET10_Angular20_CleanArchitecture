@@ -98,6 +98,13 @@ public sealed class ReservationsController : BaseApiController
     var result = await Mediator.Send(query, token);
     return result.IsSuccessful ? Ok(result) : BadRequest(result);
   }
+
+  [HttpGet("Get-Stats")]
+  public async Task<IActionResult> GetStats([FromQuery] GetReservationStatsQuery query, CancellationToken cancellationToken)
+  {
+    var result = await Mediator.Send(query, cancellationToken);
+    return Ok(result);
+  }
 }
 
 /* Sistemin Doğrulanan Tüm İş Kuralları

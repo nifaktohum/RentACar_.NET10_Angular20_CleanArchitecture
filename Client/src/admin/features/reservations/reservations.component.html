@@ -15,6 +15,50 @@
       </div>
     </div>
 
+        <!-- ==================== İSTATİSTİK KARTLARI (YENİ) ==================== -->
+        <div class="stats-grid">
+          <div class="stat-card stat-total">
+            <div class="stat-icon">
+              <i class="ri-calendar-line"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Toplam Rezervasyon</span>
+              <span class="stat-value">{{ totalCount() }}</span>
+            </div>
+          </div>
+        
+          <div class="stat-card stat-confirmed">
+            <div class="stat-icon">
+              <i class="ri-checkbox-circle-line"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Onaylanan</span>
+              <span class="stat-value">{{ getStatusCount('Confirmed') }}</span>
+            </div>
+          </div>
+        
+          <div class="stat-card stat-pending">
+            <div class="stat-icon">
+              <i class="ri-time-line"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Ödeme Bekleyen</span>
+              <span class="stat-value">{{ getStatusCount('PendingPayment') }}</span>
+            </div>
+          </div>
+        
+          <div class="stat-card stat-active">
+            <div class="stat-icon">
+              <i class="ri-car-line"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Aktif Kiralama</span>
+              <span class="stat-value">{{ getStatusCount('Active') }}</span>
+            </div>
+          </div>
+        </div>
+
+
     <!-- Filtreler -->
     <div class="filter-section">
       <div class="filter-row">

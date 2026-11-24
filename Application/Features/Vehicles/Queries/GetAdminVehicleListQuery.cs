@@ -42,17 +42,17 @@ public sealed class GetAdminVehicleListQueryHandler(
       query = query.Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType);
 
       // Sıralama
-      if (spec.OrderBy != null)
-        query = query.OrderBy(spec.OrderBy);
-      else if (spec.OrderByDescending != null)
-        query = query.OrderByDescending(spec.OrderByDescending);
+      // if (spec.OrderBy != null)
+      //   query = query.OrderBy(spec.OrderBy);
+      // else if (spec.OrderByDescending != null)
+      //   query = query.OrderByDescending(spec.OrderByDescending);
 
       // Toplam sayı
       var totalCount = await query.CountAsync(_token);
 
       // Sayfalama
-      if (spec.IsPagingEnabled)
-        query = query.Skip(spec.Skip).Take(spec.Take);
+      // if (spec.IsPagingEnabled)
+      //   query = query.Skip(spec.Skip).Take(spec.Take);
 
       var vehicles = await query.ToListAsync(_token);
 

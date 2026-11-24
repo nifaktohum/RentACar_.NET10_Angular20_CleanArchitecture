@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TS.Result;
 using Application.Behaviors;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Vehicles.Commands;
 
@@ -138,7 +139,10 @@ public sealed class UpdateVehicleCommandHandler(
       //     return Result<UpdateVehicleDto>.Failure(409, $"'{_req.VinNumber}' şasi numaralı araç zaten mevcut!");
 
       // 4. VehicleModel var mı kontrol et
-      var vehicleModel = await _vehicleModelRepo.FirstOrDefaultAsync(x => x.Id == _req.VehicleModelId && !x.IsDeleted, _token);
+      var vehicleModel = await _vehicleModelRepo
+                                  .Where(x => x.Id == _req.VehicleModelId && !x.IsDeleted)
+                                  .Include(x => x.VehicleType)   // ⬅️ EKLE
+                                  .FirstOrDefaultAsync(_token);
       if (vehicleModel is null)
       {
         _logger.LogWarning("❌ Araç Model bulunamadı. VehicleModelId: {VehicleModelId}", _req.VehicleModelId);

@@ -1,0 +1,236 @@
+@if (reservation(); as _res) {
+<div class="detail-container">
+
+  <!-- Header & Geri Butonu -->
+  <div class="page-header">
+    <div class="header-left">
+      <p-button icon="ri-arrow-left-line" [text]="true" severity="secondary" (onClick)="goBack()"
+        pTooltip="Geri Dön"></p-button>
+      <h2>Rezervasyon Detayı</h2>
+      <p-tag [value]="getStatusLabel(_res.status)" [severity]="getStatusSeverity(_res.status)"></p-tag>
+    </div>
+    <div class="header-right">
+      <span class="res-no">{{ _res.reservationNumber }}</span>
+    </div>
+  </div>
+
+  <div class="grid-layout">
+
+    <!-- SOL KOLON -->
+    <div class="left-col">
+
+      <!-- 🚨 YENİ: ARAÇ RESMİ KARTI -->
+      <p-card styleClass="vehicle-image-card">
+        <img [src]="vehicleImageUrl()" alt="Araç Resmi" class="main-car-image" />
+        <div class="plate-overlay">{{ _res.vehiclePlate }}</div>
+      </p-card>
+
+      <p-card header="Müşteri Bilgileri">
+        <div class="info-row"><span class="label">Ad Soyad:</span> <span>{{ _res.customerFullName }}</span></div>
+        <div class="info-row"><span class="label">Telefon:</span> <span>{{ _res.customerPhone }}</span></div>
+        <div class="info-row"><span class="label">E-posta:</span> <span>{{ _res.customerEmail }}</span></div>
+      </p-card>
+
+      <p-card header="Araç & Şube">
+        <div class="info-row"><span class="label">Araç:</span> <span>{{ _res.vehicleBrand }} {{ _res.vehicleModel
+            }}</span></div>
+        <div class="info-row"><span class="label">Alış Şubesi:</span> <span>{{ _res.pickupBranchName }}</span></div>
+        @if (_res.returnBranchName) {
+        <div class="info-row">
+          <span class="label">İade Şubesi:</span>
+          <span>{{ _res.returnBranchName }}</span>
+        </div>
+        }
+      </p-card>
+
+      <!-- 🚨 YENİ: EXTRALAR KARTI -->
+      <p-card header="Ekstralar">
+        @if (_res.extras && _res.extras.length > 0) {
+        <div class="extras-list">
+          @for (extra of _res.extras; track extra.extraId) {
+          <div class="extra-item">
+            <span class="extra-name">{{ extra.name }} ({{ extra.quantity }} Adet)</span>
+            <span class="extra-price">{{ extra.totalPrice | currency:'TRY':'₺'}}</span>
+          </div>
+          }
+        </div>
+        <p-divider></p-divider>
+        <div class="info-row">
+          <span class="label">Extralar Toplamı:</span>
+          <span class="text-bold">{{ _res.extrasTotalPrice | currency:'TRY':'₺'}}</span>
+        </div>
+        } @else {
+        <div class="info-row"><span class="label">Ek hizmet seçilmemiş.</span></div>
+        }
+      </p-card>
+
+      <p-card header="Tarihler">
+        <div class="info-row">
+          <span class="label">Planlanan Başlangıç:</span>
+          <span>{{ _res.plannedStartDate | date:'dd MMM yyyy, HH:mm' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Planlanan Bitiş:</span>
+          <span>{{ _res.plannedEndDate | date:'dd MMM yyyy, HH:mm' }}</span>
+        </div>
+
+        <p-divider></p-divider>
+        @if (_res.actualPickupAt) {
+        <div class="info-row">
+          <span class="label">Fiili Teslimat:</span>
+          <span>{{ _res.actualPickupAt | date:'dd MMM yyyy, HH:mm' }}</span>
+        </div>
+        }
+        @if (_res.actualReturnAt) {
+        <div class="info-row">
+          <span class="label">Fiili İade:</span>
+          <span>{{ _res.actualReturnAt | date:'dd MMM yyyy, HH:mm' }}</span>
+        </div>
+        }
+      </p-card>
+
+    </div>
+
+    <!-- SAĞ KOLON -->
+    <div class="right-col">
+
+      <p-card header="Finansal Detaylar">
+        <div class="price-row">
+          <span class="label">Günlük Fiyat:</span>
+          <span>{{ _res.dailyPrice | currency:'TRY':'₺'}}</span>
+        </div>
+        <div class="price-row">
+          <span class="label">Toplam Fiyat:</span>
+          <span>{{ _res.totalPrice | currency:'TRY':'₺'}}</span>
+        </div>
+        <div class="price-row">
+          <span class="label">Depozito:</span>
+          <span>{{ _res.depositAmount | currency:'TRY':'₺'}}</span>
+        </div>
+        <div class="price-row">
+          <span class="label">Kalan Tutar:</span>
+          <span>{{ _res.remainingAmount | currency:'TRY':'₺'}}</span>
+        </div>
+        <p-divider></p-divider>
+
+        @if (_res.billablePrice) {
+        <div class="price-row highlight">
+          <span class="label">Faturalandırılan:</span>
+          <span class="value">{{ _res.billablePrice | currency:'TRY':'₺' }}</span>
+        </div>
+        }
+
+        @if (_res.status === 'Cancelled') {
+        <div class="refund-info">
+          <p-divider></p-divider>
+          <div class="price-row">
+            <span class="label">İade Edilen:</span>
+            <span class="text-success">{{ _res.refundedAmount || 0 | currency:'TRY':'₺' }}</span>
+          </div>
+          <div class="price-row">
+            <span class="label">Yanan Tutar:</span>
+            <span class="text-danger">{{_res.forfeitedAmount || 0 | currency:'TRY':'₺' }}</span>
+          </div>
+        </div>
+        }
+      </p-card>
+
+<p-card header="İşlemler" styleClass="action-card">
+  <div class="action-buttons">
+
+    <!-- 1. DURUM: Ödeme Bekliyor (PendingPayment) -->
+    @if (reservation()?.status === 'PendingPayment') {
+    <p-button label="Sadece Depozito Al" icon="ri-secure-payment-line" severity="info" styleClass="w-full mb-2"
+      (onClick)="openActionDialog('deposit')">
+    </p-button>
+
+    <p-button label="Tam Ödeme Al" icon="ri-money-dollar-circle-line" severity="success" styleClass="w-full"
+      (onClick)="openActionDialog('fullPayment')">
+    </p-button>
+    }
+
+    <!-- 2. DURUM: Kapora Alındı, Tam Ödeme Bekliyor -->
+    @if (reservation()?.status === 'Confirmed' && !reservation()?.fullPaymentPaid) {
+    <p-button label="Tam Ödeme Al" icon="ri-money-dollar-circle-line" severity="success" styleClass="w-full"
+      (onClick)="openActionDialog('fullPayment')">
+    </p-button>
+    }
+
+    <!-- 3. DURUM: Tam Ödeme Alındı, Teslimat Bekliyor -->
+    @if (reservation()?.status === 'Confirmed' && reservation()?.fullPaymentPaid) {
+    <p-button label="Aracı Teslim Et" icon="ri-car-line" severity="primary" styleClass="w-full"
+      (onClick)="openActionDialog('activate')">
+    </p-button>
+    }
+
+    <!-- 4. DURUM: Kirada (Active) -->
+    @if (reservation()?.status === 'Active') {
+    <p-button label="Aracı İade Al" icon="ri-key-2-line" severity="warn" styleClass="w-full"
+      (onClick)="openActionDialog('complete')">
+    </p-button>
+    }
+
+    <!-- İPTAL BUTONU -->
+    @if (reservation()?.status !== 'Completed' && reservation()?.status !== 'Cancelled' && reservation()?.status !==
+    'Active') {
+    <p-button label="İptal Et" icon="ri-close-line" severity="danger" [outlined]="true" styleClass="w-full mt-2"
+      (onClick)="cancelReservation()">
+    </p-button>
+    }
+
+    <!-- KAPATILMIŞ İSE MESAJ -->
+    @if (reservation()?.status === 'Completed' || reservation()?.status === 'Cancelled') {
+    <div class="status-message mt-2">
+      <i class="ri-information-line"></i> Bu rezervasyon kapatılmıştır, işlem yapılamaz.
+    </div>
+    }
+
+  </div>
+</p-card>
+
+
+    </div>
+  </div>
+</div>
+}
+
+<!-- AKSiYON DIALOG -->
+<p-dialog [header]="getActionLabel(pendingAction())" [(visible)]="displayActionDialog" [modal]="true"
+  [style]="{ width: '450px' }">
+
+  <div class="flex flex-column gap-3 pt-3">
+
+    <!-- Depozito veya Tam Ödeme ise PaymentId göster -->
+    @if (pendingAction() === 'deposit' || pendingAction() === 'fullPayment') {
+    <div class="field">
+      <label class="block font-bold mb-2">İşlem / Ödeme Referans No</label>
+      <input pInputText [(ngModel)]="paymentIdInput" class="w-full" readonly />
+      <small class="text-gray-500">Sanal POS entegrasyonu simülasyonu.</small>
+    </div>
+    }
+
+    <!-- Activate veya Complete ise Tarih/Saat göster -->
+    @if (pendingAction() === 'activate' || pendingAction() === 'complete') {
+    <div class="field">
+      <label class="block font-bold mb-2">Fiili İşlem Zamanı</label>
+      <input pInputText type="datetime-local" [(ngModel)]="actualDateInput" class="w-full" />
+    </div>
+    }
+
+    <!-- Complete ise Kilometre göster -->
+    @if (pendingAction() === 'complete') {
+    <div class="field">
+      <label class="block font-bold mb-2">Dönüş Kilometresi</label>
+      <p-inputNumber [(ngModel)]="returnKilometerInput" [showButtons]="true" class="w-full">
+      </p-inputNumber>
+    </div>
+    }
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Vazgeç" severity="secondary" (onClick)="displayActionDialog.set(false)"></p-button>
+    <p-button label="Onayla" severity="primary" [loading]="isSubmitting()" (onClick)="confirmAction()">
+    </p-button>
+  </ng-template>
+</p-dialog>

@@ -21,7 +21,6 @@ public static class VehicleFilterExtensions
     // 2. Marka Filtresi
     if (specParams.Brands != null && specParams.Brands.Any())
     {
-      // Not: PostgreSQL kullanıyorsan Npgsql ILike kullanabilirsin, SQL Server'da ToLower yerine Collation kullanmak daha performanslıdır.
       var brands = specParams.Brands.Select(b => b.ToLower()).ToList();
       filter = filter.And(v => brands.Contains(v.Brand.ToLower()));
     }
@@ -75,15 +74,6 @@ public static class VehicleFilterExtensions
       filter = filter.And(v => v.VehicleModel != null && v.VehicleModel.VehicleType != null && vehicleTypeNames.Contains(v.VehicleModel.VehicleType.Name.ToLower()));
     }
 
-    // 10. TARİH FİLTRELERİ (Kiralama Takvimi İçin)
-    // ⚠️ DİKKAT: Eğer araç kiralama takvimini kontrol ediyorsak, ilgili tarihlerde çakışan rezervasyon olmamalı.
-    // Bu kısım Rezervasyon tablosuna bakmalıdır. Şimdilik aracın eklendiği tarihe göre filtreliyoruz.
-    if (specParams.StartDate.HasValue)
-      filter = filter.And(v => v.CreatedAt >= specParams.StartDate.Value);
-
-    if (specParams.EndDate.HasValue)
-      filter = filter.And(v => v.CreatedAt <= specParams.EndDate.Value);
-
     // 11. Fiyat Aralığı
     if (specParams.MinPrice.HasValue)
       filter = filter.And(v => v.DailyPrice >= specParams.MinPrice.Value);
@@ -100,7 +90,11 @@ public static class VehicleFilterExtensions
 
     // 13. Müsaitlik Filtresi
     if (specParams.IsAvailable.HasValue)
-      filter = filter.And(v => v.IsAvailable == specParams.IsAvailable.Value);
+    {
+      var isAvailable = specParams.IsAvailable.Value;
+      filter = filter.And(v =>
+          (v.Status == VehicleStatus.Available && v.IsActive && !v.IsDeleted) == isAvailable);
+    }
 
     // 14. Aktiflik Filtresi
     if (specParams.IsActive.HasValue)
@@ -109,10 +103,8 @@ public static class VehicleFilterExtensions
     // 15. Stok Filtreleri (VehicleModel üzerinden)
     if (specParams.IsInStock.HasValue)
     {
-      // 🚨 DİKKAT: Stock bir Computed Property'dir. LINQ to Entities bunu SQL'e çeviremez!
-      // Bunu veritabanında hesaplatmak için alt sorgu (Subquery) kullanmalıyız.
       bool inStock = specParams.IsInStock.Value;
-      filter = filter.And(v => v.VehicleModel.Vehicles.Any(veh => veh.IsAvailable) == inStock);
+      filter = filter.And(v => v.VehicleModel.Vehicles.Any(veh => veh.Status == VehicleStatus.Available && veh.IsActive && !veh.IsDeleted) == inStock);
     }
 
     // 16. Genel Arama (SearchTerm)

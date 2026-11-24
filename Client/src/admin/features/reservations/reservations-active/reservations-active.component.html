@@ -1,0 +1,248 @@
+<!-- reservations-active.component.html -->
+<div class="reservations-container">
+  <p-card>
+    <!-- Header -->
+    <div class="header-section">
+      <div class="header-left">
+        <h2>Aktif Rezervasyonlar</h2>
+        <p>Ödeme bekleyen, teslim bekleyen ve kirada olan rezervasyonları yönetin.</p>
+      </div>
+      <div class="header-right">
+        <p-button severity="contrast" icon="ri-reset-left-fill" pTooltip="Yenile" tooltipPosition="top"
+          (onClick)="loadReservations()" [loading]="isLoading()"></p-button>
+      </div>
+    </div>
+
+    <!-- ==================== İSTATİSTİK KARTLARI ==================== -->
+    <div class="stats-grid">
+      <div class="stat-card stat-total">
+        <div class="stat-icon"><i class="ri-radar-line"></i></div>
+        <div class="stat-content">
+          <span class="stat-label">Aktif Süreç</span>
+          <span class="stat-value">{{ getActiveTotalCount() }}</span>
+        </div>
+      </div>
+    
+      <div class="stat-card stat-confirmed">
+        <div class="stat-icon"><i class="ri-wallet-3-line"></i></div>
+        <div class="stat-content">
+          <span class="stat-label">Kaporası Alınmış</span>
+          <span class="stat-value">{{ getStatusCount('deposit') }}</span>
+        </div>
+      </div>
+    
+      <div class="stat-card stat-pending">
+        <div class="stat-icon"><i class="ri-money-dollar-circle-line"></i></div>
+        <div class="stat-content">
+          <span class="stat-label">Tam Ödemesi Alınmış</span>
+          <span class="stat-value">{{ getStatusCount('full') }}</span>
+        </div>
+      </div>
+    
+      <div class="stat-card stat-active">
+        <div class="stat-icon"><i class="ri-car-line"></i></div>
+        <div class="stat-content">
+          <span class="stat-label">Kirada</span>
+          <span class="stat-value">{{ getStatusCount('active') }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtreler -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Ara</label>
+          <input pInputText [(ngModel)]="filterSearch" (ngModelChange)="onFilterChange()"
+            placeholder="Rezervasyon no, müşteri..." class="filter-input" />
+        </div>
+        <div class="filter-field">
+          <label>Durum</label>
+          <p-select
+            [options]="statusOptions"
+            optionLabel="label"
+            optionValue="value"
+            [(ngModel)]="paymentFilter"
+            (ngModelChange)="onFilterChange()"
+            placeholder="Durum Seç"
+            [showClear]="true"
+            class="filter-select">
+            </p-select>
+        </div>
+        <div class="filter-field filter-reset">
+          <p-button icon="ri-filter-off-line" severity="secondary" [raised]="true" (onClick)="onResetFilters()">
+          </p-button>
+        </div>
+        <div class="filter-field filter-count">
+          <label>Toplam</label>
+          <p-button severity="contrast" [raised]="true" class="count-badge">{{ totalCount() }}</p-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tablo -->
+    <div class="table-wrapper">
+      <p-table [value]="reservations()" [lazy]="true" [paginator]="true" [rows]="pageSize()"
+        [totalRecords]="totalCount()" [loading]="isLoading()" [rowsPerPageOptions]="[5, 10, 20, 50]"
+        [tableStyle]="{ width: '100%' }" [sortField]="sortField()" [sortOrder]="sortOrder()" (onSort)="onSort($event)"
+        (onPage)="onPageChange($event)" dataKey="id"
+        currentPageReportTemplate="Toplam {totalRecords} rezervasyondan {first} - {last} arası gösteriliyor"
+        showCurrentPageReport="true">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="col-reservation-no" pSortableColumn="reservationNumber">
+              Rezervasyon No <p-sortIcon field="reservationNumber"></p-sortIcon>
+            </th>
+            <th class="col-customer" pSortableColumn="customerFullName">
+              Müşteri <p-sortIcon field="customerFullName"></p-sortIcon>
+            </th>
+            <th class="col-vehicle">Araç</th>
+            <th class="col-dates" pSortableColumn="plannedStartDate">
+              Tarih Aralığı <p-sortIcon field="plannedStartDate"></p-sortIcon>
+            </th>
+            <th class="col-days">Gün</th>
+            <th class="col-price" pSortableColumn="totalPrice">
+              Toplam Fiyat <p-sortIcon field="totalPrice"></p-sortIcon>
+            </th>
+            <th class="col-status">Durum</th>
+            <th class="col-payment">Ödeme</th>
+            <th class="col-actions">İşlemler</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-res>
+          <tr>
+            <td class="col-reservation-no">
+              <span class="reservation-no-badge">{{ res.reservationNumber }}</span>
+            </td>
+
+            <td class="col-customer">
+              <div class="customer-info">
+                <div class="customer-avatar"><i class="ri-user-line"></i></div>
+                <span class="customer-name">{{ res.customerFullName }}</span>
+              </div>
+            </td>
+
+            <td class="col-vehicle">
+              <span class="vehicle-info">{{ res.vehicleInfo }}</span>
+            </td>
+
+            <td class="col-dates">
+              <div class="date-cell">
+                <span class="date-start">{{ res.plannedStartDate | date:'dd MMM yyyy' }}</span>
+                <span class="date-divider"><i class="ri-arrow-right-line"></i></span>
+                <span class="date-end">{{ res.plannedEndDate | date:'dd MMM yyyy' }}</span>
+              </div>
+            </td>
+
+            <td class="col-days">
+              <span class="days-badge">{{ res.plannedDays }} gün</span>
+            </td>
+
+            <td class="col-price">
+              <span class="price-value">{{ res.totalPrice | currency:'TRY':'₺':'1.0-2' }}</span>
+            </td>
+              <td class="col-status">
+                @if (res.status === 'Confirmed' && res.fullPaymentPaid) {
+                <p-tag value="Tam Ödendi" severity="success"></p-tag>
+                } @else if (res.status === 'Confirmed' && res.depositPaid) {
+                <p-tag value="Kapora Alındı" severity="info"></p-tag>
+                } @else if (res.status === 'Active') {
+                <p-tag value="Kirada" severity="contrast"></p-tag>
+                }
+              </td>
+            <td class="col-payment">
+              <div class="payment-status">
+                @if (res.depositPaid) {
+                <span class="payment-badge payment-paid">
+                  <i class="ri-checkbox-circle-fill"></i> Ödendi
+                </span>
+                } @else {
+                <span class="payment-badge payment-pending">
+                  <i class="ri-close-circle-fill"></i> Ödenmedi
+                </span>
+                }
+              </div>
+            </td>
+
+            <!-- ⭐ AKSİYONLAR — DURUMA GÖRE -->
+            <td class="col-actions">
+              <div class="action-buttons">
+                <button pButton type="button" class="p-button-text p-button-rounded btn-detail" icon="ri-eye-line"
+                  pTooltip="Detay" tooltipPosition="top" (click)="navigateToDetail(res)">
+                </button>
+
+                @if (res.status === 'Confirmed') {
+                <button pButton type="button" class="p-button-text p-button-rounded btn-activate" icon="ri-key-2-line"
+                  pTooltip="Araç Teslim Et" tooltipPosition="top" (click)="openActivateDialog(res)">
+                </button>
+                }
+
+                @if (res.status === 'Active') {
+                <button pButton type="button" class="p-button-text p-button-rounded btn-complete"
+                  icon="ri-arrow-go-back-line" pTooltip="İade Al" tooltipPosition="top"
+                  (click)="openCompleteDialog(res)">
+                </button>
+                }
+
+                @if (res.status === 'PendingPayment' || res.status === 'Confirmed') {
+                <button pButton type="button" class="p-button-text p-button-rounded btn-cancel" icon="ri-close-line"
+                  pTooltip="İptal Et" tooltipPosition="top" (click)="cancelReservation(res)">
+                </button>
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9" class="empty-table-message">
+              {{ isLoading() ? 'Yükleniyor...' : 'Aktif rezervasyon bulunamadı.' }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+
+  <!-- ==================== ARAÇ TESLİM DIALOG ==================== -->
+  <p-dialog header="Aracı Teslim Et" [(visible)]="showActivateDialog" [modal]="true" [style]="{ width: '450px' }">
+    @if (activatingReservation(); as res) {
+    <div class="dialog-content">
+      <p><strong>{{ res.reservationNumber }}</strong> numaralı rezervasyon için araç teslim alınacak.</p>
+      <p><strong>Müşteri:</strong> {{ res.customerFullName }}</p>
+      <p><strong>Araç:</strong> {{ res.vehicleInfo }}</p>
+      <div class="field">
+        <label>Fiili Teslim Alma Zamanı</label>
+        <p-datepicker [(ngModel)]="activatePickupAt" [showTime]="true" dateFormat="dd.mm.yy"></p-datepicker>
+      </div>
+    </div>
+    }
+    <ng-template pTemplate="footer">
+      <p-button label="Vazgeç" severity="secondary" (onClick)="showActivateDialog.set(false)"></p-button>
+      <p-button label="Teslim Et" severity="success" [loading]="isActivating()"
+        (onClick)="confirmActivate()"></p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- ==================== İADE AL DIALOG ==================== -->
+  <p-dialog header="Aracı İade Al" [(visible)]="showCompleteDialog" [modal]="true" [style]="{ width: '450px' }">
+    @if (completingReservation(); as res) {
+    <div class="dialog-content">
+      <p><strong>{{ res.reservationNumber }}</strong> numaralı rezervasyon için araç iade alınacak.</p>
+      <p><strong>Müşteri:</strong> {{ res.customerFullName }}</p>
+      <p><strong>Araç:</strong> {{ res.vehicleInfo }}</p>
+      <div class="field">
+        <label>Fiili İade Zamanı</label>
+        <p-datepicker [(ngModel)]="completeReturnAt" [showTime]="true" dateFormat="dd.mm.yy"></p-datepicker>
+      </div>
+    </div>
+    }
+    <ng-template pTemplate="footer">
+      <p-button label="Vazgeç" severity="secondary" (onClick)="showCompleteDialog.set(false)"></p-button>
+      <p-button label="İade Al" severity="success" [loading]="isCompleting()" (click)="confirmComplete()"></p-button>
+    </ng-template>
+  </p-dialog>
+</div>

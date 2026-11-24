@@ -1,0 +1,377 @@
+<!-- reservation-form.component.html -->
+<div class="reservation-form-container">
+  <p-card>
+    <!-- Header -->
+    <div class="header-section">
+      <div class="header-left">
+        <h2>Yeni Rezervasyon</h2>
+        <p>Adım adım rezervasyon oluşturun.</p>
+      </div>
+      <p-button label="Vazgeç" icon="ri-arrow-left-line" severity="secondary" [raised]="true"
+        (onClick)="cancel()"></p-button>
+    </div>
+
+    <p-stepper [value]="currentStep()" (valueChange)="onStepChange($event)">
+      <!-- ==================== ADIM BAŞLIKLARI ==================== -->
+      <p-step-list>
+        <p-step [value]="1">Müşteri</p-step>
+        <p-step [value]="2">Tarih &amp; Şube</p-step>
+        <p-step [value]="3">Araç</p-step>
+        <p-step [value]="4">Ekstralar</p-step>
+        <p-step [value]="5">Özet</p-step>
+      </p-step-list>
+
+      <p-step-panels>
+        <!-- ==================== STEP 1: MÜŞTERİ ==================== -->
+        <p-step-panel [value]="1">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <h3>Müşteri Seç</h3>
+              <p class="step-hint">Müşteriyi isim, telefon veya e-posta ile arayın.</p>
+
+              <div class="field">
+                <label>Müşteri <span class="required">*</span></label>
+                <div class="customer-search-wrapper">
+                  <p-autocomplete [suggestions]="customerSuggestions()" (completeMethod)="searchCustomer($event)"
+                    (onSelect)="onCustomerSelected($event.value)" (onClear)="selectedCustomer.set(null);"
+                    [completeOnFocus]="true" [dropdown]="true" [forceSelection]="true" [showClear]="true"
+                    [ngModel]="selectedCustomer()" [optionLabel]="getCustomerDisplayName" placeholder="Müşteri ara..."
+                    class="w-full">
+
+                    <ng-template let-c pTemplate="item">
+                      <div class="customer-option">
+                        <strong>{{ getCustomerDisplayName(c) }}</strong>
+                        <small>
+                          {{ c.email }}
+                          @if (c.email && c.phoneNumber) { · }
+                          {{ c.phoneNumber }}
+                        </small>
+                      </div>
+                    </ng-template>
+                  </p-autocomplete>
+                </div>
+              </div>
+              @if (selectedCustomer(); as c) {
+              <div class="selected-card">
+                <div class="selected-header">
+                  <i class="ri-user-line"></i>
+                  <strong>{{ getCustomerDisplayName(c) }}</strong>
+                  @if (c.isBlacklisted) {
+                  <p-tag severity="danger" value="Kara Listede"></p-tag>
+                  }
+                </div>
+                <div class="selected-meta">
+                  <span><i class="ri-mail-line"></i> {{ c.email }}</span>
+                  <span><i class="ri-phone-line"></i> {{ c.phoneNumber }}</span>
+                  <span><i class="ri-map-pin-line"></i> {{ c.city }} / {{ c.country }}</span>
+                </div>
+              </div>
+              }
+            </div>
+
+            <div class="step-actions">
+              <p-button label="İleri" icon="ri-arrow-right-line" iconPos="right" [disabled]="!isStep1Valid()"
+                (onClick)="activateCallback(2)"></p-button>
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <!-- ==================== STEP 2: TARİH + ŞUBE ==================== -->
+        <p-step-panel [value]="2">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <h3>Tarih ve Şube</h3>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>Alış Şubesi <span class="required">*</span></label>
+                  <p-select
+                    [options]="branches()"
+                    optionLabel="name"
+                    [ngModel]="selectedPickupBranch()"
+                    (ngModelChange)="selectedPickupBranch.set($event); onDatesOrBranchChanged(); saveDraft()"
+                    placeholder="Şube seç"
+                    [filter]="true"
+                    filterBy="name"
+                    class="w-full">
+                    </p-select>
+                </div>
+
+                <div class="field">
+                  <label>İade Şubesi</label>
+                  <p-select
+                    [options]="branches()"
+                    optionLabel="name"
+                    [ngModel]="selectedReturnBranch()"
+                    (ngModelChange)="selectedReturnBranch.set($event); saveDraft()"
+                    placeholder="Farklı şube (opsiyonel)"
+                    [showClear]="true"
+                    [filter]="true"
+                    filterBy="name"
+                    class="w-full">
+                    </p-select>
+                  <small class="field-hint">Boş bırakılırsa alış şubesi ile aynıdır.</small>
+                </div>
+
+                <div class="field">
+                  <label>Başlangıç Tarihi <span class="required">*</span></label>
+                  <p-datepicker
+                    [ngModel]="plannedStartDate()"
+                    (ngModelChange)="plannedStartDate.set($event); onDatesOrBranchChanged(); saveDraft()"
+                    [minDate]="today"
+                    dateFormat="dd.mm.yy"
+                    placeholder="Başlangıç seç"
+                    appendTo="body"
+                    [panelStyle]="{ width: 'min-content' }"
+                    class="w-full">
+                    </p-datepicker>
+                </div>
+
+                <div class="field">
+                  <label>Bitiş Tarihi <span class="required">*</span></label>
+                  <p-datepicker
+                    [ngModel]="plannedEndDate()"
+                    (ngModelChange)="plannedEndDate.set($event); onDatesOrBranchChanged(); saveDraft()"
+                    [minDate]="minReturnDate()"
+                    dateFormat="dd.mm.yy"
+                    placeholder="Bitiş seç"
+                    appendTo="body"
+                    [panelStyle]="{ width: 'min-content' }"
+                    class="w-full">
+                    </p-datepicker>
+                </div>
+              </div>
+
+              @if (plannedDays() > 0) {
+              <p-message severity="info" icon="ri-information-line"
+                [text]="plannedDays() + ' günlük kiralama'"></p-message>
+              }
+            </div>
+
+            <div class="step-actions">
+              <p-button label="Geri" severity="secondary" (onClick)="activateCallback(1)"></p-button>
+              <p-button label="İleri" icon="ri-arrow-right-line" iconPos="right" [disabled]="!isStep2Valid()"
+                (onClick)="loadAvailableVehicles(); activateCallback(3)"></p-button>
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <!-- ==================== STEP 3: ARAÇ ==================== -->
+        <p-step-panel [value]="3">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <h3>Müsait Araçlar</h3>
+              <p class="step-hint">Seçilen tarih aralığında müsait araçlar listelenir.</p>
+
+              @if (isLoadingVehicles()) {
+              <div class="loading-state">
+                <i class="ri-loader-4-line spin"></i>
+                <span>Araçlar yükleniyor...</span>
+              </div>
+              } @else if (availableVehicles().length === 0) {
+              <div class="empty-state">
+                <i class="ri-car-line"></i>
+                <p>Bu tarihler için müsait araç bulunamadı.</p>
+              </div>
+              } @else {
+              <div class="vehicle-grid">
+                @for (v of availableVehicles(); track v.id) {
+                <div class="vehicle-card" [class.selected]="selectedVehicle()?.id === v.id"
+                  (click)="onVehicleSelected(v)">
+                  <div class="vehicle-image">
+                    @if (v.mainImageUrl) {
+                    <img [src]="getImageUrl(v.mainImageUrl)" [alt]="v.brand + ' ' + v.model" />
+                    } @else {
+                    <i class="ri-car-line placeholder-icon"></i>
+                    }
+                    @if (selectedVehicle()?.id === v.id) {
+                    <div class="selected-badge">
+                      <i class="ri-checkbox-circle-fill"></i>
+                    </div>
+                    }
+                  </div>
+                  <div class="vehicle-info">
+                    <strong>{{ v.brand }} {{ v.model }}</strong>
+                    <small>{{ v.year }} · {{ v.plate }}</small>
+                    <div class="price">
+                      {{ v.dailyPrice | currency: 'TRY' : '₺' : '1.0-2' }}
+                      <span>/ gün</span>
+                    </div>
+                  </div>
+                </div>
+                }
+              </div>
+              }
+            </div>
+
+            <div class="step-actions">
+              <p-button label="Geri" severity="secondary" (onClick)="activateCallback(2)"></p-button>
+              <p-button label="İleri" icon="ri-arrow-right-line" iconPos="right" [disabled]="!isStep3Valid()"
+                (onClick)="activateCallback(4)"></p-button>
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <!-- ==================== STEP 4: EXTRALAR ==================== -->
+        <p-step-panel [value]="4">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <h3>Ekstralar</h3>
+              <p class="step-hint">İsteğe bağlı ekstralar. Seçim yapmadan da devam edebilirsiniz.</p>
+
+              @if (isLoadingExtras()) {
+              <div class="loading-state">
+                <i class="ri-loader-4-line spin"></i>
+                <span>Ekstralar yükleniyor...</span>
+              </div>
+              } @else if (allExtras().length === 0) {
+              <div class="empty-state">
+                <i class="ri-shield-line"></i>
+                <p>Sistemde tanımlı ekstra bulunamadı.</p>
+              </div>
+              } @else {
+              <div class="extras-list">
+                @for (extra of allExtras(); track extra.id) {
+                <div class="extra-row" [class.selected]="isExtraSelected(extra.id)">
+                  <div class="extra-checkbox" (click)="toggleExtra(extra)">
+                    <input type="checkbox" [checked]="isExtraSelected(extra.id)" />
+                    <div class="extra-main">
+                      @if (extra.icon) {
+                      <i [class]="extra.icon"></i>
+                      } @else {
+                      <i class="ri-add-circle-line"></i>
+                      }
+                      <div class="extra-text">
+                        <strong>{{ extra.name }}</strong>
+                        <small>
+                          {{ extra.price | currency: 'TRY' : '₺' : '1.0-2' }}
+                          {{ extra.priceType === 'Daily' ? '/ gün' : '/ kiralama' }}
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (isExtraSelected(extra.id)) {
+                    <div class="extra-quantity">
+                    <p-inputnumber
+                      [ngModel]="getExtraQuantity(extra.id)"
+                      (ngModelChange)="updateExtraQuantity(extra.id, $event)"
+                      [min]="1"
+                      [showButtons]="true"
+                      buttonLayout="horizontal"
+                      [step]="1"
+                      incrementButtonIcon="ri-add-line"
+                      decrementButtonIcon="ri-subtract-line"
+                      class="qty-input">
+                      </p-inputnumber>
+                      <span class="extra-total">
+                        {{ calculateExtraPrice({ extra, quantity: getExtraQuantity(extra.id) }) | currency: 'TRY' : '₺' : '1.0-2' }}
+                      </span>
+                    </div>
+                  }
+                </div>
+                }
+              </div>
+              }
+            </div>
+
+            <div class="step-actions">
+              <p-button label="Geri" severity="secondary" (onClick)="activateCallback(3)"></p-button>
+              <p-button label="İleri" icon="ri-arrow-right-line" iconPos="right"
+                (onClick)="activateCallback(5)"></p-button>
+            </div>
+          </ng-template>
+        </p-step-panel>
+
+        <!-- ==================== STEP 5: ÖZET ==================== -->
+        <p-step-panel [value]="5">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="step-content">
+              <h3>Özet ve Onay</h3>
+
+              <div class="summary-grid">
+                <div class="summary-section">
+                  <div class="summary-item">
+                    <span class="summary-label">Müşteri</span>
+                    <span class="summary-value">{{ getCustomerDisplayName(selectedCustomer()) }}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Araç</span>
+                    <span class="summary-value">
+                      {{ selectedVehicle()?.brand }} {{ selectedVehicle()?.model }}
+                      <small>({{ selectedVehicle()?.plate }})</small>
+                    </span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Alış Şubesi</span>
+                    <span class="summary-value">{{ selectedPickupBranch()?.name ?? '-' }}</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">İade Şubesi</span>
+                    <span class="summary-value">
+                      {{ selectedReturnBranch()?.name ?? selectedPickupBranch()?.name ?? '-' }}
+                    </span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Tarih</span>
+                    <span class="summary-value">
+                      {{ plannedStartDate() | date: 'dd MMM yyyy HH:mm' }} →
+                      {{ plannedEndDate() | date: 'dd MMM yyyy HH:mm' }}
+                      <small>({{ plannedDays() }} gün)</small>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="summary-section price-section">
+                  <div class="price-row">
+                    <span>Araç Tutarı</span>
+                    <span>{{ vehicleTotal() | currency: 'TRY' : '₺' : '1.0-2' }}</span>
+                  </div>
+                  @if (selectedExtras().length > 0) {
+                  @for (se of selectedExtras(); track se.extra.id) {
+                  <div class="price-row extra">
+                    <span>{{ se.extra.name }} (×{{ se.quantity }})</span>
+                    <span>{{ calculateExtraPrice(se) | currency: 'TRY' : '₺' : '1.0-2' }}</span>
+                  </div>
+                  }
+                  }
+                  <p-divider></p-divider>
+                  <div class="price-row total">
+                    <span>TOPLAM</span>
+                    <span>{{ grandTotal() | currency: 'TRY' : '₺' : '1.0-2' }}</span>
+                  </div>
+                  <div class="price-row deposit">
+                    <span>Depozito (%20)</span>
+                    <span>{{ depositAmount() | currency: 'TRY' : '₺' : '1.0-2' }}</span>
+                  </div>
+                  <div class="price-row remaining">
+                    <span>Kalan</span>
+                    <span>{{ remainingAmount() | currency: 'TRY' : '₺' : '1.0-2' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Notlar</label>
+                <textarea
+                  pTextarea
+                  [ngModel]="notes()"
+                  (ngModelChange)="notes.set($event); saveDraft()"
+                  rows="3"
+                  placeholder="Müşteri talebi, özel not... (opsiyonel)"
+                  class="w-full">
+                  </textarea>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <p-button label="Geri" severity="secondary" (onClick)="activateCallback(4)"></p-button>
+              <p-button label="Rezervasyon Oluştur" icon="ri-check-line" [loading]="isSubmitting()"
+                [disabled]="!isAllValid()" (onClick)="submit()"></p-button>
+            </div>
+          </ng-template>
+        </p-step-panel>
+      </p-step-panels>
+    </p-stepper>
+  </p-card>
+</div>

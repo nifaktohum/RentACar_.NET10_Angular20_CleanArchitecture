@@ -166,6 +166,30 @@
         font-size: 0.75rem;
     }
 
+    // ⭐ YENİ: Tarih input'ları için stil
+    input[type="date"] {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 1px solid var(--admin-border);
+        border-radius: 6px;
+        font-size: 0.875rem;
+        color: var(--admin-text);
+        background: var(--admin-white);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        font-family: inherit;
+
+        &:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        &:disabled {
+            background: var(--admin-light);
+            cursor: not-allowed;
+        }
+    }
+
     ::ng-deep {
         .p-inputtext,
         .p-select,
@@ -248,6 +272,52 @@
     }
 }
 
+// ⭐ YENİ: Section header (HTML'de vardı, SCSS'de eksikti)
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+
+    h4 {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--admin-text);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+            color: var(--admin-accent);
+        }
+    }
+
+    .image-count-badge {
+        background: var(--admin-primary);
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+}
+
+// ⭐ YENİ: Hint text (HTML'de vardı, SCSS'de eksikti)
+.hint-text {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0 0 0.75rem 0;
+    font-size: 0.8rem;
+    color: var(--admin-text-muted);
+    font-style: italic;
+
+    i {
+        color: var(--admin-accent);
+    }
+}
+
 .images-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -264,9 +334,15 @@
     cursor: pointer;
 
     &.main-image {
-          cursor: default;
+        cursor: default;
         border-color: #f59e0b;
         box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    }
+
+    // ⭐ YENİ: Tıklanabilir resim hover'ı
+    &.clickable:hover {
+        border-color: var(--admin-accent);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
     .image-wrapper {
@@ -309,6 +385,30 @@
             }
         }
 
+        // ⭐ YENİ: Vitrin Yap overlay'i (HTML'de vardı, SCSS'de eksikti)
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+
+            i {
+                font-size: 1.5rem;
+            }
+        }
+
         .remove-image-btn {
             position: absolute;
             top: 0.25rem;
@@ -334,6 +434,11 @@
                 font-size: 0.8rem;
             }
         }
+    }
+
+    // ⭐ YENİ: Hover'da overlay'i göster
+    &:hover .image-wrapper .image-overlay {
+        opacity: 1;
     }
 
     .image-actions {

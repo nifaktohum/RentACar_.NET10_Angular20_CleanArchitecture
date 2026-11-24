@@ -123,18 +123,45 @@ export class VehicleFormComponent implements OnInit {
   // ==================== FORM INIT ====================
   private initForm(): void {
     this.vehicleForm = this.fb.group({
+      // Temel
       vehicleModelId: ['', [Validators.required]],
       brand: [{ value: '', disabled: true }],
       model: [{ value: '', disabled: true }],
       year: ['', [Validators.required, Validators.pattern(/^\d{4}$/)]],
       plate: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]{2,8}$/)]],
       color: ['', [Validators.required]],
+      branchId: ['', [Validators.required]],                    
+      vinNumber: ['', [Validators.required, Validators.minLength(17), Validators.maxLength(17)]],  
+      engineNumber: ['', [Validators.required]],                
+
+      // Teknik
       fuelType: ['', [Validators.required]],
       transmission: ['', [Validators.required]],
+      tractionType: ['', [Validators.required]],                
+      engineVolume: [0, [Validators.required, Validators.min(0.1)]],  
+      enginePower: [0, [Validators.required, Validators.min(1)]],     
+      fuelConsumption: [0, [Validators.required, Validators.min(0.1)]], 
       seatCount: [4, [Validators.required, Validators.min(1), Validators.max(20)]],
       doorCount: [4, [Validators.required, Validators.min(2), Validators.max(6)]],
+
+      // Ticari
       minAge: [18, [Validators.min(18), Validators.max(99)]],
       dailyPrice: [0, [Validators.required, Validators.min(0)]],
+      depositAmount: [0, [Validators.min(0)]],                  
+      weeklyDiscountRate: [0, [Validators.min(0), Validators.max(100)]],  
+      monthlyDiscountRate: [0, [Validators.min(0), Validators.max(100)]], 
+
+      // Bakım & Durum
+      lastMaintenanceKm: [0, [Validators.min(0)]],              
+      nextMaintenanceKm: [0, [Validators.min(0)]],              
+      lastMaintenanceDate: [null],                              
+      inspectionDate: [null],                                   
+      insuranceEndDate: [null],                                 
+      cascoEndDate: [null],                                     
+      tireStatus: [''],                                         
+      generalStatus: [''],                                      
+
+      // Diğer
       description: ['']
     });
   }
@@ -249,12 +276,30 @@ export class VehicleFormComponent implements OnInit {
       year: vehicle.year,
       plate: vehicle.plate,
       color: vehicle.color,
+      branchId: vehicle.branchId,
+      vinNumber: vehicle.vinNumber,
+      engineNumber: vehicle.engineNumber,
       fuelType: vehicle.fuelType,
       transmission: vehicle.transmission,
+      tractionType: vehicle.tractionType,
+      engineVolume: vehicle.engineVolume,
+      enginePower: vehicle.enginePower,
+      fuelConsumption: vehicle.fuelConsumption,
       seatCount: vehicle.seatCount,
       doorCount: vehicle.doorCount,
       minAge: vehicle.minAge,
       dailyPrice: vehicle.dailyPrice,
+      depositAmount: vehicle.depositAmount,
+      weeklyDiscountRate: vehicle.weeklyDiscountRate,
+      monthlyDiscountRate: vehicle.monthlyDiscountRate,
+      lastMaintenanceKm: vehicle.lastMaintenanceKm,
+      nextMaintenanceKm: vehicle.nextMaintenanceKm,
+      lastMaintenanceDate: vehicle.lastMaintenanceDate ? new Date(vehicle.lastMaintenanceDate) : null,
+      inspectionDate: vehicle.inspectionDate ? new Date(vehicle.inspectionDate) : null,
+      insuranceEndDate: vehicle.insuranceEndDate ? new Date(vehicle.insuranceEndDate) : null,
+      cascoEndDate: vehicle.cascoEndDate ? new Date(vehicle.cascoEndDate) : null,
+      tireStatus: vehicle.tireStatus,
+      generalStatus: vehicle.generalStatus,
       description: vehicle.description
     });
 
@@ -475,16 +520,18 @@ export class VehicleFormComponent implements OnInit {
   // ==================== UPDATE ====================
   private updateVehicle(): void {
     const id = this.vehicleId();
-    if (!id) return;
+    const v = this.vehicle();  // mevcut araç verisi (artık tüm alanlar var)
+    if (!id || !v) return;
 
     const request: UpdateVehicleRequest = {
       id: id,
-      vehicleModelId: this.vehicleForm.getRawValue().vehicleModelId,
+      // Form'dan gelenler (kullanıcı değiştirebilir)
       brand: this.vehicleForm.getRawValue().brand,
       model: this.vehicleForm.getRawValue().model,
       year: this.vehicleForm.value.year,
       plate: this.vehicleForm.value.plate,
       color: this.vehicleForm.value.color,
+      vehicleModelId: this.vehicleForm.getRawValue().vehicleModelId,
       fuelType: this.vehicleForm.value.fuelType,
       transmission: this.vehicleForm.value.transmission,
       seatCount: this.vehicleForm.value.seatCount,
@@ -492,7 +539,27 @@ export class VehicleFormComponent implements OnInit {
       minAge: this.vehicleForm.value.minAge || null,
       dailyPrice: this.vehicleForm.value.dailyPrice,
       description: this.vehicleForm.value.description || null,
-      isActive: this.vehicle()?.isActive ?? true,
+
+      // Form'da olmayanlar — mevcut değerlerden al
+      branchId: v.branchId,
+      vinNumber: v.vinNumber,
+      engineNumber: v.engineNumber,
+      tractionType: v.tractionType,
+      engineVolume: v.engineVolume,
+      enginePower: v.enginePower,
+      fuelConsumption: v.fuelConsumption,
+      depositAmount: v.depositAmount,
+      weeklyDiscountRate: v.weeklyDiscountRate,
+      monthlyDiscountRate: v.monthlyDiscountRate,
+      lastMaintenanceKm: v.lastMaintenanceKm,
+      nextMaintenanceKm: v.nextMaintenanceKm,
+      lastMaintenanceDate: v.lastMaintenanceDate,
+      inspectionDate: v.inspectionDate,
+      insuranceEndDate: v.insuranceEndDate,
+      cascoEndDate: v.cascoEndDate,
+      tireStatus: v.tireStatus,
+      generalStatus: v.generalStatus,
+      isActive: v.isActive,
     };
 
     this.vehicleService.update(request)
@@ -503,7 +570,6 @@ export class VehicleFormComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.isSuccessful) {
-            // ⭐ Yeni resimler varsa yükle
             if (this.additionalFiles().length > 0) {
               this.uploadAdditionalImages(id);
             } else {
@@ -520,7 +586,6 @@ export class VehicleFormComponent implements OnInit {
         }
       });
   }
-
   // ==================== EK RESİM YÜKLE ====================
   private uploadAdditionalImages(vehicleId: string): void {
     const files = this.additionalFiles();
@@ -601,8 +666,16 @@ export class VehicleFormComponent implements OnInit {
       if (fieldName === 'year') return 'Geçerli bir yıl giriniz (örn: 2024).';
       if (fieldName === 'plate') return 'Geçerli bir plaka giriniz (örn: 34ABC123).';
     }
+    if (control.hasError('minlength') && fieldName === 'vinNumber') return 'Şasi numarası 17 karakter olmalıdır.';
+    if (control.hasError('maxlength') && fieldName === 'vinNumber') return 'Şasi numarası 17 karakter olmalıdır.';
     if (control.hasError('min')) {
       if (fieldName === 'dailyPrice') return 'Fiyat 0\'dan büyük olmalıdır.';
+      if (fieldName === 'engineVolume') return 'Motor hacmi 0\'dan büyük olmalıdır.';
+      if (fieldName === 'enginePower') return 'Motor gücü 0\'dan büyük olmalıdır.';
+      if (fieldName === 'fuelConsumption') return 'Yakıt tüketimi 0\'dan büyük olmalıdır.';
+    }
+    if (control.hasError('max') && (fieldName === 'weeklyDiscountRate' || fieldName === 'monthlyDiscountRate')) {
+      return 'İndirim oranı 0-100 arasında olmalıdır.';
     }
     return 'Geçersiz değer.';
   }

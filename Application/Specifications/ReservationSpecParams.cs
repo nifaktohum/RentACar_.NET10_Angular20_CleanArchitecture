@@ -46,6 +46,83 @@ public record ReservationSpecParams : BasePagedRequest
     set => _status = value;
   }
 
+  // ============ ⭐ ÇOKLU DURUM FİLTRESİ (YENİ) ============
+  // Kullanım: ?statuses=PendingPayment,Confirmed,Active
+  // Virgülle ayrılmış string VEYA dizi olarak gelebilir.
+  private List<ReservationStatus> _statuses = [];
+  public List<ReservationStatus> Statuses
+  {
+    get => _statuses;
+    set
+    {
+      if (value == null || value.Count == 0)
+      {
+        _statuses = [];
+        return;
+      }
+
+      // Enum olarak gelirse direkt kullan
+      if (value.All(v => Enum.IsDefined(typeof(ReservationStatus), v)))
+      {
+        _statuses = value.Distinct().ToList();
+      }
+      else
+      {
+        _statuses = [];
+      }
+    }
+  }
+
+  // ⭐ Query string'den gelen "PendingPayment,Confirmed,Active" gibi
+  // virgülle ayrılmış string'i parse eden yardımcı property.
+  // ASP.NET Core model binding, "statuses" parametresini önce List<ReservationStatus>'a
+  // çevirmeye çalışır. Başaramazsa bu property devreye girer.
+  public string? StatusesRaw
+  {
+    get => _statuses.Count == 0 ? null : string.Join(",", _statuses.Select(s => s.ToString()));
+    set
+    {
+      if (string.IsNullOrWhiteSpace(value))
+      {
+        _statuses = [];
+        return;
+      }
+
+      _statuses = value
+          .Split(',', StringSplitOptions.RemoveEmptyEntries)
+          .Select(s => s.Trim())
+          .Where(s => !string.IsNullOrEmpty(s))
+          .Select(s => Enum.TryParse<ReservationStatus>(s, ignoreCase: true, out var parsed) ? parsed : (ReservationStatus?)null)
+          .Where(s => s.HasValue)
+          .Select(s => s!.Value)
+          .Distinct()
+          .ToList();
+    }
+  }
+
+  // ============ ⭐ AKTİF SÜREÇ FİLTRESİ (YENİ) ============
+  // true ise sadece "para güvenceye alınmış" rezervasyonlar döner:
+  //   - Confirmed + DepositPaid (kaporası alınmış, tam ödeme beklemede)
+  //   - Confirmed + FullPaymentPaid (tam ödemesi alınmış)
+  //   - Active (kirada)
+  private bool? _activeOnly;
+  public bool? ActiveOnly
+  {
+    get => _activeOnly;
+    set => _activeOnly = value;
+  }
+
+  // ⭐ ALT FİLTRE (opsiyonel)
+  // "deposit" → sadece Kaporası Alınmış
+  // "full"    → sadece Tam Ödemesi Alınmış
+  // "active"  → sadece Kirada
+  // null      → 3'ü birden
+  private string? _paymentFilter;
+  public string? PaymentFilter
+  {
+    get => _paymentFilter;
+    set => _paymentFilter = string.IsNullOrWhiteSpace(value) ? null : value.Trim().ToLower();
+  }
   // ============ TARİH FİLTRELERİ ============
   private DateTimeOffset? _startDate;
   public DateTimeOffset? StartDate

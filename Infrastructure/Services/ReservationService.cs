@@ -266,6 +266,7 @@ public sealed class ReservationService(
         TotalPrice: r.TotalPrice,
         DepositAmount: r.DepositAmount,
         DepositPaid: r.DepositPaid,
+        FullPaymentPaid: r.FullPaymentPaid,
         CreatedAt: r.CreatedAt
     )).ToList();
   }

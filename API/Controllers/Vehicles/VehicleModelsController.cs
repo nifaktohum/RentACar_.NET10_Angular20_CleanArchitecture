@@ -10,6 +10,7 @@ namespace API.Controllers.Vehicles;
 public class VehicleModelsController : BaseApiController
 {
   [HttpGet("get-all")]
+  [AllowAnonymous]
   public async Task<IActionResult> GetList([FromQuery] GetAllVehicleModelsQuery query)
   {
     var result = await Mediator.Send(query);
@@ -17,6 +18,7 @@ public class VehicleModelsController : BaseApiController
   }
 
   [HttpGet("get-by-id/{id}")]
+  [AllowAnonymous]
   public async Task<IActionResult> GetById(Guid id, CancellationToken token)
   {
     var command = new GetVehicleModelByIdQuery(id);

@@ -339,15 +339,13 @@ public sealed class Vehicle : BaseEntity
     if (startDate >= endDate)
       throw new DomainValidationException("Başlangıç tarihi bitiş tarihinden önce olmalı!");
 
-    // Araç aktif ve silinmemiş olmalı (anlık Status'a BAKMA)
     if (!IsActive || IsDeleted)
       return false;
 
     var now = DateTimeOffset.UtcNow;
 
     return !Reservations.Any(r =>
-        r.IsActive && !r.IsDeleted &&
-        IsBlockingStatus(r, now) &&
+        r.IsBlocking(now) &&
         r.PlannedStartDate < endDate &&
         r.PlannedEndDate > startDate);
   }

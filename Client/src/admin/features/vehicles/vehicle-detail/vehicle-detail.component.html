@@ -1,3 +1,5 @@
+<!-- vehicle-detail.component.html -->
+
 <div class="vehicle-detail-container">
   <!-- @if (isLoading()) {
   <div class="loading-state">
@@ -112,6 +114,16 @@
               <span class="info-label">Günlük Fiyat</span>
               <span class="info-value price-value">{{ vehicle()!.dailyPrice | currency:'TRY':'₺':'1.0-2' }}</span>
             </div>
+            <!-- YENİ: Şasi No -->
+            <div class="info-item">
+              <span class="info-label">Şasi No (VIN)</span>
+              <span class="info-value">{{ vehicle()!.vinNumber || '-' }}</span>
+            </div>
+            <!-- YENİ: Motor No -->
+            <div class="info-item">
+              <span class="info-label">Motor No</span>
+              <span class="info-value">{{ vehicle()!.engineNumber || '-' }}</span>
+            </div>
           </div>
         </div>
 
@@ -141,6 +153,91 @@
             <div class="info-item">
               <span class="info-label">Minimum Yaş</span>
               <span class="info-value">{{ vehicle()!.minAge || '-' }}</span>
+            </div>
+            <!-- YENİ: Çekiş Tipi -->
+            <div class="info-item">
+              <span class="info-label">Çekiş Tipi</span>
+              <span class="info-value">{{ vehicle()!.tractionType || '-' }}</span>
+            </div>
+            <!-- YENİ: Motor Hacmi -->
+            <div class="info-item">
+              <span class="info-label">Motor Hacmi</span>
+              <span class="info-value">{{ vehicle()!.engineVolume ? vehicle()!.engineVolume + ' L' : '-' }}</span>
+            </div>
+            <!-- YENİ: Motor Gücü -->
+            <div class="info-item">
+              <span class="info-label">Motor Gücü</span>
+              <span class="info-value">{{ vehicle()!.enginePower ? vehicle()!.enginePower + ' HP' : '-' }}</span>
+            </div>
+            <!-- YENİ: Yakıt Tüketimi -->
+            <div class="info-item">
+              <span class="info-label">Yakıt Tüketimi</span>
+              <span class="info-value">{{ vehicle()!.fuelConsumption ? vehicle()!.fuelConsumption + ' L/100km' : '-'
+                }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- YENİ: Ticari Bilgiler -->
+        <div class="info-group">
+          <h3 class="info-title">
+            <i class="ri-money-dollar-circle-line"></i>
+            Ticari Bilgiler
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Depozito</span>
+              <span class="info-value">{{ vehicle()!.depositAmount | currency:'TRY':'₺':'1.0-2' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Haftalık İndirim</span>
+              <span class="info-value">{{ vehicle()!.weeklyDiscountRate }}%</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Aylık İndirim</span>
+              <span class="info-value">{{ vehicle()!.monthlyDiscountRate }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- YENİ: Bakım & Yasal Bilgiler -->
+        <div class="info-group">
+          <h3 class="info-title">
+            <i class="ri-tools-line"></i>
+            Bakım & Yasal Bilgiler
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Son Bakım KM</span>
+              <span class="info-value">{{ vehicle()!.lastMaintenanceKm | number }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Sonraki Bakım KM</span>
+              <span class="info-value">{{ vehicle()!.nextMaintenanceKm | number }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Son Bakım Tarihi</span>
+              <span class="info-value">{{ vehicle()!.lastMaintenanceDate | date:'dd.MM.yyyy' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Muayene Bitiş</span>
+              <span class="info-value">{{ vehicle()!.inspectionDate | date:'dd.MM.yyyy' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Trafik Sigortası Bitiş</span>
+              <span class="info-value">{{ vehicle()!.insuranceEndDate | date:'dd.MM.yyyy' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Kasko Bitiş</span>
+              <span class="info-value">{{ vehicle()!.cascoEndDate | date:'dd.MM.yyyy' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Lastik Durumu</span>
+              <span class="info-value">{{ vehicle()!.tireStatus || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Genel Durum</span>
+              <span class="info-value">{{ vehicle()!.generalStatus || '-' }}</span>
             </div>
           </div>
         </div>

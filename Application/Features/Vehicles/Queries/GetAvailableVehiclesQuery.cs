@@ -2,6 +2,7 @@ using Application.Common.Models;
 using Application.Features.Vehicles.Dto;
 using Application.Features.Vehicles.Specifications;
 using Application.Specifications;
+using Domain.Entities.Vehicles;
 using Domain.Repositories.Vehicles;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,39 +24,47 @@ public sealed class GetAvailableVehiclesQueryHandler(
     {
       _logger.LogInformation("🔍 Müsait araçlar getiriliyor...");
 
-      // 1. Specification oluştur
+      // 1. Specification (Criteria + Include + Distinct + Sorting + Paging)
       var spec = new AvailableVehiclesSpecification(_req);
 
-      // 2. Query'yi hazırla
-      var query = spec.Criteria != null
-          ? _vehicleRepo.Where(spec.Criteria)
-          : _vehicleRepo.GetAll();
+      // 2. Base query
+      var query = _vehicleRepo.Where(spec.Criteria).AsNoTracking();
 
-      // 3. Include'ları ekle (AsNoTracking ile performansı artırıyoruz)
-      query = query
-          .AsNoTracking()
-          .Include(v => v.VehicleModel).ThenInclude(vm => vm.VehicleType)
-          .Include(v => v.Images.Where(i => i.IsActive && !i.IsDeleted));
+      // 3. Include'ları specification'dan uygula
+      foreach (var include in spec.Includes)
+        query = query.Include(include);
 
-      // 4. Sıralama (Sıralamayı Include'den sonra yapıyoruz)
+      // 4. Distinct (Images include'u duplicate getirebilir)
+      if (spec.IsDistinct)
+        query = query.Distinct();
+
+      _logger.LogInformation("🔍 Üretilen SQL: {Sql}", query.ToQueryString());
+
+      _logger.LogInformation("🔍 Start={Start} End={End}", _req.StartDate, _req.EndDate);
+
+      // 5. Toplam sayı (sayfalamadan ÖNCE, Distinct SONRASI)
+      var totalCount = await query.CountAsync(_token);
+
+      // 6. Sıralama
       if (spec.OrderBy != null)
         query = query.OrderBy(spec.OrderBy);
       else if (spec.OrderByDescending != null)
         query = query.OrderByDescending(spec.OrderByDescending);
+      else if (spec.ThenBy != null)
+        query = ((IOrderedQueryable<Vehicle>)query).ThenBy(spec.ThenBy);
+      else if (spec.ThenByDescending != null)
+        query = ((IOrderedQueryable<Vehicle>)query).ThenByDescending(spec.ThenByDescending);
 
-      // 5. Toplam sayı (Sayfalamadan ÖNCE)
-      var totalCount = await query.CountAsync(_token);
-
-      // 6. Sayfalama
+      // 7. Sayfalama
       if (spec.IsPagingEnabled)
         query = query.Skip(spec.Skip).Take(spec.Take);
 
-      // 7. Veriyi veritabanından çek (Belleğe alıyoruz)
+      // 8. Veriyi çek
       var vehicles = await query.ToListAsync(_token);
 
-      _logger.LogInformation("✅ {Count} adet müsait araç başarıyla getirildi.", vehicles.Count);
+      _logger.LogInformation("✅ {Count} adet müsait araç getirildi (total: {Total}).", vehicles.Count, totalCount);
 
-      // 8. Mapping (Veri belleğe alındığı için Domain metotları burada sorunsuz çalışır)
+      // 9. Mapping (bellekte — domain metotları sorunsuz çalışır)
       var vehicleDtos = vehicles.Select(v => new VehicleListDto(
           v.Id,
           v.Brand,
@@ -75,7 +84,7 @@ public sealed class GetAvailableVehiclesQueryHandler(
           v.Status.ToString(),
           v.IsAvailable,
           v.VehicleModel?.VehicleType?.Name ?? "Belirtilmemiş",
-          v.GetMainImageUrl() ?? string.Empty, // Artık bellekte olduğu için hata vermez
+          v.GetMainImageUrl() ?? string.Empty,
           v.IsActive,
           v.CreatedAt
       )).ToList();
@@ -91,11 +100,9 @@ public sealed class GetAvailableVehiclesQueryHandler(
     }
     catch (Exception ex)
     {
-      // Hatanın detayını görmek için loga yazdırıyoruz
-      _logger.LogError(ex, "❌ Müsait araçlar getirilirken bir hata oluştu! Hata Detayı: {Message}", ex.Message);
-
-      // Hata mesajını API'ye dönüyoruz ki ne olduğunu görebilelim
-      return Result<PagedResponse<VehicleListDto>>.Failure($"Müsait araçlar getirilirken hata oluştu: {ex.Message} | Inner: {ex.InnerException?.Message}");
+      _logger.LogError(ex, "❌ Müsait araçlar getirilirken hata oluştu.");
+      // Kullanıcıya iç detay sızdırma
+      return Result<PagedResponse<VehicleListDto>>.Failure("Müsait araçlar getirilirken bir hata oluştu.");
     }
   }
 }

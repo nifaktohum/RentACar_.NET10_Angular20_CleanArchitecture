@@ -1,9 +1,11 @@
 // reservations.component.scss
 
 ::ng-deep .reservations-container {
-  padding: 1rem;
-  max-width: 100%;
-  margin: 0 auto;
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  min-height: 100vh;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
 
   .p-card {
     background: var(--admin-white);
@@ -11,9 +13,121 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 
     .p-card-body {
-      padding: 1.5rem 2rem;
+      padding: 10px !important;
     }
   }
+
+  .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--admin-white);
+  border-radius: 12px;
+  border: 1px solid var(--admin-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    i {
+      font-size: 1.4rem;
+    }
+  }
+
+  .stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--admin-text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--admin-text);
+      line-height: 1.2;
+    }
+  }
+
+  // Duruma göre renkler
+  &.stat-total {
+    &::before { background: var(--admin-primary); }
+    .stat-icon {
+      background: rgba(59, 130, 246, 0.1);
+      i { color: var(--admin-primary); }
+    }
+  }
+
+  &.stat-confirmed {
+    &::before { background: #10b981; }
+    .stat-icon {
+      background: rgba(16, 185, 129, 0.1);
+      i { color: #10b981; }
+    }
+  }
+
+  &.stat-pending {
+    &::before { background: #f59e0b; }
+    .stat-icon {
+      background: rgba(245, 158, 11, 0.1);
+      i { color: #f59e0b; }
+    }
+  }
+
+  &.stat-active {
+    &::before { background: #8b5cf6; }
+    .stat-icon {
+      background: rgba(139, 92, 246, 0.1);
+      i { color: #8b5cf6; }
+    }
+  }
+}
+
+}
 
 
 // ==================== HEADER ====================
@@ -136,13 +250,14 @@
 .table-wrapper {
   .p-datatable {
     .p-datatable-thead > tr > th {
-      background: var(--admin-light);
-      color: var(--admin-text);
-      font-weight: 600;
-      font-size: var(--font-size-sm);
-      padding: 0.75rem 0.75rem;
-      border-bottom: 1px solid var(--admin-border);
       white-space: nowrap;
+      text-align: start;
+      vertical-align: middle;
+      padding: 0.75rem 0.75rem;
+      font-weight: 600;
+      background: var(--admin-primary);
+      color: var(--admin-white);
+      border-bottom: 2px solid var(--surface-border);
     }
 
     .p-datatable-tbody > tr {
@@ -510,3 +625,12 @@
     overflow-x: auto;
   }
 }
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ==================================================
+

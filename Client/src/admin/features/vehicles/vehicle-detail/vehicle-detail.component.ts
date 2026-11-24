@@ -11,7 +11,7 @@ import { BreadcrumbService } from '../../../core/services/breadcrumb.service';
 import { VehicleImageService } from '../../../core/services/vehicle-image.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
 import { CustomConfirmDialogService } from '../../../shared/services/custom-confirm-dialog.service';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { DividerModule } from 'primeng/divider';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
@@ -24,6 +24,7 @@ import { CardModule } from 'primeng/card';
     CurrencyPipe,
     DividerModule,
     ButtonModule,
+    DecimalPipe,
     TagModule,
     CardModule
   ],

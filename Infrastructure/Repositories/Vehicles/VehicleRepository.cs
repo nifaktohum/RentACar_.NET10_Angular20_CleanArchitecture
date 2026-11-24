@@ -3,6 +3,7 @@ using Application.Common.Extensions;
 using Domain.Entities.Vehicles;
 using Domain.Repositories;
 using Domain.Repositories.Vehicles;
+using Domain.Specifications;
 using GenericRepository;
 using Infrastructure.Context;
 using Infrastructure.Specifications;
@@ -20,6 +21,12 @@ public sealed class VehicleRepository : Repository<Vehicle, AppDbContext>, IVehi
   }
 
   // ==================== ÖZEL SORGULAR ====================
+
+
+  public async Task<List<Vehicle>> GetAsync(BaseSpecification<Vehicle> spec, CancellationToken cancellationToken = default)
+  {
+    return await _context.Vehicles.ApplySpecification(spec).ToListAsync(cancellationToken);
+  }
 
   public async Task<Vehicle?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
   {

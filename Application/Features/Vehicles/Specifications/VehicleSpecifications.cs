@@ -6,6 +6,7 @@ using Application.Specifications;
 using Domain.Specifications;
 using Application.Common.Extensions;
 using LinqKit;
+using Domain.Entities.Reservations;
 
 namespace Application.Features.Vehicles.Specifications;
 
@@ -19,8 +20,8 @@ public sealed class GetAllVehiclesSpecification : BaseSpecification<Vehicle>
   // Dışarıdan kriter almıyoruz, müsaitlik kuralını kendimiz veriyoruz.
 
   // 1. TÜM MÜSAİT ARAÇLAR
-public GetAllVehiclesSpecification(VehicleSpecParams? specParams)
-         : base(VehicleFilterExtensions.BuildFilter(specParams, includeAll: true))// includeAll: true ==> Tüm Araçları getir. musait olmayanlarda!
+  public GetAllVehiclesSpecification(VehicleSpecParams? specParams)
+           : base(VehicleFilterExtensions.BuildFilter(specParams, includeAll: true))// includeAll: true ==> Tüm Araçları getir. musait olmayanlarda!
   {
     AddInclude(v => v.VehicleModel);
     AddInclude(v => v.VehicleModel.VehicleType);
@@ -31,29 +32,77 @@ public GetAllVehiclesSpecification(VehicleSpecParams? specParams)
     // Sort bilgisini de doğrudan specParams içinden alıyoruz!
     this.ApplyVehicleSorting(specParams?.Sort);
     this.ApplyPaging(specParams ?? new VehicleSpecParams());
-  
+
   }
 }
+
+
+
+/*
+    public sealed class AvailableVehiclesSpecification : BaseSpecification<Vehicle>
+    {
+      // Dışarıdan kriter almıyoruz, müsaitlik kuralını kendimiz veriyoruz.
+
+      // 1. TÜM MÜSAİT ARAÇLAR
+      public AvailableVehiclesSpecification(VehicleSpecParams? specParams)
+            : base(VehicleFilterExtensions.BuildFilter(specParams))
+      {
+        AddInclude(v => v.VehicleModel);
+        AddInclude(v => v.VehicleModel.VehicleType);
+        AddInclude(v => v.Images.Where(i => !i.IsDeleted));
+
+        this.ApplyDistinct();
+
+        // Sort bilgisini de doğrudan specParams içinden alıyoruz!
+        this.ApplyVehicleSorting(specParams?.Sort);
+        this.ApplyPaging(specParams ?? new VehicleSpecParams());
+      }
+    }
+*/
+
 
 public sealed class AvailableVehiclesSpecification : BaseSpecification<Vehicle>
 {
-  // Dışarıdan kriter almıyoruz, müsaitlik kuralını kendimiz veriyoruz.
-
-  // 1. TÜM MÜSAİT ARAÇLAR
   public AvailableVehiclesSpecification(VehicleSpecParams? specParams)
-         : base(VehicleFilterExtensions.BuildFilter(specParams))
+      : base(BuildCriteria(specParams))
   {
     AddInclude(v => v.VehicleModel);
     AddInclude(v => v.VehicleModel.VehicleType);
-    AddInclude(v => v.Images.Where(i => !i.IsDeleted));
+    AddInclude(v => v.Images.Where(i => i.IsActive && !i.IsDeleted));
 
     this.ApplyDistinct();
-
-    // Sort bilgisini de doğrudan specParams içinden alıyoruz!
     this.ApplyVehicleSorting(specParams?.Sort);
     this.ApplyPaging(specParams ?? new VehicleSpecParams());
   }
+
+  private static Expression<Func<Vehicle, bool>> BuildCriteria(VehicleSpecParams? specParams)
+  {
+    var criteria = VehicleFilterExtensions.BuildFilter(specParams);
+
+    if (specParams?.StartDate.HasValue == true && specParams?.EndDate.HasValue == true)
+    {
+      var start = specParams.StartDate.Value;   // DateTimeOffset (UTC)
+      var end = specParams.EndDate.Value;       // DateTimeOffset (UTC)
+      var now = DateTimeOffset.UtcNow;
+
+      criteria = criteria.And(v => !v.Reservations.Any(r =>
+          !r.IsDeleted &&
+          r.IsActive &&
+          (
+              r.Status == ReservationStatus.Active ||
+              (r.Status == ReservationStatus.Confirmed && r.FullPaymentPaid) ||
+              (r.Status == ReservationStatus.Confirmed && r.DepositLockDeadline > now) ||
+              (r.Status == ReservationStatus.PendingPayment && r.PaymentDeadline > now)
+          ) &&
+          r.PlannedStartDate < end &&
+          r.PlannedEndDate > start
+      ));
+    }
+
+    return criteria;
+  }
 }
+
 
 // ✅ TÜM TİPLER
 public sealed class GetAllVehicleTypesSpecification : BaseSpecification<VehicleType>
@@ -433,14 +482,14 @@ public sealed class VehicleStatisticsSpecification : BaseSpecification<Vehicle>
 public sealed class VehiclesForReportSpecification : BaseSpecification<Vehicle>
 {
   public VehiclesForReportSpecification(VehicleSpecParams? specParams)
-                  : base(VehicleFilterExtensions.BuildFilter(specParams, includeAll: true)) 
-                  // Tüm araçlar (IsAvailable filtreleme yok)
-                  // : base(v => !v.IsDeleted
-                  //             && (!isActive.HasValue || v.IsActive == isActive.Value)
-                  //             && (string.IsNullOrWhiteSpace(fuelType) || v.FuelType.ToLower() == fuelType.ToLower())
-                  //             && (string.IsNullOrWhiteSpace(transmission) || v.Transmission.ToLower() == transmission.ToLower())
-                  //             && (!startDate.HasValue || v.CreatedAt >= startDate.Value)
-                  //             && (!endDate.HasValue || v.CreatedAt <= endDate.Value))
+                  : base(VehicleFilterExtensions.BuildFilter(specParams, includeAll: true))
+  // Tüm araçlar (IsAvailable filtreleme yok)
+  // : base(v => !v.IsDeleted
+  //             && (!isActive.HasValue || v.IsActive == isActive.Value)
+  //             && (string.IsNullOrWhiteSpace(fuelType) || v.FuelType.ToLower() == fuelType.ToLower())
+  //             && (string.IsNullOrWhiteSpace(transmission) || v.Transmission.ToLower() == transmission.ToLower())
+  //             && (!startDate.HasValue || v.CreatedAt >= startDate.Value)
+  //             && (!endDate.HasValue || v.CreatedAt <= endDate.Value))
   {
     AddInclude(v => v.VehicleModel);
     AddInclude(v => v.VehicleModel.VehicleType);
